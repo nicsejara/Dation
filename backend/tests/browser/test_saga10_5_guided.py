@@ -406,6 +406,7 @@ class Saga10GuidedTests(unittest.IsolatedAsyncioTestCase):
         await node.get_by_role('button',name='Agregar pareja de co-carga',exact=True).click()
         await node.get_by_label('Categoría A',exact=True).fill('SECO');await node.get_by_label('Categoría B',exact=True).fill('FRIO')
         await node.locator('[name=dimensions][value=pallets]').uncheck()
+        await self.page.locator('[data-dation-test=model-create]').dispatch_event('click')
         await expect(node.get_by_label('Dimensión principal de reporte',exact=True)).to_have_attribute('aria-invalid','true')
         await expect(self.page.locator('[data-dation-test=model-create]')).to_be_disabled()
         await node.get_by_label('Dimensión principal de reporte',exact=True).select_option('weight_kg')

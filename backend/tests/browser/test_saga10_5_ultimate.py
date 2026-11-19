@@ -47,7 +47,9 @@ class UltimateProTests(unittest.IsolatedAsyncioTestCase):
     async def confirm(self):
         for i in [1,2,4,5,3]:
             node=await legacy.block(self.page,i);cta=node.locator('[data-confirm-block="'+str(i)+'"]')
-            await expect(cta).to_be_enabled();await cta.click()
+            await expect(cta).to_be_enabled()
+            if i==3:await expect(cta).to_have_attribute('data-preview-current','true')
+            await cta.click()
         await expect(self.page.locator('[data-dation-test=model-create]')).to_be_enabled()
 
     async def publish(self):
@@ -161,7 +163,9 @@ print('D1_WEIGHT_PRIMARY_NO_HIDDEN_PALLETS_AND_SPLIT_PASS')
         self.assertEqual({p['logistic_unit_id'] for p in c['presentations']},{unit});self.assertTrue(all(len(p['components'])==1 for p in c['presentations']))
         await self.page.locator('[data-dation-test=core-step-1]').click();await self.ready(1)
         await expect(self.page.locator('.model-wizard-v2 input:not(:disabled):not([data-guided-ui])')).to_have_count(0)
-        self.assertEqual(await self.page.locator('.model-wizard-v2 input:not(:disabled)').evaluate_all('(ns)=>ns.map(n=>n.name)'),['cargo_search'])
+        self.assertEqual(await self.page.locator('.model-wizard-v2 input:not(:disabled)').evaluate_all('(ns)=>ns.map(n=>n.name)'),[])
+        await expect(self.page.get_by_label('Soporte compartido',exact=True)).to_be_disabled()
+        await expect(self.page.get_by_label('Producto de esta presentación',exact=True)).to_be_disabled()
         await expect(self.page.locator('[data-model-new]')).to_be_enabled()
         self.assertEqual(self.errors,[])
 
@@ -210,7 +214,8 @@ print('D1_WEIGHT_PRIMARY_NO_HIDDEN_PALLETS_AND_SPLIT_PASS')
         self.page.on('request',lambda r:writes.append(r.url) if r.method=='POST' and ('/versions' in r.url or r.url.endswith('/logistics-models')) else None)
         identity=await legacy.block(self.page,1);await identity.locator('>summary').click()
         await self.page.get_by_role('button',name='Crear nuevo modelo',exact=True).click()
-        name=self.page.get_by_label('Nombre del modelo *',exact=True);await expect(name).to_be_focused();await expect(name).to_have_value('QA Logistics Orange')
+        await self.page.get_by_role('dialog').get_by_role('button',name='Cancelar',exact=True).click()
+        name=self.page.get_by_label('Nombre del modelo *',exact=True);await legacy.block(self.page,1);await expect(name).to_have_value('QA Logistics Orange')
         await name.press('Enter');self.assertEqual(writes,[])
         entered=asyncio.Event();release=asyncio.Event()
         async def hold(route):
@@ -221,7 +226,7 @@ print('D1_WEIGHT_PRIMARY_NO_HIDDEN_PALLETS_AND_SPLIT_PASS')
         await self.page.route('**/logistics-models/contract-preview',hold)
         await second.get_by_label('Bultos por unidad logística *',exact=True).fill('81');await asyncio.wait_for(entered.wait(),10)
         await second.get_by_label('Bultos por unidad logística *',exact=True).fill('1.5');release.set()
-        await expect(self.page.locator('[data-dation-test=model-create]')).to_be_disabled();await expect(self.page.locator('[data-confirm-block="3"]')).to_be_disabled()
+        await expect(self.page.locator('[data-dation-test=model-create]')).to_be_disabled();await expect(self.page.locator('[data-confirm-block="3"]')).to_have_attribute('data-preview-current','false')
         await second.get_by_label('Bultos por unidad logística *',exact=True).fill('80');await self.confirm()
         cta=self.page.locator('[data-confirm-block="3"]');before=len(previews);await cta.dblclick();self.assertEqual(len(previews),before);self.assertEqual(writes,[])
         await self.page.unroute('**/logistics-models/contract-preview',hold)
@@ -244,7 +249,8 @@ print('D1_WEIGHT_PRIMARY_NO_HIDDEN_PALLETS_AND_SPLIT_PASS')
         await expect(self.page.locator('[data-dation-test=model-create]')).to_be_disabled()
         await expect(self.page.locator('[data-dation-test=cargo-physical-preview]')).to_contain_text('1.8')
         await third.locator('label').filter(has=self.page.locator('[name=dimensions][value=volume_m3]')).click()
-        await expect(self.page.locator('[data-confirm-block="3"]')).to_be_disabled()
+        await expect(self.page.locator('[data-confirm-block="3"]')).to_have_attribute('data-preview-current','false')
+        await self.page.locator('[data-confirm-block="3"]').click()
         await expect(self.page.locator('[data-error-for=cargo_catalog]')).to_contain_text('dimensión principal')
         await third.locator('label').filter(has=self.page.locator('[name=dimensions][value=volume_m3]')).click()
         await third.locator('label').filter(has=self.page.locator('[name=cargo_split_policy][value=DISCRETE]')).click()
@@ -275,7 +281,7 @@ print('D1_WEIGHT_PRIMARY_NO_HIDDEN_PALLETS_AND_SPLIT_PASS')
           const configuration={version:2,operating_role:'SHIPPER',transport_pattern:'DIRECT',consolidation_permitted:false,allowed_sources:['OWN'],resource_categories:[],active_dimensions:['pallets','weight_kg'],primary_dimension:'pallets',split_permitted:false,homogeneous_loads_declared:false,currency_policy:{currency:'BRL',minor_units:5,rounding:'ROUND_HALF_UP'},own_cost_model:'OWN_OPERATING_CYCLE',external_cost_models:[],per_km_billing_bases:[],cargo:{profile:'MIXED',input_mode:'catalog',split_policy:'INDIVISIBLE',compatibility_policy:'CATEGORIZED',co_load_pairs:[['SECO','FRIO']],products:[{product_id:'A',name:'A',unit_label:'sobre',units_per_package:216,compatibility_groups:['SECO']},{product_id:'B',name:'B',unit_label:'caja',units_per_package:1,compatibility_groups:['FRIO']}],logistic_units:[{logistic_unit_id:'U',label:'Viejo',type:'PALLET',tare_mass:{value:'25',unit:'kg'}}],presentations:[{presentation_id:'MIX',label:'Mixta',quantity_kind:'DISCRETE',quantity_unit:'presentation',logistic_unit_id:'U',gross_mass:{value:'900',unit:'kg'},components:[{product_id:'A',quantity:'40'},{product_id:'B',quantity:'40'}],loaded_dimensions:{length:'120',width:'100',height:'150',unit:'cm'}}]}};
           const parent=document.querySelector('.model-wizard-v2').parentElement,form=document.createElement('form');parent.replaceChildren(form);
           const controller=new AbortController(),scope={signal:controller.signal,listen(n,t,fn){n.addEventListener(t,fn,{signal:controller.signal})},own(){}};
-          window.legacyPro=mountModelFieldsV2(form,scope,{id:crypto.randomUUID(),name:'Histórico',configuration,guided_ux:{edition:'ultimate'}});window.legacyPro.lock({published:true});return window.legacyPro.read().configuration;
+          window.legacyPro=mountModelFieldsV2(form,scope,{id:crypto.randomUUID(),name:'Histórico',configuration,guided_ux:{edition:'ultimate'}},{published:true});window.legacyPro.lock({published:true});return window.legacyPro.read().configuration;
         }''')
         self.assertEqual(data['currency_policy'],{'currency':'BRL','minor_units':5,'rounding':'ROUND_HALF_UP'})
         self.assertEqual(data['primary_dimension'],'pallets');self.assertEqual(data['active_dimensions'],['pallets','weight_kg'])

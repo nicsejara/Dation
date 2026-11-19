@@ -9,8 +9,8 @@ export const defaultConfiguration=currency=>({version:1,operating_role:'SHIPPER'
 
 export const defaultConfigurationV2=currency=>({...defaultConfiguration(currency),version:2,consolidation_permitted:true,resource_categories:[],cargo:{profile:'PALLETIZED',input_mode:'direct',split_policy:'INDIVISIBLE',compatibility_policy:'CATEGORIZED',co_load_pairs:[],products:[],logistic_units:[],presentations:[]}});
 
-export function mountModelFields(form,scope,draft,{wizard=false,version=1}={}){
- if(draft.configuration.version===2)return mountModelFieldsV2(form,scope,draft);
+export function mountModelFields(form,scope,draft,{wizard=false,version=1,published=false}={}){
+ if(draft.configuration.version===2)return mountModelFieldsV2(form,scope,draft,{published});
  const host=el('div',undefined,wizard?'model-wizard-cards':'');form.append(host);
  const card=(title,copy,kind)=>{
   if(!wizard)return section(host,title,kind==='identity'?undefined:copy);

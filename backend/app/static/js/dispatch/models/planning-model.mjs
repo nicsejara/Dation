@@ -1,7 +1,8 @@
 import {api,post} from '../shared.mjs';
 import {mountDialog} from '../../platform/components.mjs';
-import {el,button,field,collapsibleSection} from './forms.mjs';
+import {el,button,field,collapsibleSection,confirmAction} from './forms.mjs';
 import {mountModelFields,defaultConfiguration,defaultConfigurationV2} from './model-fields.mjs';
+import {draftSignature} from './setup-values.mjs';
 import {wizardIcon} from './wizard-ui.mjs';
 import {mountDataContractView} from './data-contract-view.mjs';
 
@@ -22,7 +23,7 @@ export async function mountPlanningModel(form,scope,{draft={},modelId='',canMana
  const modelPanel=collapsibleSection(form,'01. Logistics Model','Definí la lógica operativa base del modelo logístico que vas a usar en este Case.',{open:true,initialStatus:'En configuración'}),modelBlock=modelPanel.body;
  modelPanel.details.dataset.dationTest='core-model';modelPanel.details.dataset.modelState='LOADING';modelPanel.setStatus('Cargando');modelPanel.details.classList.add('model-wizard');modelBlock.classList.add('ultimate-planning-model');modelBlock.hidden=true;
  const summary=modelPanel.details.querySelector('summary'),tile=el('span',undefined,'model-wizard-tile'),heading=el('span',undefined,'model-wizard-heading');tile.append(wizardIcon('layers'));heading.append(summary.querySelector('.ultimate-disclosure__title'),modelBlock.previousElementSibling);summary.prepend(tile,heading);
- const intro=el('div',undefined,'model-wizard-intro'),reuse=button('',openPicker),catalogHint=el('p',undefined,'d-metadata'),introIcon=wizardIcon('database');reuse.append(wizardIcon('folder'),el('span','Seleccionar modelo existente'));reuse.dataset.dationTest='model-reuse';const newModel=button('',startNew,'primary');newModel.append(wizardIcon('plus'),el('span','Crear nuevo modelo'));newModel.dataset.modelNew='';const toolbar=el('div',undefined,'model-wizard-top-actions');toolbar.append(reuse,newModel);intro.classList.add('model-wizard-intro-pro');intro.append(introIcon,el('strong','Creá un nuevo modelo operativo o reutilizá uno ya publicado.'),toolbar,catalogHint);
+ const intro=el('div',undefined,'model-wizard-intro'),reuse=button('',openPicker),catalogHint=el('p',undefined,'d-metadata'),introIcon=wizardIcon('database');reuse.append(wizardIcon('folder'),el('span','Seleccionar modelo existente'));reuse.dataset.dationTest='model-reuse';const newModel=button('',startNew,'primary');newModel.append(wizardIcon('plus'),el('span','Crear nuevo modelo'));newModel.dataset.modelNew='';const toolbar=el('div',undefined,'model-wizard-top-actions');toolbar.append(reuse,newModel);intro.classList.add('model-wizard-intro-pro');const introCopy=el('div',undefined,'model-wizard-intro-copy');introCopy.append(el('strong','Configurá tu modelo logístico'),el('p','Creá uno desde cero o seleccioná un modelo existente para comenzar.','d-metadata'));intro.append(introIcon,introCopy,toolbar,catalogHint);
  const editor=el('div'),feedback=el('p','','model-wizard-feedback'),footer=el('footer',undefined,'model-wizard-footer'),progress=el('div',undefined,'model-wizard-progress'),ring=el('span',undefined,'model-wizard-ring'),progressText=el('div'),count=el('p','','d-metadata'),create=button('',publish,'primary');
  feedback.role='status';feedback.setAttribute('aria-live','polite');feedback.dataset.dationTest='model-feedback';progress.dataset.dationTest='model-progress';progress.role='status';progressText.append(el('strong','Configuración del modelo'),count);ring.setAttribute('aria-hidden','true');progress.append(ring,progressText);footer.append(progress,create);modelBlock.append(intro,editor,feedback,footer);
  feedback.id='model-create-feedback';create.setAttribute('aria-describedby',feedback.id);create.dataset.dationTest='model-create';const createLabel=unified?'Guardar y continuar':'Crear y seleccionar modelo',createCaption=el('span',createLabel);create.append(wizardIcon('check'),createCaption);
@@ -33,12 +34,12 @@ export async function mountPlanningModel(form,scope,{draft={},modelId='',canMana
   // Only brand-new UI drafts use the homogeneous route. Saved and published
   // configurations retain their original mode, dimensions and physical units.
   if(saga10){if(!['ARS','USD','EUR'].includes(configuration.currency_policy.currency))configuration.currency_policy.currency='ARS';configuration.active_dimensions=['weight_kg','volume_m3'];configuration.primary_dimension='weight_kg';configuration.cargo.input_mode='catalog';}
-  return {id:crypto.randomUUID(),name:'',description:'',status:'active',expected_revision:1,configuration,...(saga10?{guided_ux:{edition:'ultimate'}}:{})};
+  return {id:crypto.randomUUID(),name:'',description:'',status:'active',expected_revision:1,configuration,...(saga10?{guided_ux:{edition:'ultimate',origin:'new-guided',confirmed:{},subconfirmed:{}}}:{})};
  };
- const state={mode:draft.mode||'new',model_id:draft.model_id||modelId,version_id:draft.version_id||'',new_model:draft.new_model||newDraft(),intent:draft.intent||null,locked:!!draft.locked};
+ const state={mode:draft.mode||'new',model_id:draft.model_id||modelId,version_id:draft.version_id||'',new_model:draft.new_model||newDraft(),intent:draft.intent||null,locked:!!draft.locked,recovery:draft.recovery||null};
  // An old draft may contain an acknowledged version without its selection flag.
  if(state.intent&&state.version_id===state.intent.version_id){state.mode='existing';state.model_id=state.intent.model_id;state.intent.published=true;}
- let fields=null,selected=null,compiled=false,ready=false,generation=0,renderGeneration=0,timer=null,busy=false,pickerOpen=false,previewPending=false,message='',previewFailed=false;
+ let fields=null,selected=null,compiled=false,ready=false,generation=0,renderGeneration=0,timer=null,busy=false,pickerOpen=false,previewPending=false,message='',previewFailed=false,resetting=false,lastEdit='';
  const models=[];let offset=0,total=0;
  do{const page=await api('/api/platform/logistics-models?'+new URLSearchParams({limit:50,offset}),{signal:scope.signal});if(!scope.active)return;models.push(...page.items.filter(m=>m.status==='active'&&m.versions.length));offset+=50;total=page.total;if(offset<total&&!page.items.length)throw new Error('La lista de Models cambió. Recargá la configuración.');}while(offset<total);
  scope.own(()=>{generation++;clearTimeout(timer);});
@@ -52,15 +53,16 @@ export async function mountPlanningModel(form,scope,{draft={},modelId='',canMana
   const selectedVersion=isSelected();
   modelPanel.setStatus(selectedVersion?'Configurado':!canManage?'Sólo lectura':previewFailed||pending()&&!busy?'Revisar configuración':'En configuración',selectedVersion?'complete':previewFailed?'warning':'pending');
   modelPanel.details.dataset.modelState=busy?'NEW_PUBLISHING':pickerOpen?'REUSE_PICKER':selectedVersion?'MODEL_SELECTED':!canManage?'READ_ONLY':previewFailed||pending()?'ERROR_RECOVERABLE':previewPending?'NEW_VALIDATING':compiled&&complete===valid.length?'NEW_READY_TO_CREATE':'NEW_EDITING';
-  reuse.disabled=!models.length||busy||pending()||state.locked;
-  catalogHint.textContent=!canManage?'Un Admin debe crear y publicar modelos. Podés reutilizar una versión disponible.':models.length?'También podés reutilizar una versión ya publicada.':'Todavía no hay modelos publicados para reutilizar.';
+  reuse.disabled=!models.length||busy||pending()||state.locked||resetting;
+  catalogHint.textContent=!canManage?'Un Admin debe crear y publicar modelos. Podés reutilizar una versión disponible.':models.length?'':'Todavía no hay modelos publicados para reutilizar.';
+  catalogHint.hidden=!catalogHint.textContent;
   reuse.setAttribute('aria-describedby','model-catalog-hint');catalogHint.id='model-catalog-hint';
   create.hidden=selectedVersion||!canManage;
   create.disabled=busy||(state.locked&&!pending())||(!pending()&&(!compiled||complete!==valid.length||fields?.canPublish&&!fields.canPublish()));create.setAttribute('aria-busy',String(busy));
   const caption=busy?'Creando modelo…':pending()?'Reintentar publicación pendiente':createLabel;if(createCaption.textContent!==caption)createCaption.textContent=caption;
   feedback.textContent=message||(!canManage?'Necesitás permiso de administración para crear un modelo.':'');feedback.hidden=!feedback.textContent;
   modelRetry.hidden=(state.mode!=='new'&&isSelected())||!previewFailed||busy||pending();modelRetry.textContent=state.mode==='existing'&&!isSelected()?'Reintentar selección del modelo':'Reintentar Data Contract';
-  newModel.hidden=!canManage;newModel.disabled=busy||pending()||state.locked;retry.hidden=state.mode==='new'||!previewFailed;
+  newModel.hidden=!canManage;newModel.disabled=busy||pending()||state.locked||resetting;retry.hidden=state.mode==='new'||!previewFailed;
   contractView.setState({ready,compiled,pending:previewPending,failed:previewFailed,selected:isSelected(),provisional:state.mode==='new'});
  }
  async function preview({focusError=false}={}){
@@ -80,8 +82,9 @@ export async function mountPlanningModel(form,scope,{draft={},modelId='',canMana
  }
  let previewBody=null;let contractCount=0;
  async function render(){
-  const own=++renderGeneration;generation++;clearTimeout(timer);compiled=ready=false;contractView.invalidate();editor.replaceChildren();
+  const own=++renderGeneration;generation++;clearTimeout(timer);compiled=ready=previewPending=false;previewFailed=false;lastEdit='';fields=null;contractView.invalidate();editor.replaceChildren();
   if(state.mode==='new'){
+   if(state.recovery){const recovered=el('aside',undefined,'guided-note'),restore=button('Restaurar borrador anterior',async()=>{if(busy||pending()||state.locked||!canManage)return;if(meaningful(fields.read())&&!await confirmAction(form,scope,'Restaurar borrador anterior','Se reemplazará la configuración guiada actual por la copia anterior conservada.','Restaurar borrador'))return;state.new_model=state.recovery;state.recovery=null;message='';await render();persist();});restore.disabled=busy||pending()||state.locked;recovered.append(el('span','Se conserva una copia del borrador anterior con su contrato original.'),restore);editor.append(recovered);}
    fields=mountModelFields(editor,scope,state.new_model,{wizard:true});
    if(pending()||!canManage||state.locked)fields.lock();
    if(pending())message='Hay una publicación pendiente. Se conserva la configuración y su identidad para reintentar sin crear otro modelo.';
@@ -90,15 +93,28 @@ export async function mountPlanningModel(form,scope,{draft={},modelId='',canMana
    const chosen=detail.versions.find(v=>v.id===state.version_id);if(detail.model.status!=='active'||!chosen)throw new Error('La versión publicada ya no está disponible. Elegí otra versión.');selected=detail;if(!models.some(m=>m.id===detail.model.id))models.push({...detail.model,versions:detail.versions});
    const selectedSummary=el('div',undefined,'model-wizard-selection'),text=el('div');text.append(el('h3',detail.model.name),el('p',chosen.config_jsonb.version===2?'Modelo publicado seleccionado':'Modelo seleccionado · Versión '+chosen.version,'d-metadata'));
    selectedSummary.append(text);editor.append(selectedSummary);
-   fields=mountModelFields(editor,scope,{...detail.model,configuration:chosen.config_jsonb},{wizard:true,version:chosen.version});fields.lock({published:true});
+   fields=mountModelFields(editor,scope,{...detail.model,configuration:chosen.config_jsonb},{wizard:true,version:chosen.version,published:true});fields.lock({published:true});
   }
   changed();await preview();
  }
  function fail(error){if(!scope.active)return;ready=compiled=false;previewFailed=true;message=error.message;feedback.role='alert';changed();}
- function startNew(){
-  if(!canManage||busy||pending()||state.locked)return;
-  if(state.mode==='new'){const input=editor.querySelector('[name=model_name]');input?.closest('details')?.setAttribute('open','');input?.focus();return;}
-  state.mode='new';state.model_id='';state.version_id='';state.intent=null;selected=null;message='';render().then(persist).catch(fail);changed();
+ function meaningful(value){
+  const clean=newDraft(),ui=value.guided_ux||{};
+  return !!(value.name?.trim()||value.description?.trim()||Object.keys(ui.confirmed||{}).length||draftSignature(value.configuration)!==draftSignature(clean.configuration)||Object.values(ui.catalogue||{}).some(v=>Array.isArray(v)&&v.length));
+ }
+ async function startNew({preserveDraft=false}={}){
+  if(!canManage||busy||pending()||state.locked||resetting)return;
+  resetting=true;sync();
+  try{
+   const previous=state.mode==='new'&&fields?fields.read():state.new_model;
+   const discard=(state.mode==='new'||!state.intent?.published)&&meaningful(previous);
+   if(discard&&!await confirmAction(form,scope,'Crear nuevo modelo',preserveDraft?'La nueva configuración usa tres CSV. Se conservará una copia recuperable del borrador anterior y se iniciará uno vacío.':'Se descartará este borrador sin publicar, incluidos sus configuraciones y confirmaciones. Los modelos publicados no cambian.','Crear nuevo modelo'))return;
+   if(!scope.active||busy||pending()||state.locked)return;
+   generation++;renderGeneration++;clearTimeout(timer);fields=null;
+   state.recovery=preserveDraft?structuredClone(previous):null;
+   state.mode='new';state.model_id='';state.version_id='';state.intent=null;state.new_model=newDraft();selected=null;compiled=ready=previewPending=previewFailed=false;previewBody=null;contractCount=0;message='';
+   await render();persist();editor.querySelector('[name=model_name]')?.focus();
+  }catch(error){fail(error);}finally{resetting=false;if(scope.active)sync();}
  }
  async function openPicker(){
   if(reuse.disabled)return;pickerOpen=true;sync();
@@ -150,13 +166,14 @@ export async function mountPlanningModel(form,scope,{draft={},modelId='',canMana
  // Invalidate immediately: stale provisional responses cannot enable publication.
  const edit=event=>{
   if(state.mode!=='new'||pending()||state.locked)return;
-  fields.showErrors();
+  const key=JSON.stringify(fields.read());if(key===lastEdit)return;lastEdit=key;fields.refreshErrors?.();
   if(!['model_name','model_description','model_status'].includes(event.target.name)){fields.invalidateCompiled?.();generation++;compiled=ready=previewPending=false;clearTimeout(timer);timer=setTimeout(()=>preview(),250);}
   changed();
  };
  scope.listen(editor,'keydown',event=>{if(event.key==='Enter'&&event.target.matches('input:not([type=checkbox]):not([type=radio])'))event.preventDefault();});
  scope.listen(editor,'input',edit);scope.listen(editor,'change',edit);
  scope.listen(editor,'model-review',changed);
+ scope.listen(editor,'model-new-request',()=>startNew({preserveDraft:true}));
  scope.listen(editor,'model-editor-mode',event=>{
   if(state.mode!=='new'||busy||pending()||state.locked||!canManage)return;
   state.new_model=event.detail;render().then(persist).catch(fail);
