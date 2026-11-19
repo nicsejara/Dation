@@ -84,7 +84,7 @@ export function mountCargoEditor(places,scope,initial,{guided=false,profile=()=>
  function summary(parent,p,unit,{support=false}={}){
   const panel=el('aside',undefined,'guided-physical-summary'),list=el('dl'),error=el('p',undefined,'d-field__error'),linked=unit||state.logistic_units.find(u=>u.logistic_unit_id===p?.logistic_unit_id);
   const art=p?.quantity_kind==='CONTINUOUS'?wizardIcon(profile()==='LIQUID_BULK'?'drop':'mound'):linked?.type==='PALLET'?palletArt():wizardIcon('box');
-  error.role='alert';panel.append(el('h4',support?'Resumen de la unidad':profile()==='PALLETIZED'?'Resumen del pallet':'Resumen de la presentación'),art,list,error);parent.append(panel);
+  error.role='alert';panel.append(el('h4',support?'Resumen de la unidad':guided?'Resumen de la composición':profile()==='PALLETIZED'?'Resumen del pallet':'Resumen de la presentación'),art,list,error);parent.append(panel);
   projections.push(()=>{
    list.replaceChildren();error.textContent=serverError;const u=unit||state.logistic_units.find(u=>u.logistic_unit_id===p?.logistic_unit_id),physics=p&&compiled?.[p.presentation_id],stats=p&&composition(p);
    if(p?.quantity_kind==='CONTINUOUS'){

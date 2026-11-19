@@ -39,5 +39,11 @@
     "supabase_changed": false,
     "engines_enabled": false
   },
-  "ci": "Exact candidate run/checks recorded in PR after completion"
+  "ci": "Exact candidate run/checks recorded in PR after completion",
+  "visual_closeout": {
+    "passed": 2,
+    "seconds": 26.493,
+    "evidence": "visual-final.txt",
+    "reason": "Type-neutral composition summary, no inherited pallet label for BIG_BAG/OTHER. Refreshed all screenshots after this copy-only correction."
+  }
 }

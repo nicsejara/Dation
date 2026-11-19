@@ -233,7 +233,7 @@ export function mountModelFieldsV2(form,scope,draft){
   readout(reviewSummary,'Dimensión principal',DIMS.find(([v])=>v===primary.value)?.[1]);readout(reviewSummary,'Fraccionamiento',simple?(split.value==='INDIVISIBLE'?'Orden sin fraccionamiento':'Fraccionable por unidades completas'):split.selectedOptions[0]?.textContent);readout(reviewSummary,'Compatibilidad',compat.selectedOptions[0]?.textContent);
   readout(reviewSummary,'Recursos',sources().join(' + ')||'Pendiente');readout(reviewSummary,'Moneda',c.currency_policy.currency);
   readout(reviewSummary,'Data Contract previsto',catalog?'3 CSV: Órdenes + Líneas de órdenes + Recursos':'2 CSV: Órdenes + Recursos',compiledKey===key?'Validado por Dation para este borrador':'Pendiente de validación vigente');
-  summary.textContent=(PROFILES.find(p=>p[0]===profile.value)?.[1]||'Carga')+' · '+(catalog?c.cargo.products.length+' productos · '+c.cargo.presentations.length+' presentaciones':'Datos directos · sin catálogo')+' · '+active.map(v=>DIMS.find(([id])=>id===v)[1]).join(' + ');
+  summary.textContent=(simple?'Catálogo homogéneo':PROFILES.find(p=>p[0]===profile.value)?.[1]||'Carga')+' · '+(catalog?c.cargo.products.length+' productos · '+c.cargo.presentations.length+' presentaciones':'Datos directos · sin catálogo')+' · '+active.map(v=>DIMS.find(([id])=>id===v)[1]).join(' + ');
   if(!compiledData&&!serverError){physical.role='status';physical.textContent='Las propiedades físicas se muestran después de validar el contrato actual con Dation.';}updateFlow();
  }
  scope.listen(mode.root,'input',e=>e.stopPropagation());scope.listen(mode.root,'change',async e=>{
