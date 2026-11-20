@@ -64,10 +64,10 @@ export async function mountLibraryEditor(root,{route,scope,copies,back,go,loadMo
   const own=++previewGeneration,key=fingerprint(fields.read().configuration);compiledKey='';retryPreview.hidden=true;
   if(!fields.sectionValidity().slice(1).every(Boolean)){sync();return;}
   previewPending=true;sync();
-  try{const data=await previewV2Draft(fields.read().configuration,scope.signal);if(!scope.active||own!==previewGeneration||key!==fingerprint(fields.read().configuration))return;
+  try{const data=await previewV2Draft(fields.read().configuration,scope.signal);if(!scope.active||own!==previewGeneration||busy||controller.pending||key!==fingerprint(fields.read().configuration))return;
    if(data.provisional!==true||!data.contracts)throw new Error('La validación no corresponde al borrador actual.');
    compiledKey=key;fields.setCompiled(data);persistRecovery();
-  }catch(error){if(scope.active&&own===previewGeneration){fields.showServerError(error.message,{focus});retryPreview.hidden=false;say(error.message,true);}}
+  }catch(error){if(scope.active&&own===previewGeneration&&!busy&&!controller.pending){fields.showServerError(error.message,{focus});retryPreview.hidden=false;say(error.message,true);}}
   finally{if(scope.active&&own===previewGeneration){previewPending=false;sync();}}
  }
  function freeze(){const controls=[...form.querySelectorAll('input,select,textarea,button')].map(n=>[n,n.disabled]);for(const [n]of controls)n.disabled=true;return ()=>{if(!controller.pending)for(const [n,disabled]of controls)n.disabled=disabled;};}
@@ -78,7 +78,7 @@ export async function mountLibraryEditor(root,{route,scope,copies,back,go,loadMo
    say(result.where==='server'?'Borrador guardado en el servidor. No está publicado.':'Borrador guardado en este navegador para esta cuenta. No está en el servidor ni publicado.');
    if(navigateAfter&&result.where==='server'){allowLeave=true;await go({modelId:controller.record.modelId,modelWorkId:record.workId,modelView:'edit',replace:true});}return true;
   }catch(error){if(scope.active){say(error.status===409?'Conflicto: el servidor cambió. Tu copia y revisión original se conservan; recargá explícitamente antes de continuar.':error.message,true);reload.hidden=!existing||!!controller.record.publishIntent;}return false;}
-  finally{busy=false;if(scope.active){restore();sync();}}
+  finally{busy=false;if(scope.active){restore();sync();if(!controller.pending&&!compiledKey)preview();}}
  }
  async function runPublish(){
   if(busy||historical||fields.historical)return;

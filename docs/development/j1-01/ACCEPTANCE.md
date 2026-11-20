@@ -74,7 +74,7 @@ Evidence IDs and complete methods: [verification index](G6_TEST_MATRIX_REPORT.md
 | J101-068 | Tarjetas y toolbar adaptables sin truncar botones. | PASS | B06 | Verified by the referenced real test/source evidence. |
 | J101-069 | Tarjetas 1-col, botones >=44px, sin scroll horizontal. | PASS | B06 / B13 | Includes measured transient dialog: all actions ≥44 px in four viewports, overflow and Escape checks. |
 | J101-070 | No se confunde Confirmado/Publicado/Vinculado/Consulta. | PASS | B01 / B02 / B06 | Verified by the referenced real test/source evidence. |
-| J101-071 | Estado busy/error, role y aria-live correctos; keyboard dialogs. | PASS | B03 / B04 / B06 / B13 | Includes measured transient dialog: all actions ≥44 px in four viewports, overflow and Escape checks. |
+| J101-071 | Estado busy/error, role y aria-live correctos; keyboard dialogs. | PASS | B03 / B04 / B06 / B13 / B14 | Includes measured transient dialog: all actions ≥44 px in four viewports, overflow and Escape checks. Late preview success/error cannot reactivate any control while a save is pending. |
 | J101-072 | Acceso a model_id de otro workspace es rechazado por backend. | PASS | B05 / SQL | Verified by the referenced real test/source evidence. |
 | J101-073 | Intentos write sin permiso son rechazados aunque se fuerce el request. | PASS | B05 / SQL | Verified by the referenced real test/source evidence. |
 | J101-074 | GET/Review no escriben y no alteran checks/hash publicados. | PASS | B04 / B07 / B10 | Verified by the referenced real test/source evidence. |

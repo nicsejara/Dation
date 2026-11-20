@@ -1,0 +1,8 @@
+test_default_closed_and_explicit_opt_in_preserves_read_only_actor (tests.test_model_library_gate.ModelLibraryGateTests.test_default_closed_and_explicit_opt_in_preserves_read_only_actor) ... ok
+test_existing_gates_cannot_be_bypassed (tests.test_model_library_gate.ModelLibraryGateTests.test_existing_gates_cannot_be_bypassed) ... ok
+test_template_entrypoints_and_relative_imports_resolve (tests.test_frontend_import_graph.FrontendImportGraphTests.test_template_entrypoints_and_relative_imports_resolve) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.111s
+
+OK

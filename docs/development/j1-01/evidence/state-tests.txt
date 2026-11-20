@@ -1,7 +1,7 @@
-✔ new models use independent R6 defaults and never inherit a Case candidate (3.875512ms)
-✔ durable copies isolate users, workspaces, working IDs and revisions (7.888457ms)
-✔ exact review/version routes roundtrip and reject malformed or mixed identities (2.029782ms)
-✔ typed return preserves Case draft and run; publishing a different model cannot overwrite it (0.924908ms)
+✔ new models use independent R6 defaults and never inherit a Case candidate (3.779688ms)
+✔ durable copies isolate users, workspaces, working IDs and revisions (7.618032ms)
+✔ exact review/version routes roundtrip and reject malformed or mixed identities (2.609949ms)
+✔ typed return preserves Case draft and run; publishing a different model cannot overwrite it (1.374973ms)
 ℹ tests 4
 ℹ suites 0
 ℹ pass 4
@@ -9,4 +9,4 @@
 ℹ cancelled 0
 ℹ skipped 0
 ℹ todo 0
-ℹ duration_ms 21.101569
+ℹ duration_ms 22.237674

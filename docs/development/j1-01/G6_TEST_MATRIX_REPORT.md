@@ -22,6 +22,7 @@ local PASS does not substitute for GitHub CI.
 | B11 | `...test_11_same_working_copy_is_locked_across_tabs_without_losing_recovery` | Browser lock protects same copy; release permits later recovery |
 | B12 | `DefaultLibraryGateTests.test_default_closed_retains_legacy_library_and_rejects_new_mode_links` | Real default-closed route and legacy compatibility |
 | B13 | `ModelLibraryTests.test_12_dirty_dialog_touch_targets_at_every_viewport` | New dialog actions ≥44 px at four widths, no overflow, Escape preserves draft |
+| B14 | `ModelLibraryTests.test_13_late_preview_success_or_error_cannot_unlock_a_pending_save` | Real delayed success/error responses keep every control disabled until Save acknowledgment |
 | U01 | `tests/test_model_library_state.mjs` | 4 pure identity/storage/route/return invariants |
 | U02 | `tests/test_model_library_controller.mjs` | 4 mutation/replay/CAS/advanced-create-revision invariants |
 | U03 | `tests/test_model_library_session.mjs` | 2 fresh-tab/authenticated scope/logout clearing VM tests |
@@ -37,6 +38,8 @@ Browser tests live in
 [`backend/tests/browser/test_model_library_j101.py`](../../../backend/tests/browser/test_model_library_j101.py)
 (repository path; evidence IDs above identify complete method names).
 Logs and original PNG/geometry outputs are indexed by [VISUALS](VISUALS.md).
+
+Pending-mutation latency coverage adds [the late-preview fence](QA_PENDING_PREVIEW_FIX.md), proven with real requests and both success/error responses.
 
 Final transient-dialog QA added [a scoped touch correction](QA_DIALOG_TOUCH_FIX.md), with RED measurement and four-width GREEN evidence.
 

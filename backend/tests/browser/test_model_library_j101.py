@@ -1,5 +1,5 @@
 """Real J1.01 browser/API/PostgreSQL invariants, default-off production gate."""
-import json,re,unittest
+import asyncio,json,re,unittest
 from pathlib import Path
 from urllib.parse import parse_qs,urlparse
 from uuid import uuid4
@@ -159,6 +159,29 @@ class ModelLibraryTests(R4Browser):
    data=await dialog.evaluate('''d=>({width:innerWidth,scroll:d.scrollWidth,client:d.clientWidth,buttons:[...d.querySelectorAll('button')].map(n=>({text:n.textContent,height:n.getBoundingClientRect().height,width:n.getBoundingClientRect().width}))})''');self.assertLessEqual(data['scroll'],data['client'],data);self.assertTrue(all(n['height']>=44 and n['width']>=44 for n in data['buttons']),data);metrics.append(data)
    await self.page.screenshot(path=str(OUT/('dialog-'+str(width)+'.png')),full_page=True,animations='disabled')
   (OUT/'dialog-geometry.json').write_text(json.dumps(metrics,indent=2));await self.page.keyboard.press('Escape');await expect(dialog).to_have_count(0);await expect(self.page.get_by_label('Nombre del modelo *',exact=True)).to_have_value('J101 Diálogo accesible')
+ async def test_13_late_preview_success_or_error_cannot_unlock_a_pending_save(self):
+  observations=[]
+  for preview_error in [False,True]:
+   with self.subTest(preview_error=preview_error):
+    preview_seen=asyncio.Event();preview_release=asyncio.Event();save_seen=asyncio.Event();save_release=asyncio.Event()
+    async def hold_preview(route):
+     response=await route.fetch();preview_seen.set();await preview_release.wait()
+     if preview_error:await route.fulfill(status=503,json={'detail':'J101 preview tardío fallido'})
+     else:await route.fulfill(response=response)
+    async def hold_save(route):
+     response=await route.fetch();save_seen.set();await save_release.wait();await route.fulfill(response=response)
+    await self.page.route('**/api/platform/logistics-models/contract-preview',hold_preview);await self.page.route('**/api/platform/logistics-models',hold_save)
+    try:
+     name='J101 Guardado protegido '+str(preview_error);await self.start(name);await self.fill();await asyncio.wait_for(preview_seen.wait(),10)
+     original=await self.page.get_by_label('Nombre del modelo *',exact=True).input_value();await self.page.locator('[data-library-save]').click();await asyncio.wait_for(save_seen.wait(),10)
+     async with self.page.expect_response(lambda r:r.url.endswith('/contract-preview')):preview_release.set()
+     await self.page.evaluate('new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)))')
+     enabled=await self.page.locator('.j101-editor input:not([disabled]),.j101-editor select:not([disabled]),.j101-editor textarea:not([disabled]),.j101-editor button:not([disabled])').evaluate_all('nodes=>nodes.map(n=>n.name||n.textContent)');self.assertEqual(enabled,[]);await expect(self.page.locator('[data-library-save]')).to_be_disabled();await expect(self.page.locator('[data-library-publish]')).to_be_disabled()
+     observations.append({'preview_error':preview_error,'enabled_while_save_pending':enabled});save_release.set();await expect(self.page).not_to_have_url(re.compile('model_id=new'));await self.loaded();await expect(self.page.get_by_label('Nombre del modelo *',exact=True)).to_have_value(original)
+     mid=parse_qs(urlparse(self.page.url).query)['model_id'][0];self.assertEqual((await self.api('GET','/api/platform/logistics-models/'+mid))['model']['name'],original)
+    finally:
+     preview_release.set();save_release.set();await self.page.unroute('**/api/platform/logistics-models/contract-preview',hold_preview);await self.page.unroute('**/api/platform/logistics-models',hold_save)
+  (OUT/'pending-save-preview.json').write_text(json.dumps(observations,indent=2))
 
 class DefaultLibraryGateTests(R4Browser):
  async def test_default_closed_retains_legacy_library_and_rejects_new_mode_links(self):
