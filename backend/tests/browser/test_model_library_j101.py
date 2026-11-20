@@ -152,6 +152,13 @@ class ModelLibraryTests(R4Browser):
   await self.start('J101 Copia exclusiva');await self.page.locator('[data-library-save]').click();url=self.page.url
   second=await self.context.new_page();await second.goto(url);await expect(second.locator('#ultimate-models-root')).to_contain_text('Este borrador ya está abierto en otra pestaña');await expect(second.locator('.model-wizard-pro')).to_have_count(0)
   await expect(self.page.get_by_label('Nombre del modelo *',exact=True)).to_have_value('J101 Copia exclusiva');await self.page.locator('.j101-back').click();await self.loaded();await second.reload();await expect(second.get_by_label('Nombre del modelo *',exact=True)).to_have_value('J101 Copia exclusiva');await second.close()
+ async def test_12_dirty_dialog_touch_targets_at_every_viewport(self):
+  await self.start('J101 Diálogo accesible');await self.page.locator('.j101-back').click();dialog=self.page.get_by_role('dialog');await expect(dialog).to_be_visible();metrics=[]
+  for width in [1440,1280,768,375]:
+   await self.page.set_viewport_size({'width':width,'height':844});await self.page.evaluate('new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)))')
+   data=await dialog.evaluate('''d=>({width:innerWidth,scroll:d.scrollWidth,client:d.clientWidth,buttons:[...d.querySelectorAll('button')].map(n=>({text:n.textContent,height:n.getBoundingClientRect().height,width:n.getBoundingClientRect().width}))})''');self.assertLessEqual(data['scroll'],data['client'],data);self.assertTrue(all(n['height']>=44 and n['width']>=44 for n in data['buttons']),data);metrics.append(data)
+   await self.page.screenshot(path=str(OUT/('dialog-'+str(width)+'.png')),full_page=True,animations='disabled')
+  (OUT/'dialog-geometry.json').write_text(json.dumps(metrics,indent=2));await self.page.keyboard.press('Escape');await expect(dialog).to_have_count(0);await expect(self.page.get_by_label('Nombre del modelo *',exact=True)).to_have_value('J101 Diálogo accesible')
 
 class DefaultLibraryGateTests(R4Browser):
  async def test_default_closed_retains_legacy_library_and_rejects_new_mode_links(self):

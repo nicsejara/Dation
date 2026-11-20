@@ -67,9 +67,9 @@ J101-065,UX,G6,Footer,Footer de biblioteca mantiene 4 zonas semánticas coherent
 J101-066,UX,G6,Responsive 1440,"Sin overflow, tarjetas 2-col y acciones alineadas.",PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B06,Verified by the referenced real test/source evidence.
 J101-067,UX,G6,Responsive 1280,Sin overflow con rail real y tipografía legible.,PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B06,Verified by the referenced real test/source evidence.
 J101-068,UX,G6,Responsive 768,Tarjetas y toolbar adaptables sin truncar botones.,PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B06,Verified by the referenced real test/source evidence.
-J101-069,UX,G6,Responsive 375,"Tarjetas 1-col, botones >=44px, sin scroll horizontal.",PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B06,Verified by the referenced real test/source evidence.
+J101-069,UX,G6,Responsive 375,"Tarjetas 1-col, botones >=44px, sin scroll horizontal.",PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B06 / B13,"Includes measured transient dialog: all actions ≥44 px in four viewports, overflow and Escape checks."
 J101-070,UX,G6,Texto,No se confunde Confirmado/Publicado/Vinculado/Consulta.,PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B01 / B02 / B06,Verified by the referenced real test/source evidence.
-J101-071,UX,G6,A11y error,"Estado busy/error, role y aria-live correctos; keyboard dialogs.",PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B03 / B04 / B06,Verified by the referenced real test/source evidence.
+J101-071,UX,G6,A11y error,"Estado busy/error, role y aria-live correctos; keyboard dialogs.",PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B03 / B04 / B06 / B13,"Includes measured transient dialog: all actions ≥44 px in four viewports, overflow and Escape checks."
 J101-072,SEC,G6,Workspace,Acceso a model_id de otro workspace es rechazado por backend.,PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B05 / SQL,Verified by the referenced real test/source evidence.
 J101-073,SEC,G6,Permisos API,Intentos write sin permiso son rechazados aunque se fuerce el request.,PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B05 / SQL,Verified by the referenced real test/source evidence.
 J101-074,SEC,G6,No side effects,GET/Review no escriben y no alteran checks/hash publicados.,PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B04 / B07 / B10,Verified by the referenced real test/source evidence.

@@ -24,5 +24,18 @@
     "browser_tests": 3,
     "browser_seconds": 40.108,
     "recorded_utc": "2026-11-20T22:26:31.507533+00:00"
+  },
+  "intermediate_ci": {
+    "run_id": 44828992939,
+    "head": "45e6fd8a2ae44c44b5b5b2da74ef3cf95c4b6f32",
+    "conclusion": "cancelled",
+    "reason": "Superseded after measured transient dialog touch correction; Python/Node already passed.",
+    "updated_utc": "2026-11-20T22:44:21Z"
+  },
+  "final_dialog_qa": {
+    "tests": 2,
+    "seconds": 21.37,
+    "result": "PASS",
+    "recorded_utc": "2026-11-20T22:49:50.159019+00:00"
   }
 }

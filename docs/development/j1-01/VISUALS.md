@@ -9,8 +9,9 @@ Actual application, synthetic authenticated local API/PostgreSQL fixtures. These
 | review | [1440](evidence/review-1440.png) | [1280](evidence/review-1280.png) | [768](evidence/review-768.png) | [375](evidence/review-375.png) |
 | history | [1440](evidence/history-1440.png) | [1280](evidence/history-1280.png) | [768](evidence/history-768.png) | [375](evidence/history-375.png) |
 | error | [1440](evidence/error-1440.png) | [1280](evidence/error-1280.png) | [768](evidence/error-768.png) | [375](evidence/error-375.png) |
+| dialog | [1440](evidence/dialog-1440.png) | [1280](evidence/dialog-1280.png) | [768](evidence/dialog-768.png) | [375](evidence/dialog-375.png) |
 
-All five scenes: zero document overflow at each width; visible controls ≥44 px. Library is two columns at 1440, one at 375. [Integrity IDs/hashes](evidence/version-integrity.json) prove actual synthetic versions and pinned Case invariance.
+All six scenes: zero document overflow at each width; visible controls ≥44 px. Library is two columns at 1440, one at 375. [Integrity IDs/hashes](evidence/version-integrity.json) prove actual synthetic versions and pinned Case invariance.
 
 The editor and Review reuse R6. Mobile screenshots are long full-page captures of real forms; they were not composited, edited or replaced with mockups.
 
