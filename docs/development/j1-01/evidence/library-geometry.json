@@ -1,0 +1,830 @@
+[
+  {
+    "width": 1440,
+    "scroll": 1440,
+    "client": 1440,
+    "buttons": [
+      {
+        "text": "Crear nuevo modelo",
+        "width": 159.703125,
+        "height": 44,
+        "left": 1224.296875,
+        "right": 1384
+      },
+      {
+        "text": "Buscar",
+        "width": 78.078125,
+        "height": 44,
+        "left": 1305.921875,
+        "right": 1384
+      },
+      {
+        "text": "Revisar modelo",
+        "width": 130.828125,
+        "height": 44,
+        "left": 313,
+        "right": 443.828125
+      },
+      {
+        "text": "Ver versiones",
+        "width": 118.5625,
+        "height": 44,
+        "left": 453.828125,
+        "right": 572.390625
+      },
+      {
+        "text": "Abrir borrador",
+        "width": 122.84375,
+        "height": 44,
+        "left": 582.390625,
+        "right": 705.234375
+      },
+      {
+        "text": "Revisar modelo",
+        "width": 130.828125,
+        "height": 44,
+        "left": 871,
+        "right": 1001.828125
+      },
+      {
+        "text": "Ver versiones",
+        "width": 118.5625,
+        "height": 44,
+        "left": 1011.828125,
+        "right": 1130.390625
+      },
+      {
+        "text": "Abrir borrador",
+        "width": 122.84375,
+        "height": 44,
+        "left": 1140.390625,
+        "right": 1263.234375
+      },
+      {
+        "text": "Revisar modelo",
+        "width": 130.828125,
+        "height": 44,
+        "left": 313,
+        "right": 443.828125
+      },
+      {
+        "text": "Ver versiones",
+        "width": 118.5625,
+        "height": 44,
+        "left": 453.828125,
+        "right": 572.390625
+      },
+      {
+        "text": "Abrir borrador",
+        "width": 122.84375,
+        "height": 44,
+        "left": 582.390625,
+        "right": 705.234375
+      },
+      {
+        "text": "Revisar modelo",
+        "width": 130.828125,
+        "height": 44,
+        "left": 871,
+        "right": 1001.828125
+      },
+      {
+        "text": "Ver versiones",
+        "width": 118.5625,
+        "height": 44,
+        "left": 1011.828125,
+        "right": 1130.390625
+      },
+      {
+        "text": "Abrir borrador",
+        "width": 122.84375,
+        "height": 44,
+        "left": 1140.390625,
+        "right": 1263.234375
+      },
+      {
+        "text": "Revisar modelo",
+        "width": 130.828125,
+        "height": 44,
+        "left": 313,
+        "right": 443.828125
+      },
+      {
+        "text": "Ver versiones",
+        "width": 118.5625,
+        "height": 44,
+        "left": 453.828125,
+        "right": 572.390625
+      },
+      {
+        "text": "Abrir borrador",
+        "width": 122.84375,
+        "height": 44,
+        "left": 582.390625,
+        "right": 705.234375
+      },
+      {
+        "text": "Revisar modelo",
+        "width": 130.828125,
+        "height": 44,
+        "left": 871,
+        "right": 1001.828125
+      },
+      {
+        "text": "Ver versiones",
+        "width": 118.5625,
+        "height": 44,
+        "left": 1011.828125,
+        "right": 1130.390625
+      },
+      {
+        "text": "Abrir borrador",
+        "width": 122.84375,
+        "height": 44,
+        "left": 1140.390625,
+        "right": 1263.234375
+      },
+      {
+        "text": "Anterior",
+        "width": 84.5625,
+        "height": 44,
+        "left": 674.75,
+        "right": 759.3125
+      },
+      {
+        "text": "Siguiente",
+        "width": 92.515625,
+        "height": 44,
+        "left": 904.71875,
+        "right": 997.234375
+      },
+      {
+        "text": "\u2190",
+        "width": 44,
+        "height": 44,
+        "left": 313,
+        "right": 357
+      },
+      {
+        "text": "Continuar a Decision Case",
+        "width": 198.71875,
+        "height": 44,
+        "left": 1160.28125,
+        "right": 1359
+      }
+    ],
+    "cards": [
+      {
+        "x": 288,
+        "y": 420.171875,
+        "width": 538
+      },
+      {
+        "x": 846,
+        "y": 420.171875,
+        "width": 538
+      },
+      {
+        "x": 288,
+        "y": 694.21875,
+        "width": 538
+      },
+      {
+        "x": 846,
+        "y": 694.21875,
+        "width": 538
+      },
+      {
+        "x": 288,
+        "y": 968.265625,
+        "width": 538
+      },
+      {
+        "x": 846,
+        "y": 968.265625,
+        "width": 538
+      }
+    ]
+  },
+  {
+    "width": 1280,
+    "scroll": 1280,
+    "client": 1280,
+    "buttons": [
+      {
+        "text": "Crear nuevo modelo",
+        "width": 159.703125,
+        "height": 44,
+        "left": 1064.296875,
+        "right": 1224
+      },
+      {
+        "text": "Buscar",
+        "width": 78.078125,
+        "height": 44,
+        "left": 1145.921875,
+        "right": 1224
+      },
+      {
+        "text": "Revisar modelo",
+        "width": 130.828125,
+        "height": 44,
+        "left": 313,
+        "right": 443.828125
+      },
+      {
+        "text": "Ver versiones",
+        "width": 118.5625,
+        "height": 44,
+        "left": 453.828125,
+        "right": 572.390625
+      },
+      {
+        "text": "Abrir borrador",
+        "width": 122.84375,
+        "height": 44,
+        "left": 582.390625,
+        "right": 705.234375
+      },
+      {
+        "text": "Revisar modelo",
+        "width": 130.828125,
+        "height": 44,
+        "left": 791,
+        "right": 921.828125
+      },
+      {
+        "text": "Ver versiones",
+        "width": 118.5625,
+        "height": 44,
+        "left": 931.828125,
+        "right": 1050.390625
+      },
+      {
+        "text": "Abrir borrador",
+        "width": 122.84375,
+        "height": 44,
+        "left": 1060.390625,
+        "right": 1183.234375
+      },
+      {
+        "text": "Revisar modelo",
+        "width": 130.828125,
+        "height": 44,
+        "left": 313,
+        "right": 443.828125
+      },
+      {
+        "text": "Ver versiones",
+        "width": 118.5625,
+        "height": 44,
+        "left": 453.828125,
+        "right": 572.390625
+      },
+      {
+        "text": "Abrir borrador",
+        "width": 122.84375,
+        "height": 44,
+        "left": 582.390625,
+        "right": 705.234375
+      },
+      {
+        "text": "Revisar modelo",
+        "width": 130.828125,
+        "height": 44,
+        "left": 791,
+        "right": 921.828125
+      },
+      {
+        "text": "Ver versiones",
+        "width": 118.5625,
+        "height": 44,
+        "left": 931.828125,
+        "right": 1050.390625
+      },
+      {
+        "text": "Abrir borrador",
+        "width": 122.84375,
+        "height": 44,
+        "left": 1060.390625,
+        "right": 1183.234375
+      },
+      {
+        "text": "Revisar modelo",
+        "width": 130.828125,
+        "height": 44,
+        "left": 313,
+        "right": 443.828125
+      },
+      {
+        "text": "Ver versiones",
+        "width": 118.5625,
+        "height": 44,
+        "left": 453.828125,
+        "right": 572.390625
+      },
+      {
+        "text": "Abrir borrador",
+        "width": 122.84375,
+        "height": 44,
+        "left": 582.390625,
+        "right": 705.234375
+      },
+      {
+        "text": "Revisar modelo",
+        "width": 130.828125,
+        "height": 44,
+        "left": 791,
+        "right": 921.828125
+      },
+      {
+        "text": "Ver versiones",
+        "width": 118.5625,
+        "height": 44,
+        "left": 931.828125,
+        "right": 1050.390625
+      },
+      {
+        "text": "Abrir borrador",
+        "width": 122.84375,
+        "height": 44,
+        "left": 1060.390625,
+        "right": 1183.234375
+      },
+      {
+        "text": "Anterior",
+        "width": 84.5625,
+        "height": 44,
+        "left": 594.75,
+        "right": 679.3125
+      },
+      {
+        "text": "Siguiente",
+        "width": 92.515625,
+        "height": 44,
+        "left": 824.71875,
+        "right": 917.234375
+      },
+      {
+        "text": "\u2190",
+        "width": 44,
+        "height": 44,
+        "left": 313,
+        "right": 357
+      },
+      {
+        "text": "Continuar a Decision Case",
+        "width": 198.71875,
+        "height": 44,
+        "left": 1000.28125,
+        "right": 1199
+      }
+    ],
+    "cards": [
+      {
+        "x": 288,
+        "y": 419.96875,
+        "width": 458
+      },
+      {
+        "x": 766,
+        "y": 419.96875,
+        "width": 458
+      },
+      {
+        "x": 288,
+        "y": 694.015625,
+        "width": 458
+      },
+      {
+        "x": 766,
+        "y": 694.015625,
+        "width": 458
+      },
+      {
+        "x": 288,
+        "y": 968.0625,
+        "width": 458
+      },
+      {
+        "x": 766,
+        "y": 968.0625,
+        "width": 458
+      }
+    ]
+  },
+  {
+    "width": 768,
+    "scroll": 768,
+    "client": 768,
+    "buttons": [
+      {
+        "text": "Crear nuevo modelo",
+        "width": 159.703125,
+        "height": 44,
+        "left": 566.296875,
+        "right": 726
+      },
+      {
+        "text": "Buscar",
+        "width": 78.078125,
+        "height": 44,
+        "left": 647.921875,
+        "right": 726
+      },
+      {
+        "text": "Revisar modelo",
+        "width": 130.828125,
+        "height": 44,
+        "left": 139,
+        "right": 269.828125
+      },
+      {
+        "text": "Ver versiones",
+        "width": 118.5625,
+        "height": 44,
+        "left": 279.828125,
+        "right": 398.390625
+      },
+      {
+        "text": "Abrir borrador",
+        "width": 122.84375,
+        "height": 44,
+        "left": 408.390625,
+        "right": 531.234375
+      },
+      {
+        "text": "Revisar modelo",
+        "width": 130.828125,
+        "height": 44,
+        "left": 139,
+        "right": 269.828125
+      },
+      {
+        "text": "Ver versiones",
+        "width": 118.5625,
+        "height": 44,
+        "left": 279.828125,
+        "right": 398.390625
+      },
+      {
+        "text": "Abrir borrador",
+        "width": 122.84375,
+        "height": 44,
+        "left": 408.390625,
+        "right": 531.234375
+      },
+      {
+        "text": "Revisar modelo",
+        "width": 130.828125,
+        "height": 44,
+        "left": 139,
+        "right": 269.828125
+      },
+      {
+        "text": "Ver versiones",
+        "width": 118.5625,
+        "height": 44,
+        "left": 279.828125,
+        "right": 398.390625
+      },
+      {
+        "text": "Abrir borrador",
+        "width": 122.84375,
+        "height": 44,
+        "left": 408.390625,
+        "right": 531.234375
+      },
+      {
+        "text": "Revisar modelo",
+        "width": 130.828125,
+        "height": 44,
+        "left": 139,
+        "right": 269.828125
+      },
+      {
+        "text": "Ver versiones",
+        "width": 118.5625,
+        "height": 44,
+        "left": 279.828125,
+        "right": 398.390625
+      },
+      {
+        "text": "Abrir borrador",
+        "width": 122.84375,
+        "height": 44,
+        "left": 408.390625,
+        "right": 531.234375
+      },
+      {
+        "text": "Revisar modelo",
+        "width": 130.828125,
+        "height": 44,
+        "left": 139,
+        "right": 269.828125
+      },
+      {
+        "text": "Ver versiones",
+        "width": 118.5625,
+        "height": 44,
+        "left": 279.828125,
+        "right": 398.390625
+      },
+      {
+        "text": "Abrir borrador",
+        "width": 122.84375,
+        "height": 44,
+        "left": 408.390625,
+        "right": 531.234375
+      },
+      {
+        "text": "Revisar modelo",
+        "width": 130.828125,
+        "height": 44,
+        "left": 139,
+        "right": 269.828125
+      },
+      {
+        "text": "Ver versiones",
+        "width": 118.5625,
+        "height": 44,
+        "left": 279.828125,
+        "right": 398.390625
+      },
+      {
+        "text": "Abrir borrador",
+        "width": 122.84375,
+        "height": 44,
+        "left": 408.390625,
+        "right": 531.234375
+      },
+      {
+        "text": "Anterior",
+        "width": 84.5625,
+        "height": 44,
+        "left": 258.75,
+        "right": 343.3125
+      },
+      {
+        "text": "Siguiente",
+        "width": 92.515625,
+        "height": 44,
+        "left": 488.71875,
+        "right": 581.234375
+      },
+      {
+        "text": "\u2190",
+        "width": 44,
+        "height": 44,
+        "left": 139,
+        "right": 183
+      },
+      {
+        "text": "Continuar a Decision Case",
+        "width": 198.71875,
+        "height": 44,
+        "left": 199,
+        "right": 397.71875
+      }
+    ],
+    "cards": [
+      {
+        "x": 114,
+        "y": 410.171875,
+        "width": 612
+      },
+      {
+        "x": 114,
+        "y": 684.21875,
+        "width": 612
+      },
+      {
+        "x": 114,
+        "y": 958.265625,
+        "width": 612
+      },
+      {
+        "x": 114,
+        "y": 1232.3125,
+        "width": 612
+      },
+      {
+        "x": 114,
+        "y": 1506.359375,
+        "width": 612
+      },
+      {
+        "x": 114,
+        "y": 1780.40625,
+        "width": 612
+      }
+    ]
+  },
+  {
+    "width": 375,
+    "scroll": 375,
+    "client": 375,
+    "buttons": [
+      {
+        "text": "Crear nuevo modelo",
+        "width": 251,
+        "height": 44,
+        "left": 92,
+        "right": 343
+      },
+      {
+        "text": "Buscar",
+        "width": 251,
+        "height": 44,
+        "left": 92,
+        "right": 343
+      },
+      {
+        "text": "Revisar modelo",
+        "width": 130.828125,
+        "height": 44,
+        "left": 109,
+        "right": 239.828125
+      },
+      {
+        "text": "Ver versiones",
+        "width": 118.5625,
+        "height": 44,
+        "left": 109,
+        "right": 227.5625
+      },
+      {
+        "text": "Abrir borrador",
+        "width": 122.84375,
+        "height": 44,
+        "left": 109,
+        "right": 231.84375
+      },
+      {
+        "text": "Revisar modelo",
+        "width": 130.828125,
+        "height": 44,
+        "left": 109,
+        "right": 239.828125
+      },
+      {
+        "text": "Ver versiones",
+        "width": 118.5625,
+        "height": 44,
+        "left": 109,
+        "right": 227.5625
+      },
+      {
+        "text": "Abrir borrador",
+        "width": 122.84375,
+        "height": 44,
+        "left": 109,
+        "right": 231.84375
+      },
+      {
+        "text": "Revisar modelo",
+        "width": 130.828125,
+        "height": 44,
+        "left": 109,
+        "right": 239.828125
+      },
+      {
+        "text": "Ver versiones",
+        "width": 118.5625,
+        "height": 44,
+        "left": 109,
+        "right": 227.5625
+      },
+      {
+        "text": "Abrir borrador",
+        "width": 122.84375,
+        "height": 44,
+        "left": 109,
+        "right": 231.84375
+      },
+      {
+        "text": "Revisar modelo",
+        "width": 130.828125,
+        "height": 44,
+        "left": 109,
+        "right": 239.828125
+      },
+      {
+        "text": "Ver versiones",
+        "width": 118.5625,
+        "height": 44,
+        "left": 109,
+        "right": 227.5625
+      },
+      {
+        "text": "Abrir borrador",
+        "width": 122.84375,
+        "height": 44,
+        "left": 109,
+        "right": 231.84375
+      },
+      {
+        "text": "Revisar modelo",
+        "width": 130.828125,
+        "height": 44,
+        "left": 109,
+        "right": 239.828125
+      },
+      {
+        "text": "Ver versiones",
+        "width": 118.5625,
+        "height": 44,
+        "left": 109,
+        "right": 227.5625
+      },
+      {
+        "text": "Abrir borrador",
+        "width": 122.84375,
+        "height": 44,
+        "left": 109,
+        "right": 231.84375
+      },
+      {
+        "text": "Revisar modelo",
+        "width": 130.828125,
+        "height": 44,
+        "left": 109,
+        "right": 239.828125
+      },
+      {
+        "text": "Ver versiones",
+        "width": 118.5625,
+        "height": 44,
+        "left": 109,
+        "right": 227.5625
+      },
+      {
+        "text": "Abrir borrador",
+        "width": 122.84375,
+        "height": 44,
+        "left": 109,
+        "right": 231.84375
+      },
+      {
+        "text": "Anterior",
+        "width": 84.5625,
+        "height": 44,
+        "left": 113.515625,
+        "right": 198.078125
+      },
+      {
+        "text": "Siguiente",
+        "width": 92.515625,
+        "height": 44,
+        "left": 171.234375,
+        "right": 263.75
+      },
+      {
+        "text": "\u2190",
+        "width": 44,
+        "height": 44,
+        "left": 109,
+        "right": 153
+      },
+      {
+        "text": "Continuar a Decision Case",
+        "width": 157,
+        "height": 53.09375,
+        "left": 169,
+        "right": 326
+      }
+    ],
+    "cards": [
+      {
+        "x": 92,
+        "y": 628.0625,
+        "width": 251
+      },
+      {
+        "x": 92,
+        "y": 992.828125,
+        "width": 251
+      },
+      {
+        "x": 92,
+        "y": 1357.59375,
+        "width": 251
+      },
+      {
+        "x": 92,
+        "y": 1722.359375,
+        "width": 251
+      },
+      {
+        "x": 92,
+        "y": 2087.125,
+        "width": 251
+      },
+      {
+        "x": 92,
+        "y": 2451.890625,
+        "width": 251
+      }
+    ]
+  }
+]

@@ -1,0 +1,84 @@
+ac_id,categoria,gate,escenario,criterio_verificable,estado_inicial,evidencia,test,notas
+J101-001,BAS,G0,Preexistencia,"Se utiliza la ruta y biblioteca existente models/index.mjs, sin duplicar páginas.",PASS,G6_TEST_MATRIX_REPORT.md; evidence/,G0 / models/index.mjs,Verified by the referenced real test/source evidence.
+J101-002,BAS,G0,R6,Se identifica editor R6 real y se conserva todos sus subpasos.,PASS,G6_TEST_MATRIX_REPORT.md; evidence/,G0 / R6,Verified by the referenced real test/source evidence.
+J101-003,BAS,G0,SQL,Se inspeccionan operaciones reales create/update/publish y permisos.,PASS,G6_TEST_MATRIX_REPORT.md; evidence/,SQL,Verified by the referenced real test/source evidence.
+J101-004,BAS,G0,Flags,El nuevo shell no se activa de forma productiva antes de J1.02.,PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B12 / U04,Default-off real server capability; no productive activation.
+J101-005,BAS,G0,CI,Existe evidencia del baseline y comandos de pruebas reales.,PASS,G6_TEST_MATRIX_REPORT.md; evidence/,G0 / SQL,Verified by the referenced real test/source evidence.
+J101-006,BAS,G1,Arquitectura,Hay adapter único que no mezcla Case draft y Model draft.,PASS,G6_TEST_MATRIX_REPORT.md; evidence/,U01 / U02,Verified by the referenced real test/source evidence.
+J101-007,BAS,G1,Arquitectura,El contrato de navegación diferencia Library Review y Case Pinned Review.,PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B02 / B10,Verified by the referenced real test/source evidence.
+J101-008,BAS,G1,Observabilidad,No se simula estado de publicación en front sin confirmación backend.,PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B09 / U02,Verified by the referenced real test/source evidence.
+J101-009,LIB,G2,Vacío,Workspace sin Models muestra empty state y CTA de crear si hay permiso.,PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B01 / B12,Verified by the referenced real test/source evidence.
+J101-010,LIB,G2,Lista,Workspace con dos Models muestra dos tarjetas de familias diferentes.,PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B02,Verified by the referenced real test/source evidence.
+J101-011,LIB,G2,Búsqueda,Búsqueda envía filtro soportado y maneja búsqueda sin resultados.,PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B06 / B07,Verified by the referenced real test/source evidence.
+J101-012,LIB,G2,Paginación,Paginación de 25/50+ elementos no duplica ni pierde modelos.,PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B07,Verified by the referenced real test/source evidence.
+J101-013,LIB,G2,Errores,"GET con error muestra retry, no se interpreta como biblioteca vacía.",PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B04,Verified by the referenced real test/source evidence.
+J101-014,LIB,G2,Permisos,Sin can_manage_models no aparece CTA mutante habilitado.,PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B05,Verified by the referenced real test/source evidence.
+J101-015,LIB,G2,Archivados,Modelos archivados conservan lectura histórica permitida.,PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B07,Verified by the referenced real test/source evidence.
+J101-016,LIB,G2,No Case,Ningún CTA en biblioteca crea Case.,PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B01 / B02,Verified by the referenced real test/source evidence.
+J101-017,LIB,G2,No autovincular,Ninguna tarjeta marca de modo autoritativo una Model Version como elección del Case.,PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B02 / B05,Verified by the referenced real test/source evidence.
+J101-018,LIB,G2,Resumen,"Metadata visible de tarjeta proviene de respuesta real, sin campos inventados.",PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B06 / G0,Verified by the referenced real test/source evidence.
+J101-019,LIB,G2,Estabilidad,Loading conserva geometría y evita salto de layout excesivo.,PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B06 / CSS min-block-size,Reserved grid height; final scene geometry verified at four widths.
+J101-020,CRT,G3,Crear A,Primer nuevo modelo recibe identidad propia y se crea exactamente una familia.,PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B02 / U01,Verified by the referenced real test/source evidence.
+J101-021,CRT,G3,Crear B,Segundo nuevo modelo de la sesión no reutiliza ID de A.,PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B02 / U01,Verified by the referenced real test/source evidence.
+J101-022,CRT,G3,Aislamiento,"Nombres, cargas y costos de A no contaminan B.",PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B01 / B02,Verified by the referenced real test/source evidence.
+J101-023,CRT,G3,Borrador A,Guardar borrador A preserva A sin publicar ni crear Case.,PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B01,Verified by the referenced real test/source evidence.
+J101-024,CRT,G3,Borrador B,Borrador B es recuperable sin sobrescribir A.,PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B01 / B11,"Durable browser copies, authenticated scope; one lock per mounted copy."
+J101-025,CRT,G3,Recarga,Recarga de A recupera datos del draft correcto o informa que sólo era local.,PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B01,Incomplete saves explicitly browser-local; logout intentionally clears private recovery.
+J101-026,CRT,G3,Editor,"El editor renderizado es el wizard R6 aprobado, no editor V1 degradado.",PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B06 / R6,Verified by the referenced real test/source evidence.
+J101-027,CRT,G3,Checks,Cinco confirmaciones internas sólo activan después de validación real.,PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B02 / R6,Verified by the referenced real test/source evidence.
+J101-028,CRT,G3,Invalidez,Cambiar un dato validado invalida únicamente confirmaciones dependientes.,PASS,G6_TEST_MATRIX_REPORT.md; evidence/,R6,Existing R6 confirmation dependencies unchanged and regressed.
+J101-029,CRT,G3,Cargo,Hasta dos tipos homogéneos y semántica alternativa se mantienen.,PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B02 / R6,Verified by the referenced real test/source evidence.
+J101-030,CRT,G3,Volumen,Comprobación rígida volumétrica R6 y preview vigente siguen funcionando.,PASS,G6_TEST_MATRIX_REPORT.md; evidence/,R6 / DOMAIN,Verified by the referenced real test/source evidence.
+J101-031,CRT,G3,Art,Iconos R6 de vacío/cargado/bulto individual permanecen correctos.,PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B06 / R6,Verified by the referenced real test/source evidence.
+J101-032,CRT,G3,Guardar,Guardar explícitamente no publica automáticamente el modelo.,PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B01 / B08,Verified by the referenced real test/source evidence.
+J101-033,CRT,G3,Publicar,Publicar explícitamente no crea Case ni Data Pack.,PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B02,Verified by the referenced real test/source evidence.
+J101-034,CRT,G3,Dirty,Salir con cambios ofrece guardar/descartar/seguir y no borra sin aviso.,PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B03 / B06,Verified by the referenced real test/source evidence.
+J101-035,VER,G4,Publicación,Modelo A validado se publica como v1 con snapshot/hash real.,PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B02,Verified by the referenced real test/source evidence.
+J101-036,VER,G4,Versión sucesora,Modelo A publica v2 sin mutar snapshot v1.,PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B02 / SQL,Verified by the referenced real test/source evidence.
+J101-037,VER,G4,Modelos paralelos,"A-v1 y B-v1 son modelos diferentes, no dos versiones de la misma familia.",PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B02,Verified by the referenced real test/source evidence.
+J101-038,VER,G4,Review,Library Review no hace POST/PUT/PATCH ni usa Case ficticio.,PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B04 / B10,Verified by the referenced real test/source evidence.
+J101-039,VER,G4,Pinned,Case C fijado A-v1 sigue mostrando A-v1 después de publicar A-v2.,PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B02 / B10,Verified by the referenced real test/source evidence.
+J101-040,VER,G4,Historial,Historial lista versiones publicadas del modelo correcto.,PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B02 / B07,Verified by the referenced real test/source evidence.
+J101-041,VER,G4,Histórico,Modelos legacy V1 se visualizan sin adaptación mutante.,PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B04 / R6,Legacy snapshots read without conversion; new R6 successors only if representable.
+J101-042,VER,G4,Fechas,No se inventan fechas de publicación ni cantidad de Cases asociados.,PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B06 / G0,Verified by the referenced real test/source evidence.
+J101-043,VER,G4,Idempotencia,Retry publish con mismo intent no duplica version_id.,PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B09 / U02 / SQL,Verified by the referenced real test/source evidence.
+J101-044,VER,G4,Concurrencia,Conflicto expected_revision conserva borrador local y no pisa server.,PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B08 / U02,Verified by the referenced real test/source evidence.
+J101-045,VER,G4,Archive,Archivar modelo no elimina versiones ni Cases.,PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B07 / SQL,Verified by the referenced real test/source evidence.
+J101-046,VER,G4,Edición segura,Versión publicada jamás se edita in-place.,PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B02 / SQL,Verified by the referenced real test/source evidence.
+J101-047,NAV,G5,Paso 01,El punto de entrada del nuevo Paso 01 es la biblioteca.,PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B12 / B06,Preview entry point is the existing library route; legacy Core step order intentionally retained until J1.02.
+J101-048,NAV,G5,Continuar,Continuar abre Case sin autoseleccionar último Model publicado.,PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B02,Continues the existing Core flow without candidate/last-published selection; no J1.02 selector.
+J101-049,NAV,G5,Back Case Draft,"Volver de Case draft abre biblioteca, no editor del último modelo.",PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B05,"Explicit Core library action opens library, not latest model editor; legacy internal step Back is preserved."
+J101-050,NAV,G5,Retorno Case Draft,"Volver al Case draft conserva nombre, descripción y elección provisional.",PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B05,Existing Case draft identity/name and candidate remain in their own store.
+J101-051,NAV,G5,No cambio por publicación,Publicar B en biblioteca no reemplaza A seleccionada en Case draft.,PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B05 / U01,Publishing B never writes Case state; independent return token preserves A candidate.
+J101-052,NAV,G5,Deep-link,Abrir model_id válido lleva a la familia/versión correcta.,PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B02 / B10,Verified by the referenced real test/source evidence.
+J101-053,NAV,G5,Deep-link error,ID inválido/ajeno muestra error controlado sin fallback mutante.,PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B04 / U01 / B05,Verified by the referenced real test/source evidence.
+J101-054,NAV,G5,Back navegador,Browser Back/Forward restaura navegación sin crear/guardar/publicar.,PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B03 / B07,Verified by the referenced real test/source evidence.
+J101-055,NAV,G5,Modo,Cambiar de Review a Edit exige acción explícita y permisos.,PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B05 / B08,Verified by the referenced real test/source evidence.
+J101-056,NAV,G5,Origin,Navegación conserva origen/returnTarget sin usarlo como autorización.,PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B05 / B10 / U01,Verified by the referenced real test/source evidence.
+J101-057,NAV,G5,Graph,Volver de Graph a pinned review conserva Case y run original.,PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B10 / R6,Verified by the referenced real test/source evidence.
+J101-058,NAV,G5,Sin loops,No hay bucles de router ni headers duplicados tras repetidos Back/Forward.,PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B03 / B07 / B10,Verified by the referenced real test/source evidence.
+J101-059,NAV,G5,Compat Legacy,Flujo de creación Case/Graph actual sigue disponible bajo flag legacy.,PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B12 / R6 / NAV,Default-off browser plus existing R6/legacy regression tests.
+J101-060,UX,G6,Dark,Biblioteca usa tokens reales y dark mode de Dation.,PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B06,Verified by the referenced real test/source evidence.
+J101-061,UX,G6,Header,Título/Hero no se distorsionan con regreso desde Case/Graph.,PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B10 / B06,Verified by the referenced real test/source evidence.
+J101-062,UX,G6,Focus,Header informativo no dibuja marco turquesa espurio al enfocarse.,PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B10,Verified by the referenced real test/source evidence.
+J101-063,UX,G6,A11y,Botones reales mantienen :focus-visible accesible.,PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B06,Verified by the referenced real test/source evidence.
+J101-064,UX,G6,CTA,Cada vista tiene CTA primario inequívoco y permisos reales.,PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B05 / B06,Verified by the referenced real test/source evidence.
+J101-065,UX,G6,Footer,Footer de biblioteca mantiene 4 zonas semánticas coherentes.,PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B06,Verified by the referenced real test/source evidence.
+J101-066,UX,G6,Responsive 1440,"Sin overflow, tarjetas 2-col y acciones alineadas.",PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B06,Verified by the referenced real test/source evidence.
+J101-067,UX,G6,Responsive 1280,Sin overflow con rail real y tipografía legible.,PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B06,Verified by the referenced real test/source evidence.
+J101-068,UX,G6,Responsive 768,Tarjetas y toolbar adaptables sin truncar botones.,PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B06,Verified by the referenced real test/source evidence.
+J101-069,UX,G6,Responsive 375,"Tarjetas 1-col, botones >=44px, sin scroll horizontal.",PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B06,Verified by the referenced real test/source evidence.
+J101-070,UX,G6,Texto,No se confunde Confirmado/Publicado/Vinculado/Consulta.,PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B01 / B02 / B06,Verified by the referenced real test/source evidence.
+J101-071,UX,G6,A11y error,"Estado busy/error, role y aria-live correctos; keyboard dialogs.",PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B03 / B04 / B06,Verified by the referenced real test/source evidence.
+J101-072,SEC,G6,Workspace,Acceso a model_id de otro workspace es rechazado por backend.,PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B05 / SQL,Verified by the referenced real test/source evidence.
+J101-073,SEC,G6,Permisos API,Intentos write sin permiso son rechazados aunque se fuerce el request.,PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B05 / SQL,Verified by the referenced real test/source evidence.
+J101-074,SEC,G6,No side effects,GET/Review no escriben y no alteran checks/hash publicados.,PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B04 / B07 / B10,Verified by the referenced real test/source evidence.
+J101-075,SEC,G6,Case invariance,Todos los Cases históricos mantienen version_id/Pack/Run/approval.,PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B02 / B10 / SQL,Synthetic historical fixtures compared; no claim of querying production data.
+J101-076,SEC,G6,Physics,"Regresiones R6 / Saga10 de dominio, D1, D2 continúan pasando.",PASS,G6_TEST_MATRIX_REPORT.md; evidence/,R6 / DOMAIN,Verified by the referenced real test/source evidence.
+J101-077,SEC,G6,Error,Fallos/redirecciones no exponen información de otro workspace.,PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B05 / U01,Verified by the referenced real test/source evidence.
+J101-078,REL,G7,PR,Hay un PR J1.01 sin cambios no relacionados ni conflictos.,PENDING,G6_TEST_MATRIX_REPORT.md; evidence/,PR checks,Await PR creation and conflict verification.
+J101-079,REL,G7,Pruebas,Cada AC presenta test/evidencia real o BLOCKED/FAIL honesto.,PASS,G6_TEST_MATRIX_REPORT.md; evidence/,This matrix / verification index,Verified by the referenced real test/source evidence.
+J101-080,REL,G7,CI,Checks reportados son los verdaderamente ejecutados y requeridos.,PENDING,G6_TEST_MATRIX_REPORT.md; evidence/,GitHub FAST / FULL / required-gate,PENDING until exact candidate GitHub terminal required checks.
+J101-081,REL,G7,Rollback,Existe ruta reversible con feature flag o equivalente real.,PASS,G6_TEST_MATRIX_REPORT.md; evidence/,B12 / RELEASE_ROLLBACK.md,Verified by the referenced real test/source evidence.
+J101-082,REL,G7,No deploy,"Sin merge, despliegue, promoción, billing ni activación de tráfico.",PASS,G6_TEST_MATRIX_REPORT.md; evidence/,Git diff / PR state,Verified by the referenced real test/source evidence.
+J101-083,REL,G7,Handoff,Hay inventario de contratos/IDs y baseline para implementar J1.02.,PASS,G6_TEST_MATRIX_REPORT.md; evidence/,HANDOFF_J102.md,Verified by the referenced real test/source evidence.

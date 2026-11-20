@@ -1,0 +1,12 @@
+✔ incomplete explicit save is honestly local and makes no API call (5.803069ms)
+✔ lost create/publish responses retain exact intents, never write a Case and never duplicate versions (3.805215ms)
+✔ revision conflict retains local content and original revision until explicit reload (0.418897ms)
+✔ creation replay after another edit cannot silently adopt the newer server draft (0.324948ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 21.096408
