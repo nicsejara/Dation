@@ -42,7 +42,7 @@ function mountFields(form,scope,draft,{published:immutable=false}){
   ['Restricciones físicas y reglas','Definí qué límites físicos se controlan y cómo pueden repartirse las órdenes.']
  ].map(([title,copy],i)=>stepPanel(cargo,i+1,title,copy));
  const editor=mountCargoGuidedEditor({units:steps[0].body,products:steps[1].body},scope,saved.catalogue||cfg.cargo,{ui:saved.r4?.cargo||{},profile:cfg.cargo.profile});
- const rules=steps[2].body,ruleGrid=el('div',undefined,'r4-rule-grid'),capacity=el('div'),orderRule=el('div');ruleGrid.append(capacity,orderRule);rules.append(ruleGrid);
+ const rules=steps[2].body,ruleGrid=el('div',undefined,'r4-rule-grid r6-rule-grid'),capacity=el('div'),orderRule=el('div');ruleGrid.append(capacity,orderRule);rules.append(ruleGrid);
  const dimensions=checkboxCards(capacity,'¿Qué restricciones físicas debe controlar Dation?','dimensions',[
  ['weight_kg','Peso máximo','Controla que el peso bruto total no supere la capacidad declarada del vehículo.','weight'],['volume_m3','Volumen máximo','Controla que el volumen exterior total no supere la capacidad volumétrica declarada.','box']
  ],cfg.active_dimensions);dimensions.root.classList.add('guided-two-columns');

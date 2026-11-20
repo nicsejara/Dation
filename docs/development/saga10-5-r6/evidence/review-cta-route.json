@@ -1,0 +1,17 @@
+{
+  "view": [
+    "logistics-case-setup"
+  ],
+  "core_step": [
+    "1"
+  ],
+  "preparation_id": [
+    "2e943f1f-fc67-4bc0-8ab1-9c54c0de09b1"
+  ],
+  "parent_case_id": [
+    "4448233e-14f1-49e1-8c05-3c799aacc15b"
+  ],
+  "return_view": [
+    "logistics-map"
+  ]
+}

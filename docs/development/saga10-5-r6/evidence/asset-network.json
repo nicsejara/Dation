@@ -1,0 +1,68 @@
+[
+  {
+    "name": "pallet-empty.webp",
+    "transfer": 22212,
+    "encoded": 21912,
+    "duration_ms": 17.5
+  },
+  {
+    "name": "box-empty.webp",
+    "transfer": 12118,
+    "encoded": 11818,
+    "duration_ms": 19.899999976158142
+  },
+  {
+    "name": "pallet-loaded.webp",
+    "transfer": 23740,
+    "encoded": 23440,
+    "duration_ms": 7.400000035762787
+  },
+  {
+    "name": "caja-individual.webp",
+    "transfer": 13406,
+    "encoded": 13106,
+    "duration_ms": 17.69999998807907
+  },
+  {
+    "name": "big_bag-empty.webp",
+    "transfer": 24560,
+    "encoded": 24260,
+    "duration_ms": 17.80000001192093
+  },
+  {
+    "name": "crate-empty.webp",
+    "transfer": 16976,
+    "encoded": 16676,
+    "duration_ms": 16.30000001192093
+  },
+  {
+    "name": "other-empty.webp",
+    "transfer": 18276,
+    "encoded": 17976,
+    "duration_ms": 20.80000001192093
+  },
+  {
+    "name": "box-loaded.webp",
+    "transfer": 13406,
+    "encoded": 13106,
+    "duration_ms": 7
+  },
+  {
+    "name": "crate-loaded.webp",
+    "transfer": 21292,
+    "encoded": 20992,
+    "duration_ms": 2.800000011920929
+  },
+  {
+    "name": "big_bag-loaded.webp",
+    "transfer": 29022,
+    "encoded": 28722,
+    "duration_ms": 3.100000023841858
+  },
+  {
+    "name": "other-loaded.webp",
+    "transfer": 21720,
+    "encoded": 21420,
+    "duration_ms": 2.899999976158142
+  }
+]

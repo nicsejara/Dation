@@ -1,0 +1,30 @@
+{
+  "logistic_unit": {
+    "type": "PALLET",
+    "name": "Pallet madera",
+    "dimensions": {
+      "length": 120,
+      "width": 140,
+      "height": 150,
+      "unit": "cm"
+    },
+    "tare_kg": 25
+  },
+  "product": {
+    "package_type": "caja",
+    "dimensions": {
+      "length": 30,
+      "width": 30,
+      "height": 25,
+      "unit": "cm"
+    },
+    "gross_kg": 12,
+    "quantity": 60
+  },
+  "expected": {
+    "exterior_m3": 2.52,
+    "nominal_total_m3": 1.35,
+    "ratio": 0.5357142857142857,
+    "gross_kg": 745
+  }
+}

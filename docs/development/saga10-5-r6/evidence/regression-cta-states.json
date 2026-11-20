@@ -1,0 +1,37 @@
+[
+  {
+    "block": "1",
+    "disabled": true,
+    "state": "confirmed",
+    "bg": "rgb(25, 36, 45)",
+    "border": "rgba(145, 189, 199, 0.18)"
+  },
+  {
+    "block": "2",
+    "disabled": true,
+    "state": "confirmed",
+    "bg": "rgb(25, 36, 45)",
+    "border": "rgba(145, 189, 199, 0.18)"
+  },
+  {
+    "block": "3",
+    "disabled": true,
+    "state": "confirmed",
+    "bg": "rgb(25, 36, 45)",
+    "border": "rgba(145, 189, 199, 0.18)"
+  },
+  {
+    "block": "4",
+    "disabled": true,
+    "state": "confirmed",
+    "bg": "rgb(25, 36, 45)",
+    "border": "rgba(145, 189, 199, 0.18)"
+  },
+  {
+    "block": "5",
+    "disabled": true,
+    "state": "confirmed",
+    "bg": "rgb(25, 36, 45)",
+    "border": "rgba(145, 189, 199, 0.18)"
+  }
+]
