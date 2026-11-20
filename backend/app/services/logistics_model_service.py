@@ -39,8 +39,12 @@ async def call(ctx,operation,arguments=None):
 
 
 async def capabilities(ctx):
+    import os
     from app.services.decision_journey_service import capabilities as journey_capabilities
-    return {**await call(ctx,'capabilities'),'unified_journey_enabled':await journey_capabilities(ctx)}
+    caps=await call(ctx,'capabilities')
+    library=bool(os.getenv('DATION_J101_LIBRARY_ENABLED','false').lower()=='true'
+        and all(caps.get(key,False) for key in ('enabled','saga10_schema_enabled','saga10_ui_enabled')))
+    return {**caps,'unified_journey_enabled':await journey_capabilities(ctx),'models_library_enabled':library}
 
 
 async def require_schema(ctx,config):

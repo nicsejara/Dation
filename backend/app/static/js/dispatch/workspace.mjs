@@ -859,6 +859,7 @@ window.dationSetCoreStep=(step,{history:mode='push'}={})=>{
  const next={...resource,coreStep:step};if(mode!=='none')writeResourceHistory(next,{replace:mode==='replace'});resource=next;
 };
 async function navigateResource(view,options={}){
+  if(options.history!==false&&window.dationModelCanLeave&&!await window.dationModelCanLeave())return;
   if(options.history!==false&&window.dationUltimateCanLeave&&!window.dationUltimateCanLeave())return;
   if(view==='logistics-data'&&!options.caseId&&(options.caseId===null||!state.decisionCase?.id))return navigateResource('logistics-case-setup',{...options,caseId:null,nodeId:null,runId:null,history:true,replace:true});
   if(view==='inicio')view='platform-home';
@@ -869,6 +870,7 @@ async function navigateResource(view,options={}){
   const publicView=Object.entries(aliases).find(([,value])=>value===view)?.[0]||view;
   const next={view:publicView,caseId:!['logistics-data','logistics-map','logistics-config','decision-dashboard','logistics-case-setup','logistics-case-data'].includes(publicView)?null:['logistics-case-setup','logistics-case-data'].includes(publicView)?(options.caseId||null):options.caseId===undefined?state.decisionCase?.id||state.ultimateCaseContext?.id||null:options.caseId,nodeId:options.nodeId===undefined?state.activeNode:options.nodeId,runId:options.runId||(publicView==='decision-dashboard'?state.run?.id||resource?.runId:null)};
   if(['logistics-models','logistics-case-setup'].includes(publicView))next.modelId=options.modelId||null;
+  if(publicView==='logistics-models')for(const key of ['modelView','modelVersionId','modelWorkId','modelReturnId'])next[key]=options[key]||null;
   if(publicView==='logistics-case-setup')for(const key of ['coreStep','preparationId','parentCaseId','returnView','returnNode','returnRun','returnCenter'])next[key]=options[key]||null;
   saveDraft();routeController?.abort();routeController=new AbortController();const generation=++routeGeneration;
   runPolling.stop();pollGeneration++;
@@ -953,6 +955,9 @@ mountTraceability();
 async function restoreResource(event){try{
  if(event?.type==='popstate'&&revertingCoreHistory){revertingCoreHistory=false;return;}
  const target=readResource(location.href),targetIndex=Number.isSafeInteger(history.state?.dationJourneyIndex)?history.state.dationJourneyIndex:journeyHistoryIndex;
+ if(event?.type==='popstate'&&window.dationModelCanLeave&&!await window.dationModelCanLeave()){
+  const delta=journeyHistoryIndex-targetIndex;if(delta){revertingCoreHistory=true;history.go(delta);}else history.replaceState({dationJourneyIndex:journeyHistoryIndex},'',resourceUrl(location.href,resource));return;
+ }
  if(event?.type==='popstate'&&window.dationCoreNavigation?.matches(target)){journeyHistoryIndex=targetIndex;resource=target;window.dationCoreNavigation.restore(target);return;}
  if(event?.type==='popstate'&&window.dationCoreNavigation&&window.dationUltimateCanLeave&&!window.dationUltimateCanLeave()){
   const delta=journeyHistoryIndex-targetIndex;if(delta){revertingCoreHistory=true;history.go(delta);}else history.replaceState({dationJourneyIndex:journeyHistoryIndex},'',resourceUrl(location.href,resource));return;

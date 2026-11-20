@@ -7,6 +7,7 @@ import {decisionCard,decisionChoices,decorateDecisionCase,mountCaseReview,decora
 import {mountPolicy,policyInputValues,GOALS} from '../models/policy.mjs';
 import {ROLES,DIMENSIONS} from '../models/model-fields.mjs';
 import {mountPublishedReview} from '../models/model-published-review.mjs';
+import {browserIdentity,rememberReturn} from '../models/model-library-state.mjs';
 import {mountModelFieldsV2} from '../models/model-fields-v2.mjs';
 import {mountPlanningModel} from '../models/planning-model.mjs';
 import {mountSetupSteps,flattenCorePanel} from '../models/wizard-ui.mjs';
@@ -158,6 +159,7 @@ export async function mountCaseSetup(root,{route,navigate,onContext}){
    planning_start:start.value,planning_end:end.value,horizon_type:type.value,operating_mode:mode.value,expected_updated_at:draft.expected_updated_at,
    decision_owner_user_id:owners.initial?.value||'',owners:Object.fromEntries(['logistics_assignment','logistics_scheduling'].map(id=>[id,{id:owners[id]?.value||draft.owners[id].id,updated_at:draft.owners[id].updated_at}])),policy_values:policyUI.draft()});
   kit.setCollector(collect,()=>{const errors={...(mathEditable?policyUI.validate():{}),...(planningModel?.validate()||{})};if(unified&&fresh&&preparation?.pending)errors.data_preparation='Guardá o quitá los CSV locales en Data Contract & Preparation antes de finalizar.';if(!name.value.trim())errors.case_name='Ingresá el nombre del Case.';if(start.value&&end.value&&start.value>end.value)errors.planning_end='La fecha de fin debe ser igual o posterior a la de inicio.';if(fresh&&canAssign&&(!owners.initial.value||owners.initial.selectedOptions[0]?.disabled))errors.decision_owner_user_id='Elegí un Decision Owner activo y elegible.';return errors;});
+  if(caps.models_library_enabled){const library=button('Abrir biblioteca de modelos',()=>{kit.saveDraft();const modelReturnId=rememberReturn({...route,view:'logistics-case-setup'},browserIdentity());return navigate('logistics-models',{modelReturnId});});library.dataset.openModelLibrary='';header.append(library);}
   const review=mountCaseReview(caseRoot),progress=decorateCaseFooter(kit,{fresh});
   function reflect(){
    const errors=kit.validation(),keys=Object.keys(errors).filter(key=>errors[key]);

@@ -3,11 +3,8 @@ import {el,field,section,choices} from './forms.mjs';
 import {wizardIcon} from './wizard-ui.mjs';
 export const ROLES=[['SHIPPER','Generador de carga'],['LOGISTICS_PROVIDER','Proveedor logístico'],['HYBRID','Operación híbrida']];
 export const DIMENSIONS=[['pallets','Pallets'],['weight_kg','Peso (kg)'],['volume_m3','Volumen (m³)'],['units','Unidades']];
-export const defaultConfiguration=currency=>({version:1,operating_role:'SHIPPER',transport_pattern:'DIRECT',allowed_sources:['OWN','EXTERNAL'],
- active_dimensions:['pallets'],primary_dimension:'pallets',split_permitted:false,homogeneous_loads_declared:false,
- currency_policy:{currency:currency||'ARS',minor_units:2,rounding:'ROUND_HALF_UP'},own_cost_model:'OWN_OPERATING_CYCLE',external_cost_models:['PER_TRIP','PER_KM'],per_km_billing_bases:['ONE_WAY','ROUND_TRIP']});
-
-export const defaultConfigurationV2=currency=>({...defaultConfiguration(currency),version:2,consolidation_permitted:true,resource_categories:[],cargo:{profile:'PALLETIZED',input_mode:'direct',split_policy:'INDIVISIBLE',compatibility_policy:'CATEGORIZED',co_load_pairs:[],products:[],logistic_units:[],presentations:[]}});
+import {defaultConfiguration,defaultConfigurationV2} from './model-defaults.mjs';
+export {defaultConfiguration,defaultConfigurationV2};
 
 export function mountModelFields(form,scope,draft,{wizard=false,version=1,published=false}={}){
  if(draft.configuration.version===2)return mountModelFieldsV2(form,scope,draft,{published});

@@ -9,7 +9,7 @@ import {mountDataContractView} from './data-contract-view.mjs';
 
 // Keep v1 recovery copy unchanged. V2 physical validation is structured by
 // FastAPI; preserve its relevant business messages instead of hiding the cause.
-async function previewV2Draft(configuration,signal){
+export async function previewV2Draft(configuration,signal){
  const response=await fetch('/api/platform/logistics-models/contract-preview',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({configuration}),signal});
  const data=await response.json();
  if(!response.ok){
