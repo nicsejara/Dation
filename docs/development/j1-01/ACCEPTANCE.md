@@ -81,7 +81,7 @@ Evidence IDs and complete methods: [verification index](G6_TEST_MATRIX_REPORT.md
 | J101-075 | Todos los Cases históricos mantienen version_id/Pack/Run/approval. | PASS | B02 / B10 / SQL | Synthetic historical fixtures compared; no claim of querying production data. |
 | J101-076 | Regresiones R6 / Saga10 de dominio, D1, D2 continúan pasando. | PASS | R6 / DOMAIN | Verified by the referenced real test/source evidence. |
 | J101-077 | Fallos/redirecciones no exponen información de otro workspace. | PASS | B05 / U01 | Verified by the referenced real test/source evidence. |
-| J101-078 | Hay un PR J1.01 sin cambios no relacionados ni conflictos. | PENDING | PR checks | Await PR creation and conflict verification. |
+| J101-078 | Hay un PR J1.01 sin cambios no relacionados ni conflictos. | PASS | PR #133 | Open dedicated PR; no conflicts, merge or automerge. |
 | J101-079 | Cada AC presenta test/evidencia real o BLOCKED/FAIL honesto. | PASS | This matrix / verification index | Verified by the referenced real test/source evidence. |
 | J101-080 | Checks reportados son los verdaderamente ejecutados y requeridos. | PENDING | GitHub FAST / FULL / required-gate | PENDING until exact candidate GitHub terminal required checks. |
 | J101-081 | Existe ruta reversible con feature flag o equivalente real. | PASS | B12 / RELEASE_ROLLBACK.md | Verified by the referenced real test/source evidence. |

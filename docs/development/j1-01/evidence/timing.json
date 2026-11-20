@@ -8,5 +8,21 @@
   "seconds_from_g0_to_local_validation": 2173,
   "risk": "R3",
   "full_ci_required": true,
-  "ci_status": "PENDING"
+  "ci_status": "PENDING",
+  "initial_ci": {
+    "run_id": 44827087749,
+    "head": "77b9f1fd7837a29417a90a65293ebba4a82f94a8",
+    "conclusion": "failure",
+    "cause": "pre-existing two orphan frontend modules; reproduced on exact baseline",
+    "python_tests": 782,
+    "python_failures": 1,
+    "python_seconds": 298.337
+  },
+  "focused_import_repair": {
+    "import_graph_tests": 1,
+    "import_graph_status": "PASS",
+    "browser_tests": 3,
+    "browser_seconds": 40.108,
+    "recorded_utc": "2026-11-20T22:26:31.507533+00:00"
+  }
 }

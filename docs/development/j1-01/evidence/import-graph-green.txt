@@ -1,0 +1,6 @@
+test_template_entrypoints_and_relative_imports_resolve (tests.test_frontend_import_graph.FrontendImportGraphTests.test_template_entrypoints_and_relative_imports_resolve) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 0.084s
+
+OK

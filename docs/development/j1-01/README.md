@@ -33,7 +33,7 @@ from Core. **Continuar a Decision Case** resumes the existing Core flow without
 model selection. Contextual return preserves the existing Case draft or pinned
 Case/Graph route. It does not implement J1.02's reordered steps/manual selector.
 
-[Architecture/contracts](ARCHITECTURE.md) · [Future J1.02 interface](HANDOFF_J102.md)
+[Focused baseline CI repair](CI_IMPORT_GRAPH_FIX.md) · [Architecture/contracts](ARCHITECTURE.md) · [Future J1.02 interface](HANDOFF_J102.md)
 · [Manual activation and rollback](RELEASE_ROLLBACK.md).
 
 Browser recovery contains model configuration, not credentials. It is scoped to

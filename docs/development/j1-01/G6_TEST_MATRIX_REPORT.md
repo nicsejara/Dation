@@ -37,6 +37,8 @@ Browser tests live in
 (repository path; evidence IDs above identify complete method names).
 Logs and original PNG/geometry outputs are indexed by [VISUALS](VISUALS.md).
 
+First mandatory CI exposed two pre-existing orphan modules. [Focused repair](CI_IMPORT_GRAPH_FIX.md) records identical baseline/candidate reproduction and the minimal deletion; the graph assertion is unchanged.
+
 ## Commands
 
 Run from `backend` using the existing isolated dependencies:

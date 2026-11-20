@@ -6,15 +6,16 @@ completion time are recorded in the associated PR description after CI**. Updati
 the candidate merely to embed its own CI result would change the validated SHA
 and require another full run. No such circular validation is used.
 
-The two external release criteria (J101-078 PR/conflict status, J101-080 actual CI)
-are tracked as PENDING in the committed matrix until verified, then resolved by
-the final PR report at the same head SHA. A local result never implies CI_GREEN.
+J101-078 is PASS: PR #133 is open on the dedicated branch with no conflicts or
+automerge. J101-080 (actual terminal CI) remains PENDING in the committed matrix
+until resolved by the final PR report at the same head SHA. A local result never implies CI_GREEN.
 
 ## Candidate scope
 
 - Base main: `894f2fa46469ae9b040a550ecca357398c3171f3`.
 - Runtime implementation commit: `90f239a0e5bebd0200c63b714f1abbaba151a1af`.
 - Branch: `feat/j1-01-models-library`; one PR to main, **NOT_MERGED**.
+- Focused pre-existing import-graph repair: [cause/evidence](CI_IMPORT_GRAPH_FIX.md).
 - Risk: **R3**, unmodified classifier; FULL CI mandatory.
 - G0 started 2026-11-20 18:34:59 America/Buenos_Aires.
 - Local final J1.01 browser: **12/12 PASS in 84.317 s**.
