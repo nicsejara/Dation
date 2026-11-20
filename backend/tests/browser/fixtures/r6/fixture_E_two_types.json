@@ -1,0 +1,32 @@
+{
+  "unit": {
+    "type": "PALLET",
+    "dimensions": {
+      "length": 120,
+      "width": 100,
+      "height": 150,
+      "unit": "cm"
+    },
+    "tare_kg": 25
+  },
+  "types": [
+    {
+      "product": "Vino",
+      "quantity": 60,
+      "gross_per_box_kg": 12,
+      "expected_gross_kg": 745
+    },
+    {
+      "product": "Aceite",
+      "quantity": 80,
+      "gross_per_box_kg": 8,
+      "expected_gross_kg": 665
+    }
+  ],
+  "expected": {
+    "exterior_each_m3": 1.8,
+    "type_count": 2,
+    "shared_logistic_unit_id": true,
+    "more_than_two": false
+  }
+}

@@ -6,6 +6,7 @@ import {el,button,field,section,collapsibleSection,pageHeader,draftStore,mountFo
 import {decisionCard,decisionChoices,decorateDecisionCase,mountCaseReview,decorateCaseFooter} from './decision-case-ui.mjs';
 import {mountPolicy,policyInputValues,GOALS} from '../models/policy.mjs';
 import {ROLES,DIMENSIONS} from '../models/model-fields.mjs';
+import {mountPublishedReview} from '../models/model-published-review.mjs';
 import {mountModelFieldsV2} from '../models/model-fields-v2.mjs';
 import {mountPlanningModel} from '../models/planning-model.mjs';
 import {mountSetupSteps,flattenCorePanel} from '../models/wizard-ui.mjs';
@@ -110,9 +111,10 @@ export async function mountCaseSetup(root,{route,navigate,onContext}){
   if(savedCard)caseRoot.append(savedCard);
   const identity=decisionCard(caseRoot,'Identidad del Case','Definí un nombre y una descripción para identificar este Case.','document'),name=field(identity,'Nombre del Case',{name:'case_name',value:draft.name,required:true,maxLength:120}),description=field(identity,'Descripción (opcional)',{name:'case_description',type:'textarea',value:draft.description,maxLength:1000});
   let modelSelect,versionSelect,models;
-  if(!fresh&&caps.saga10_ui_enabled&&current.model_version.config_jsonb.version===2){
+  if(!fresh&&caps.saga10_ui_enabled&&(unified||current.model_version.config_jsonb.version===2)){
    // Review the exact pinned version; never instantiate a new planning draft.
-   const review=mountModelFieldsV2(existingModelPanel.body,scope,{...current.model,configuration:current.model_version.config_jsonb},{published:true});review.lock({published:true});
+   if(unified)mountPublishedReview(existingModelPanel,current,{onChooseVersion:editable&&caps.can_create_case?()=>editSource(root,scope,coreSourceRoute(route),(view,target)=>navigate(view,{...target,...(view==='logistics-case-setup'&&!target.caseId&&target.parentCaseId?{coreStep:1}:{})}),{forceDerive:true}):null});
+   else{const review=mountModelFieldsV2(existingModelPanel.body,scope,{...current.model,configuration:current.model_version.config_jsonb},{published:true});review.lock({published:true});}
    modelSelect={value:current.model.id};versionSelect={value:current.model_version.id};models=async()=>{};
   }else if(!fresh){
   const modelGroup=section(existingModelPanel.body,'Model y versión publicada','La versión elegida queda ligada al Case y no puede reemplazarse después de crear el contexto.');
@@ -179,7 +181,7 @@ export async function mountCaseSetup(root,{route,navigate,onContext}){
    const localNavigation={matches:target=>scope.active&&sameCoreJourney(route,target),restore:target=>{if(!localNavigation.matches(target))return false;const wanted=(target.coreStep||1)-1;steps.show(wanted,true,{history:'none'});if(steps.active!==wanted){steps.show(steps.active,true,{history:'replace',force:true});let note=header.querySelector('[data-journey-navigation-note]');if(!note){note=el('p','','d-metadata');note.dataset.journeyNavigationNote='';note.role='status';header.querySelector('.d-page-header__copy').append(note);}note.textContent='La etapa anterior requiere una versión de modelo seleccionada y su contrato válido. Se conserva el borrador en la etapa disponible.';}return true;}};
    scope.listen(window,'dation:core-step',()=>header.querySelector('[data-journey-navigation-note]')?.remove());
    window.dationCoreNavigation=localNavigation;scope.own(()=>{if(window.dationCoreNavigation===localNavigation)delete window.dationCoreNavigation;});
-   if(row&&editable)existingModelPanel.body.append(button('Crear un Case con otra Model Version',()=>editSource(root,scope,coreSourceRoute(route),navigate,{forceDerive:true})));
+   if(row&&editable&&!existingModelPanel.details.hasAttribute('data-model-review'))existingModelPanel.body.append(button('Crear un Case con otra Model Version',()=>editSource(root,scope,coreSourceRoute(route),navigate,{forceDerive:true})));
    if(row){if(!mathEditable&&editable)horizon.append(button('Crear nuevo Case a partir de este',()=>editSource(root,scope,coreSourceRoute(route),navigate)));}
   }
   if(!fresh){

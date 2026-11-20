@@ -1,0 +1,6 @@
+test_decimal_frontiers_fixtures_and_atomic_saved_types (test_r6_volume_coherence.R6VolumeTests.test_decimal_frontiers_fixtures_and_atomic_saved_types) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 0.074s
+
+OK

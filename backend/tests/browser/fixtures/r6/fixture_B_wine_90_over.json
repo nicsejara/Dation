@@ -1,0 +1,29 @@
+{
+  "logistic_unit": {
+    "type": "PALLET",
+    "dimensions": {
+      "length": 120,
+      "width": 100,
+      "height": 150,
+      "unit": "cm"
+    },
+    "tare_kg": 25
+  },
+  "product": {
+    "package_type": "caja",
+    "dimensions": {
+      "length": 30,
+      "width": 30,
+      "height": 25,
+      "unit": "cm"
+    },
+    "gross_kg": 12,
+    "quantity": 90
+  },
+  "expected": {
+    "nominal_total_m3": 2.025,
+    "exterior_m3": 1.8,
+    "ratio": 1.125,
+    "blocking": true
+  }
+}

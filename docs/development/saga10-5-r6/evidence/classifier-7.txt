@@ -1,0 +1,12 @@
+test_core_ux_must_include_case_smoke (test_rapid_impact.RapidImpactTests.test_core_ux_must_include_case_smoke) ... ok
+test_css (test_rapid_impact.RapidImpactTests.test_css) ... ok
+test_docs (test_rapid_impact.RapidImpactTests.test_docs) ... ok
+test_graph_ux_must_include_dependency_smoke (test_rapid_impact.RapidImpactTests.test_graph_ux_must_include_dependency_smoke) ... ok
+test_mixed_risks_elevate (test_rapid_impact.RapidImpactTests.test_mixed_risks_elevate) ... ok
+test_sql_and_auth_always_full (test_rapid_impact.RapidImpactTests.test_sql_and_auth_always_full) ... ok
+test_workflow_release_and_unknown_fail_closed (test_rapid_impact.RapidImpactTests.test_workflow_release_and_unknown_fail_closed) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.000s
+
+OK

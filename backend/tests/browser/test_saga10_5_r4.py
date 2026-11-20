@@ -74,8 +74,8 @@ class R4Tests(fixture.R4Browser):
    radio=first.locator('[name=guided_unit_type][value='+kind+']');await radio.focus();await self.page.keyboard.press('Space');await self.page.get_by_role('dialog').get_by_role('button',name='Cancelar',exact=True).click()
    self.assertEqual((await self.draft())['configuration']['cargo']['logistic_units'][0]['type'],'PALLET' if kind=='BOX' else previous)
    await radio.focus();await self.page.keyboard.press('Space');await self.page.get_by_role('dialog').get_by_role('button',name='Cambiar unidad',exact=True).click();previous=kind
-   await expect(first.locator('[data-support-art=empty]')).to_have_attribute('data-unit-type',kind)
-   self.assertNotEqual(await first.locator('[data-support-art=empty]').inner_html(),await self.page.locator('[data-support-art=loaded]').first.inner_html())
+   await expect(first.locator('[data-support-art=loaded]')).to_have_attribute('data-unit-type',kind)
+   self.assertNotEqual(await first.locator('[data-support-art=loaded]').inner_html(),await self.page.locator('[data-support-art=individual]').first.inner_html())
    if kind in ['BIG_BAG','OTHER']:
     await first.locator('[name=unit_volume]').fill('');await self.page.locator('[data-confirm-block="3"]').click();await expect(self.page.locator('[data-error-for=cargo_catalog]')).to_contain_text('Completá')
     await first.locator('[name=unit_volume]').fill('1.8');c=(await self.draft())['configuration']['cargo'];self.assertTrue(all(p['loaded_dimensions'] is None and p['external_volume']['value']=='1.8' for p in c['presentations']))
@@ -121,7 +121,7 @@ class R4Tests(fixture.R4Browser):
   for i in range(3):
    await self.page.get_by_role('button',name='Editar datos de origen',exact=True).click();await self.ready(2);await self.page.locator('[data-dation-test=core-step-1]').click();await self.ready(1);await blocks.block(self.page,3)
    await expect(self.page.locator('[data-pro-step]')).to_have_count(3);await expect(self.page.locator('[data-cargo-step]')).to_have_count(0);await expect(self.page.locator('.model-wizard-v2 input:enabled,.model-wizard-v2 select:enabled,.model-wizard-v2 [data-save-load-type]:enabled')).to_have_count(0)
-   await expect(self.page.locator('[data-pro-step="2"]')).to_contain_text('Configuración de solo lectura. Los tipos de carga se conservan sin cambios.');self.assertNotIn('Seleccioná una tarjeta inferior',await self.page.locator('[data-pro-step="2"]').text_content())
+   await expect(self.page.locator('[data-historical-review]')).to_contain_text('Se conserva el contrato original.');self.assertNotIn('Seleccioná una tarjeta inferior',await self.page.locator('[data-pro-step="2"]').text_content())
    await self.page.screenshot(path=str(OUT/f'published-review-return-{i}.png'),full_page=True,animations='disabled')
    current=await self.api('GET','/api/platform/logistics-models/'+mid);self.assertEqual(current,original)
    await self.page.locator('.journey-return-link').click();await self.page.locator('[data-ux05-ready=true]').wait_for();self.assertEqual(parse_qs(urlparse(self.page.url).query)['case_id'],[cid])

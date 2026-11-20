@@ -1,0 +1,45 @@
+{
+  "checks": "R6_EXACT_RELATIVE_1E12_FRONTIERS_FLEXIBLES_ATOMIC_BUFFER_STABLE_IDS_PASS",
+  "records": [
+    {
+      "fixture": "fixture_A_wine_60.json",
+      "status": "informational",
+      "comparable": true,
+      "blocking": false,
+      "exterior": 1.8,
+      "individual": 0.0225,
+      "total": 1.35,
+      "ratio": 0.75
+    },
+    {
+      "fixture": "fixture_B_wine_90_over.json",
+      "status": "invalid_rigid",
+      "comparable": true,
+      "blocking": true,
+      "exterior": 1.8,
+      "individual": 0.0225,
+      "total": 2.025,
+      "ratio": 1.125
+    },
+    {
+      "fixture": "fixture_C_wine_80_equal.json",
+      "status": "warning_equal",
+      "comparable": true,
+      "blocking": false,
+      "exterior": 1.8,
+      "individual": 0.0225,
+      "total": 1.8,
+      "ratio": 1
+    },
+    {
+      "fixture": "fixture_D_pallet_2_52.json",
+      "status": "informational",
+      "comparable": true,
+      "blocking": false,
+      "exterior": 2.52,
+      "individual": 0.0225,
+      "total": 1.35,
+      "ratio": 0.5357142857142857
+    }
+  ]
+}

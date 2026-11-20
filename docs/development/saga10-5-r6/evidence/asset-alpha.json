@@ -1,0 +1,134 @@
+[
+  {
+    "url": "/static/img/logistics/r6/pallet-empty.webp",
+    "width": 300,
+    "height": 335,
+    "zeroAlpha": 0.6841393034825871,
+    "corners": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "url": "/static/img/logistics/r6/pallet-loaded.webp",
+    "width": 300,
+    "height": 335,
+    "zeroAlpha": 0.5198009950248756,
+    "corners": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "url": "/static/img/logistics/r6/box-empty.webp",
+    "width": 300,
+    "height": 335,
+    "zeroAlpha": 0.6456218905472637,
+    "corners": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "url": "/static/img/logistics/r6/box-loaded.webp",
+    "width": 300,
+    "height": 335,
+    "zeroAlpha": 0.7031442786069652,
+    "corners": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "url": "/static/img/logistics/r6/crate-empty.webp",
+    "width": 300,
+    "height": 335,
+    "zeroAlpha": 0.6589054726368159,
+    "corners": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "url": "/static/img/logistics/r6/crate-loaded.webp",
+    "width": 300,
+    "height": 335,
+    "zeroAlpha": 0.6211940298507462,
+    "corners": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "url": "/static/img/logistics/r6/big_bag-empty.webp",
+    "width": 300,
+    "height": 335,
+    "zeroAlpha": 0.6551940298507463,
+    "corners": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "url": "/static/img/logistics/r6/big_bag-loaded.webp",
+    "width": 300,
+    "height": 335,
+    "zeroAlpha": 0.6227562189054726,
+    "corners": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "url": "/static/img/logistics/r6/other-empty.webp",
+    "width": 300,
+    "height": 335,
+    "zeroAlpha": 0.6120796019900497,
+    "corners": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "url": "/static/img/logistics/r6/other-loaded.webp",
+    "width": 300,
+    "height": 335,
+    "zeroAlpha": 0.5880696517412936,
+    "corners": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "url": "/static/img/logistics/r6/caja-individual.webp",
+    "width": 300,
+    "height": 335,
+    "zeroAlpha": 0.7031442786069652,
+    "corners": [
+      0,
+      0,
+      0,
+      0
+    ]
+  }
+]

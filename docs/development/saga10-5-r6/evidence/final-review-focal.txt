@@ -1,0 +1,63 @@
+test_01_geometry_titles_rules_and_complete_forms (test_saga10_5_r6.R6Tests.test_01_geometry_titles_rules_and_complete_forms) ... Executing <Task finished name='Task-1' coro=<Saga10WizardTests.asyncSetUp() done, defined at /workspace/work/dation-saga10-5-r6/backend/tests/browser/test_saga10_wizard.py:24> result=None created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.114 seconds
+Executing <Task pending name='Task-6' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-saga10-5-r6/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.227 seconds
+ok
+test_02_asset_contexts_five_units_and_network (test_saga10_5_r6.R6Tests.test_02_asset_contexts_five_units_and_network) ... Executing <Task pending name='Task-17' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-saga10-5-r6/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.345 seconds
+ok
+test_05_pinned_review_geometry_readonly_and_draft_isolation (test_saga10_5_r6.R6Tests.test_05_pinned_review_geometry_readonly_and_draft_isolation) ... Executing <Task pending name='Task-29' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-saga10-5-r6/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.295 seconds
+ok
+test_06_review_cta_derives_new_case_without_replacing_source (test_saga10_5_r6.R6Tests.test_06_review_cta_derives_new_case_without_replacing_source) ... ERROR
+Executing <Task pending name='Task-43' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-saga10-5-r6/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.243 seconds
+test_07_historical_contradiction_warns_without_writes_or_fake_metadata (test_saga10_5_r6.R6Tests.test_07_historical_contradiction_warns_without_writes_or_fake_metadata) ... Executing <Task pending name='Task-53' coro=<R6Tests.test_07_historical_contradiction_warns_without_writes_or_fake_metadata() running at /workspace/work/dation-saga10-5-r6/backend/tests/browser/test_saga10_5_r6.py:85> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.283 seconds
+Executing <Task pending name='Task-57' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-saga10-5-r6/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.232 seconds
+ok
+test_07_three_csv_case_graph_review_three_returns_and_new (test_saga10_5_r4.R4Tests.test_07_three_csv_case_graph_review_three_returns_and_new) ... Executing <Task finished name='Task-67' coro=<R4Tests.test_07_three_csv_case_graph_review_three_returns_and_new() done, defined at /workspace/work/dation-saga10-5-r6/backend/tests/browser/test_saga10_5_r4.py:110> result=None created at /usr/lib/python3.13/asyncio/runners.py:100> took 1.054 seconds
+Executing <Task pending name='Task-69' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-saga10-5-r6/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.200 seconds
+ok
+
+======================================================================
+ERROR: test_06_review_cta_derives_new_case_without_replacing_source (test_saga10_5_r6.R6Tests.test_06_review_cta_derives_new_case_without_replacing_source)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/usr/lib/python3.13/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/usr/lib/python3.13/asyncio/base_events.py", line 725, in run_until_complete
+    return future.result()
+           ~~~~~~~~~~~~~^^
+  File "/workspace/work/dation-saga10-5-r6/backend/tests/browser/test_saga10_5_r6.py", line 78, in test_06_review_cta_derives_new_case_without_replacing_source
+    for entity in ['transport_demand','order_lines','transport_resources']:await saga.Saga10WizardTests.upload(self,entity)
+                                                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/work/dation-saga10-5-r6/backend/tests/browser/test_saga10_wizard.py", line 63, in upload
+    host=self.page.locator('[data-preparation-entity='+entity+']');await host.locator('input[type=file]').set_input_files({'name':entity+'.csv','mimeType':'text/csv','buffer':raw})
+                                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/async_api/_generated.py", line 20320, in set_input_files
+    await self._impl_obj.set_input_files(
+    ...<3 lines>...
+    )
+  File "/workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_locator.py", line 663, in set_input_files
+    return await self._frame.set_input_files(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_frame.py", line 838, in set_input_files
+    await self._channel.send(
+    ...<8 lines>...
+    )
+  File "/workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py", line 76, in send
+    return await self._connection.wrap_api_call(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py", line 632, in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+playwright._impl._errors.TimeoutError: Locator.set_input_files: Timeout 12000ms exceeded.
+Call log:
+  - waiting for locator("[data-preparation-entity=transport_demand]").locator("input[type=file]")
+
+
+----------------------------------------------------------------------
+Ran 6 tests in 76.517s
+
+FAILED (errors=1)

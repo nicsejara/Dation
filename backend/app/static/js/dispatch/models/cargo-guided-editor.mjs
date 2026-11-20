@@ -1,7 +1,8 @@
+import {coherenceCopy,COHERENCE_SCOPE} from './cargo-volume-coherence.mjs';
 import {el,button,confirmAction} from './forms.mjs';
 import {modelField as field,radioCards,note,readout,display,statusCircle} from './guided-ui.mjs';
 import {dimensionInUnit} from './cargo-presentation-values.mjs';
-import {unitArt,volumeCard,volumeText,sectionHeading} from './cargo-presentation-ui.mjs';
+import {unitArt,bultoArt,volumeCard,volumeText,sectionHeading} from './cargo-presentation-ui.mjs';
 import {createCargoState,volume,fingerprint} from './cargo-guided-state.mjs';
 const TYPES=[['PALLET','Pallet','Mercadería agrupada sobre pallet.','pallet'],['BOX','Caja','Unidad transportada en cajas individuales.','box'],['CRATE','Cajón','Carga despachada en cajones o bins.','container'],['BIG_BAG','Big bag','Carga contenida en big bags flexibles.','bag'],['OTHER','Otra unidad','Configuración personalizada.','layers']];
 const nameOf=type=>TYPES.find(t=>t[0]===type)?.[1]||type;
@@ -9,7 +10,7 @@ const nameOf=type=>TYPES.find(t=>t[0]===type)?.[1]||type;
 // catalog manager is not mounted or hidden beneath it.
 export function mountCargoGuidedEditor({units:one,products:two},scope,catalog,{ui={},profile}={}){
  const model=createCargoState(catalog,ui),s=model.state,originalType=s.unit.type,unitControls={},productControls={};let locked=false,busy=false,showErrors=false,previewError=false,unitChanged=false;
- const type=radioCards(one,'Tipo de unidad logística','guided_unit_type',TYPES,s.unit.type);type.root.classList.add('guided-five-columns','r5-unit-options');
+ const type=radioCards(one,'Tipo de unidad logística','guided_unit_type',TYPES,s.unit.type);type.root.classList.add('guided-five-columns','r5-unit-options');type.root.querySelector('legend').classList.add('r6-section-title');
  for(const input of type.root.querySelectorAll('input')){const icon=input.closest('label').querySelector('svg'),art=unitArt(input.value);delete art.node.dataset.supportArt;art.node.dataset.artSlot='option';icon.replaceWith(art.node);}
  const choiceHelp=el('p','Seleccioná la unidad principal con la que transportás la carga.','d-field__help');type.root.insertBefore(choiceHelp,type.root.querySelector('.guided-radio-grid'));
  note(one,'Elegí la unidad logística que realmente viaja en el transporte. Su composición se define en el Paso 2.');
@@ -42,24 +43,26 @@ export function mountCargoGuidedEditor({units:one,products:two},scope,catalog,{u
  const feedback=el('p',undefined,'d-metadata');feedback.role='status';feedback.setAttribute('aria-live','polite');const saveGuide=el('aside',undefined,'r5-save-guide');saveGuide.dataset.saveGuide='';saveGuide.append(el('strong','Tipo registrado en este borrador'),el('p','Completá nuevamente el formulario superior si necesitás registrar otro producto para esta misma unidad logística.'));two.append(saveGuide);
  const actionRow=el('div',undefined,'r4-save-row'),save=button('Guardar tipo de carga',saveType,'primary');save.dataset.saveLoadType='';actionRow.append(feedback,save);two.append(actionRow);
  const history=el('section',undefined,'r4-history'),historyHead=el('header',undefined,'r5-history-heading'),historyTitle=el('h4','Tipos de carga registrados'),counter=el('span',undefined,'d-metadata'),cards=el('div',undefined,'r4-history-cards'),limit=el('p',undefined,'guided-note');historyHead.append(historyTitle,counter);history.append(historyHead,el('p','Cada tarjeta representa una carga homogénea guardada para esta unidad logística.','d-field__help'),cards);history.dataset.loadHistory='';two.append(history,limit);
- const emptyArt=unitArt(s.unit.type),loadedArt=unitArt(s.unit.type,{loaded:true}),unitReadings=el('dl'),productReadings=el('dl'),unitBridge=note(el('div'),'En el siguiente paso vas a definir el contenido de esta unidad.');unitSummary.append(el('h4','Resumen de la unidad'),emptyArt.node,unitReadings,unitBridge);productSummary.append(el('h4','Resumen de la composición'),loadedArt.node,productReadings);
+ const unitIllustration=unitArt(s.unit.type,{loaded:true}),packageIllustration=bultoArt(s.form.values.packageType),unitReadings=el('dl'),productReadings=el('dl'),unitBridge=note(el('div'),'El volumen exterior incluye soporte y espacios no ocupados; no es volumen útil certificado.');unitSummary.append(el('h4','Resumen de la unidad logística'),unitIllustration.node,unitReadings,unitBridge);productSummary.append(el('h4','Resumen del bulto'),packageIllustration.node,productReadings);
+ const genericArt=el('p','Ilustración genérica del bulto.','d-metadata'),coherenceBox=el('section',undefined,'r6-coherence'),coherenceValues=el('dl'),coherenceTrack=el('div',undefined,'r6-coherence-track'),coherenceBar=el('span'),coherenceMessage=el('p'),coherenceScope=el('p',COHERENCE_SCOPE,'d-field__help');coherenceBox.dataset.coherence='';coherenceBox.append(el('h5','Coherencia volumétrica'),coherenceValues,coherenceTrack,coherenceMessage,coherenceScope);coherenceTrack.setAttribute('aria-hidden','true');coherenceTrack.append(coherenceBar);productSummary.append(genericArt,coherenceBox);
+ const quantityError=productControls.quantity.closest('.d-field').querySelector('.d-field__error');quantityError.role='alert';
  const cardViews=new Map();let feedbackKind='state';
  for(const n of [...Object.values(unitControls),...Object.values(productControls)])if(n.type==='number'){n.step=n.name==='product_quantity'?'1':'any';n.min=n.name==='unit_tare'?'0':'0.000001';}
  function notify(){one.dispatchEvent(new Event('change',{bubbles:true}));}
  function resetForm(){for(const [key,n]of Object.entries(productControls)){if(key==='packageType'&&![...n.options].some(o=>o.value===s.form.values[key])){const o=el('option',s.form.values[key]);o.value=s.form.values[key];n.append(o);}n.value=s.form.values[key];}showErrors=false;paint({});}
- function paint(errors){for(const n of [...Object.values(unitControls),...Object.values(productControls)]){const error=errors[n.name];if(error)n.setAttribute('aria-invalid','true');else n.removeAttribute('aria-invalid');n.closest('.d-field').querySelector('.d-field__error').textContent=error||'';}}
+ function paint(errors){for(const n of [...Object.values(unitControls),...Object.values(productControls)]){const error=errors[n.name];if(error)n.setAttribute('aria-invalid','true');else n.removeAttribute('aria-invalid');const box=n.closest('.d-field').querySelector('.d-field__error');if(box.textContent!==(error||''))box.textContent=error||'';}}
  function values(){for(const [key,n]of Object.entries(productControls))s.form.values[key]=n.value;}
  function stats(v){const quantity=Number(v.quantity),mass=Number(v.massKg),tare=Number(s.unit.tareKg);return v.quantity!==''&&v.massKg!==''&&s.unit.tareKg!==''&&quantity>0&&mass>0?{content:quantity*mass,gross:quantity*mass+tare}:null;}
  function summarize(){
   const u=s.unit,v=s.form.values,st=stats(v),unit=nameOf(u.type),vol=model.unitVolume();unitVolume.update(vol,['BIG_BAG','OTHER'].includes(u.type)?'Volumen exterior declarado para esta unidad.':undefined);packageVolume.update(volume(v));
-  emptyArt.update(u.type);loadedArt.update(u.type);unitReadings.replaceChildren();
+  unitIllustration.update(u.type);packageIllustration.update(v.packageType);genericArt.hidden=v.packageType==='caja';unitReadings.replaceChildren();
   readout(unitReadings,'Tipo',unit);readout(unitReadings,'Dimensiones',vol===null?null:['BIG_BAG','OTHER'].includes(u.type)?volumeText(vol):[u.length,u.width,u.height].join(' × ')+' '+u.measure);readout(unitReadings,'Tara',display(u.tareKg,'kg'));readout(unitReadings,'Volumen exterior',volumeText(vol));
-  productReadings.replaceChildren();readout(productReadings,'Producto',v.name||null);readout(productReadings,'Tipo de bulto',v.packageType);readout(productReadings,'Bultos por unidad',display(v.quantity));readout(productReadings,'Peso por bulto',display(v.massKg,'kg'));readout(productReadings,'Peso del contenido',display(st?.content,'kg'));readout(productReadings,'Tara',display(u.tareKg,'kg'));const total=readout(productReadings,'Peso bruto total',display(st?.gross,'kg'));total.dataset.cargoMetric='gross';total.classList.add('r5-gross-total');readout(productReadings,'Volumen exterior',volumeText(vol));if(st)readout(productReadings,'Cálculo',display(v.quantity)+' × '+display(v.massKg,'kg')+' + '+display(u.tareKg,'kg')+' = '+display(st.gross,'kg'));
+  productReadings.replaceChildren();readout(productReadings,'Producto',v.name||null);readout(productReadings,'Tipo de bulto',v.packageType);readout(productReadings,'Bultos por unidad',display(v.quantity));readout(productReadings,'Peso por bulto',display(v.massKg,'kg'));readout(productReadings,'Peso del contenido',display(st?.content,'kg'));readout(productReadings,'Tara',display(u.tareKg,'kg'));const total=readout(productReadings,'Peso bruto total de la unidad',display(st?.gross,'kg'));total.dataset.cargoMetric='gross';total.classList.add('r5-gross-total');readout(productReadings,'Volumen exterior',volumeText(vol));if(st)readout(productReadings,'Cálculo',display(v.quantity)+' × '+display(v.massKg,'kg')+' + '+display(u.tareKg,'kg')+' = '+display(st.gross,'kg'));
  }
  function renderHistory(){
-  history.hidden=s.savedTypes.length===0;counter.textContent=s.savedTypes.length+' de 2 tipos';const nodes=[];
+  history.hidden=s.savedTypes.length===0;counter.textContent=s.savedTypes.length+(s.savedTypes.length===1?' tipo registrado':' tipos registrados');const nodes=[];
   for(const [i,t]of s.savedTypes.entries()){
-   const v=model.formFrom(t),st=stats(v),id=t.presentation.presentation_id,needsReview=s.review||s.form.target===id&&model.dirty();let view=cardViews.get(id);
+   const v=model.formFrom(t),st=stats(v),id=t.presentation.presentation_id,needsReview=model.coherence(v).blocking||s.review||s.form.target===id&&model.dirty();let view=cardViews.get(id);
    if(!view){const card=button('',async()=>{
     if(locked||busy)return;if(model.dirty()&&!await confirmAction(one.closest('form'),scope,'Conservar o descartar cambios','Hay cambios sin guardar en el formulario. Podés cancelar para conservarlos o descartarlos para abrir el tipo seleccionado.','Descartar cambios'))return;
     model.select(id);resetForm();feedbackKind='state';refresh();notify();productControls.name.focus();
@@ -86,7 +89,8 @@ export function mountCargoGuidedEditor({units:one,products:two},scope,catalog,{u
   save.textContent=s.form.target?'Actualizar tipo de carga':'Guardar tipo de carga';save.disabled=locked||busy||full||!!s.form.target&&!model.dirty()||!s.form.target&&s.savedTypes.length>0&&!model.dirty();save.setAttribute('aria-busy',String(busy));
   limit.hidden=!locked&&!full;limit.textContent=locked?'Configuración de solo lectura. Los tipos de carga se conservan sin cambios.':full?'Ya registraste dos tipos de carga. Seleccioná una tarjeta inferior para revisar o actualizar uno.':'';
   for(const [key,label]of [['length','Largo'],['width','Ancho'],['height','Alto']])productControls[key].closest('.d-field').querySelector('label').textContent=label+' de '+s.form.values.packageType+' ('+s.form.values.unit+') *';
-  if(showErrors)paint(model.formErrors());summarize();renderHistory();saveMessage();
+  const coherent=model.coherence();save.disabled=save.disabled||coherent.blocking;paint(showErrors?model.formErrors():coherent.blocking?{product_quantity:coherenceCopy(coherent)}:{});summarize();renderHistory();saveMessage();
+  coherenceBox.dataset.state=coherent.status;coherenceBox.dataset.ratio=coherent.ratio??'';coherenceValues.replaceChildren();readout(coherenceValues,'Volumen exterior',volumeText(coherent.exterior));readout(coherenceValues,'Volumen nominal de bultos',volumeText(coherent.total));readout(coherenceValues,'Relación volumétrica',coherent.ratio===null?'Pendiente':new Intl.NumberFormat('es-AR',{maximumFractionDigits:2}).format(coherent.ratio*100)+' %');coherenceBar.style.width=coherent.ratio===null?'0%':Math.min(coherent.ratio*100,100)+'%';coherenceTrack.hidden=coherent.ratio===null;coherenceMessage.textContent=coherenceCopy(coherent);
  }
  function saveType(){
   if(locked||busy||save.disabled)return;values();busy=true;const result=model.save();busy=false;

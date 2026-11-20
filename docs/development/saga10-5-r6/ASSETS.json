@@ -1,0 +1,233 @@
+{
+  "total_bytes": 1044235,
+  "webp_bytes": 213428,
+  "png_fallback_bytes": 830807,
+  "files": [
+    {
+      "path": "backend/app/static/img/logistics/r6/big_bag-empty.png",
+      "bytes": 80875,
+      "sha256": "7c701a1846c797a316bf8bfe596cceab73ea551885b7bde9c1a8c88225232794",
+      "source": "05_ASSETS_3D/candidatos/empty/big_bag.png",
+      "source_sha256": "7c701a1846c797a316bf8bfe596cceab73ea551885b7bde9c1a8c88225232794",
+      "unaltered": true,
+      "role": "empty",
+      "notes": "Original R6 supplied bytes"
+    },
+    {
+      "path": "backend/app/static/img/logistics/r6/big_bag-empty.webp",
+      "bytes": 24260,
+      "sha256": "23ff53aeb78c4501ab50c34103395987b16731c53873e8f3fecfff832bb88b8d",
+      "source": "05_ASSETS_3D/candidatos/empty/big_bag.webp",
+      "source_sha256": "23ff53aeb78c4501ab50c34103395987b16731c53873e8f3fecfff832bb88b8d",
+      "unaltered": true,
+      "role": "empty",
+      "notes": "Original R6 supplied bytes"
+    },
+    {
+      "path": "backend/app/static/img/logistics/r6/big_bag-loaded.png",
+      "bytes": 96430,
+      "sha256": "58e771cb7e3a1d90a45fe33a32c27b40b05ed933f1ed5faa77bae5091accde01",
+      "source": "05_ASSETS_3D/candidatos/loaded/big_bag.png",
+      "source_sha256": "58e771cb7e3a1d90a45fe33a32c27b40b05ed933f1ed5faa77bae5091accde01",
+      "unaltered": true,
+      "role": "loaded",
+      "notes": "Original R6 supplied bytes"
+    },
+    {
+      "path": "backend/app/static/img/logistics/r6/big_bag-loaded.webp",
+      "bytes": 28722,
+      "sha256": "96f7b224adaefe4a6df03ae8339f5ae2828059ec706358832af04813826b3d24",
+      "source": "05_ASSETS_3D/candidatos/loaded/big_bag.webp",
+      "source_sha256": "96f7b224adaefe4a6df03ae8339f5ae2828059ec706358832af04813826b3d24",
+      "unaltered": true,
+      "role": "loaded",
+      "notes": "Original R6 supplied bytes"
+    },
+    {
+      "path": "backend/app/static/img/logistics/r6/box-empty.png",
+      "bytes": 67008,
+      "sha256": "deb5081dc7ff267dea8a8cf1070219c888ff153c27ca0012218063e3c139a2e9",
+      "source": "05_ASSETS_3D/candidatos/empty/box.png",
+      "source_sha256": "2b2636413f5a5dd5eaafa99796c5df28927085c0644a8ad976643c8b8ec214a5",
+      "unaltered": false,
+      "role": "empty",
+      "notes": "ImageGen removal of detached left sliver; rejected first result for alpha; accepted second edit normalized to 300x335 via ImageMagick and WebP quality85",
+      "edit_source": "evidence/box-empty-cleanup-source.png",
+      "edit_source_sha256": "0339e7aee836409b32338b50f692b5b37444108177e67e5b4f2a4558f735a565",
+      "normalization": "magick source.png -resize 270x260 -background none -gravity center -extent 300x335 box-empty.png; magick box-empty.png -quality 85 box-empty.webp"
+    },
+    {
+      "path": "backend/app/static/img/logistics/r6/box-empty.webp",
+      "bytes": 11818,
+      "sha256": "8f39f4d2f5c4d802027cde1bb1e70a05a3d6976d0104344608ef529caf6ab771",
+      "source": "05_ASSETS_3D/candidatos/empty/box.webp",
+      "source_sha256": "90646b2b1c84d2f41c005a4b0ba5183eb280b60ca3bfee564d5ffd0c93025061",
+      "unaltered": false,
+      "role": "empty",
+      "notes": "ImageGen removal of detached left sliver; rejected first result for alpha; accepted second edit normalized to 300x335 via ImageMagick and WebP quality85",
+      "edit_source": "evidence/box-empty-cleanup-source.png",
+      "edit_source_sha256": "0339e7aee836409b32338b50f692b5b37444108177e67e5b4f2a4558f735a565",
+      "normalization": "magick source.png -resize 270x260 -background none -gravity center -extent 300x335 box-empty.png; magick box-empty.png -quality 85 box-empty.webp"
+    },
+    {
+      "path": "backend/app/static/img/logistics/r6/box-loaded.png",
+      "bytes": 56198,
+      "sha256": "0ad0e19457242368ad773450588acd3c8f743544251ef9a5aee6752d67b6ec08",
+      "source": "05_ASSETS_3D/candidatos/loaded/box.png",
+      "source_sha256": "0ad0e19457242368ad773450588acd3c8f743544251ef9a5aee6752d67b6ec08",
+      "unaltered": true,
+      "role": "loaded",
+      "notes": "Original R6 supplied bytes"
+    },
+    {
+      "path": "backend/app/static/img/logistics/r6/box-loaded.webp",
+      "bytes": 13106,
+      "sha256": "61cea1a6e5a0e6f25465c21bccc8fa7be1ce447b4e07862d77a4f9dd662c1f5c",
+      "source": "05_ASSETS_3D/candidatos/loaded/box.webp",
+      "source_sha256": "61cea1a6e5a0e6f25465c21bccc8fa7be1ce447b4e07862d77a4f9dd662c1f5c",
+      "unaltered": true,
+      "role": "loaded",
+      "notes": "Original R6 supplied bytes"
+    },
+    {
+      "path": "backend/app/static/img/logistics/r6/caja-individual.png",
+      "bytes": 56198,
+      "sha256": "0ad0e19457242368ad773450588acd3c8f743544251ef9a5aee6752d67b6ec08",
+      "source": "05_ASSETS_3D/candidatos/individual_bulto/caja_individual.png",
+      "source_sha256": "0ad0e19457242368ad773450588acd3c8f743544251ef9a5aee6752d67b6ec08",
+      "unaltered": true,
+      "role": "individual_package",
+      "notes": "Original R6 supplied bytes"
+    },
+    {
+      "path": "backend/app/static/img/logistics/r6/caja-individual.webp",
+      "bytes": 13106,
+      "sha256": "61cea1a6e5a0e6f25465c21bccc8fa7be1ce447b4e07862d77a4f9dd662c1f5c",
+      "source": "05_ASSETS_3D/candidatos/individual_bulto/caja_individual.webp",
+      "source_sha256": "61cea1a6e5a0e6f25465c21bccc8fa7be1ce447b4e07862d77a4f9dd662c1f5c",
+      "unaltered": true,
+      "role": "individual_package",
+      "notes": "Original R6 supplied bytes"
+    },
+    {
+      "path": "backend/app/static/img/logistics/r6/crate-empty.png",
+      "bytes": 66089,
+      "sha256": "b5365725cdeb718f9d44e966063c1290768acdfd971c249df9813ab5b354511a",
+      "source": "05_ASSETS_3D/candidatos/empty/crate.png",
+      "source_sha256": "b5365725cdeb718f9d44e966063c1290768acdfd971c249df9813ab5b354511a",
+      "unaltered": true,
+      "role": "empty",
+      "notes": "Original R6 supplied bytes"
+    },
+    {
+      "path": "backend/app/static/img/logistics/r6/crate-empty.webp",
+      "bytes": 16676,
+      "sha256": "8e4b3e1da7729acabc51a65cf9915128606bbc9e73b68c1271ddcadde7aec018",
+      "source": "05_ASSETS_3D/candidatos/empty/crate.webp",
+      "source_sha256": "8e4b3e1da7729acabc51a65cf9915128606bbc9e73b68c1271ddcadde7aec018",
+      "unaltered": true,
+      "role": "empty",
+      "notes": "Original R6 supplied bytes"
+    },
+    {
+      "path": "backend/app/static/img/logistics/r6/crate-loaded.png",
+      "bytes": 80070,
+      "sha256": "32bfb778beef196abcd39aa3feab7ef521d5055060a5c428212544f7fbb8aa62",
+      "source": "05_ASSETS_3D/candidatos/loaded/crate.png",
+      "source_sha256": "32bfb778beef196abcd39aa3feab7ef521d5055060a5c428212544f7fbb8aa62",
+      "unaltered": true,
+      "role": "loaded",
+      "notes": "Original R6 supplied bytes"
+    },
+    {
+      "path": "backend/app/static/img/logistics/r6/crate-loaded.webp",
+      "bytes": 20992,
+      "sha256": "9e241735a429f3bad5b666b39aaf2d9da5f985d8dc44c3c6fe9c28053f6512bc",
+      "source": "05_ASSETS_3D/candidatos/loaded/crate.webp",
+      "source_sha256": "9e241735a429f3bad5b666b39aaf2d9da5f985d8dc44c3c6fe9c28053f6512bc",
+      "unaltered": true,
+      "role": "loaded",
+      "notes": "Original R6 supplied bytes"
+    },
+    {
+      "path": "backend/app/static/img/logistics/r6/other-empty.png",
+      "bytes": 71775,
+      "sha256": "0cd132bbbb9c9e2b10928408be504ad4e2331a885f87cdbaa3f4194d0252bf2f",
+      "source": "05_ASSETS_3D/candidatos/empty/other.png",
+      "source_sha256": "0cd132bbbb9c9e2b10928408be504ad4e2331a885f87cdbaa3f4194d0252bf2f",
+      "unaltered": true,
+      "role": "empty",
+      "notes": "Original R6 supplied bytes"
+    },
+    {
+      "path": "backend/app/static/img/logistics/r6/other-empty.webp",
+      "bytes": 17976,
+      "sha256": "7607c4a8751e5d4bc6bcff35206bebcafb80dd00b8701ac9c123b59a3dcf6d2a",
+      "source": "05_ASSETS_3D/candidatos/empty/other.webp",
+      "source_sha256": "7607c4a8751e5d4bc6bcff35206bebcafb80dd00b8701ac9c123b59a3dcf6d2a",
+      "unaltered": true,
+      "role": "empty",
+      "notes": "Original R6 supplied bytes"
+    },
+    {
+      "path": "backend/app/static/img/logistics/r6/other-loaded.png",
+      "bytes": 81626,
+      "sha256": "0c06c42eb1fb94714475f6f25098b1147be12610e9be95489219243d119341a8",
+      "source": "05_ASSETS_3D/candidatos/loaded/other.png",
+      "source_sha256": "0c06c42eb1fb94714475f6f25098b1147be12610e9be95489219243d119341a8",
+      "unaltered": true,
+      "role": "loaded",
+      "notes": "Original R6 supplied bytes"
+    },
+    {
+      "path": "backend/app/static/img/logistics/r6/other-loaded.webp",
+      "bytes": 21420,
+      "sha256": "b2a72fd9fd27fb2cf027c8ebea3e8b192c1465eb0dacbdc4147d95a29a358a97",
+      "source": "05_ASSETS_3D/candidatos/loaded/other.webp",
+      "source_sha256": "b2a72fd9fd27fb2cf027c8ebea3e8b192c1465eb0dacbdc4147d95a29a358a97",
+      "unaltered": true,
+      "role": "loaded",
+      "notes": "Original R6 supplied bytes"
+    },
+    {
+      "path": "backend/app/static/img/logistics/r6/pallet-empty.png",
+      "bytes": 77481,
+      "sha256": "1daa2c976a3fcfb45311f2b31fe1b3689f98610a73dd65299fcf66da5531a754",
+      "source": "05_ASSETS_3D/candidatos/empty/pallet.png",
+      "source_sha256": "1daa2c976a3fcfb45311f2b31fe1b3689f98610a73dd65299fcf66da5531a754",
+      "unaltered": true,
+      "role": "empty",
+      "notes": "Original R6 supplied bytes"
+    },
+    {
+      "path": "backend/app/static/img/logistics/r6/pallet-empty.webp",
+      "bytes": 21912,
+      "sha256": "325e5de00ccc63e9c59bd5151280dd504ccb1001970dce3f3e7aeb29cf684895",
+      "source": "05_ASSETS_3D/candidatos/empty/pallet.webp",
+      "source_sha256": "325e5de00ccc63e9c59bd5151280dd504ccb1001970dce3f3e7aeb29cf684895",
+      "unaltered": true,
+      "role": "empty",
+      "notes": "Original R6 supplied bytes"
+    },
+    {
+      "path": "backend/app/static/img/logistics/r6/pallet-loaded.png",
+      "bytes": 97057,
+      "sha256": "0d2e54d8d37fc0440efc6bd67fff0c9bfa57597996025d3c6bdcc6562ab9b26a",
+      "source": "05_ASSETS_3D/candidatos/loaded/pallet.png",
+      "source_sha256": "0d2e54d8d37fc0440efc6bd67fff0c9bfa57597996025d3c6bdcc6562ab9b26a",
+      "unaltered": true,
+      "role": "loaded",
+      "notes": "Original R6 supplied bytes"
+    },
+    {
+      "path": "backend/app/static/img/logistics/r6/pallet-loaded.webp",
+      "bytes": 23440,
+      "sha256": "dbc54b55f00d1ba57d5ec1bdcb582f50e3547eab9edbdac44d5462192257d92c",
+      "source": "05_ASSETS_3D/candidatos/loaded/pallet.webp",
+      "source_sha256": "dbc54b55f00d1ba57d5ec1bdcb582f50e3547eab9edbdac44d5462192257d92c",
+      "unaltered": true,
+      "role": "loaded",
+      "notes": "Original R6 supplied bytes"
+    }
+  ]
+}
