@@ -1,0 +1,666 @@
+[
+  {
+    "width": 1440,
+    "scroll": 1440,
+    "client": 1440,
+    "controls": [
+      {
+        "label": "Crear Decision Case",
+        "disabled": false,
+        "rect": {
+          "x": 288,
+          "y": 274.171875,
+          "width": 989.625,
+          "height": 44,
+          "top": 274.171875,
+          "right": 1277.625,
+          "bottom": 318.171875,
+          "left": 288
+        }
+      },
+      {
+        "label": "01 \u00b7 Logistics Models",
+        "disabled": false,
+        "rect": {
+          "x": 288,
+          "y": 367.171875,
+          "width": 190,
+          "height": 44,
+          "top": 367.171875,
+          "right": 478,
+          "bottom": 411.171875,
+          "left": 288
+        }
+      },
+      {
+        "label": "02 \u00b7 Decision Case",
+        "disabled": false,
+        "rect": {
+          "x": 288,
+          "y": 421.171875,
+          "width": 190,
+          "height": 44,
+          "top": 421.171875,
+          "right": 478,
+          "bottom": 465.171875,
+          "left": 288
+        }
+      },
+      {
+        "label": "03 \u00b7 Data Preparation",
+        "disabled": true,
+        "rect": {
+          "x": 288,
+          "y": 475.171875,
+          "width": 190,
+          "height": 44,
+          "top": 475.171875,
+          "right": 478,
+          "bottom": 519.171875,
+          "left": 288
+        }
+      },
+      {
+        "label": "j102_case_search",
+        "disabled": false,
+        "rect": {
+          "x": 502,
+          "y": 394.671875,
+          "width": 530,
+          "height": 44,
+          "top": 394.671875,
+          "right": 1032,
+          "bottom": 438.671875,
+          "left": 502
+        }
+      },
+      {
+        "label": "j102_case_filter",
+        "disabled": false,
+        "rect": {
+          "x": 1048,
+          "y": 394.671875,
+          "width": 200,
+          "height": 44,
+          "top": 394.671875,
+          "right": 1248,
+          "bottom": 438.671875,
+          "left": 1048
+        }
+      },
+      {
+        "label": "Buscar Cases",
+        "disabled": false,
+        "rect": {
+          "x": 1264,
+          "y": 394.671875,
+          "width": 120,
+          "height": 44,
+          "top": 394.671875,
+          "right": 1384,
+          "bottom": 438.671875,
+          "left": 1264
+        }
+      },
+      {
+        "label": "Reintentar Cases",
+        "disabled": false,
+        "rect": {
+          "x": 952,
+          "y": 458.671875,
+          "width": 432,
+          "height": 44,
+          "top": 458.671875,
+          "right": 1384,
+          "bottom": 502.671875,
+          "left": 952
+        }
+      },
+      {
+        "label": "Cases anteriores",
+        "disabled": false,
+        "rect": {
+          "x": 785.640625,
+          "y": 522.671875,
+          "width": 138.78125,
+          "height": 44,
+          "top": 522.671875,
+          "right": 924.421875,
+          "bottom": 566.671875,
+          "left": 785.640625
+        }
+      },
+      {
+        "label": "M\u00e1s Cases",
+        "disabled": true,
+        "rect": {
+          "x": 999.125,
+          "y": 522.671875,
+          "width": 101.21875,
+          "height": 44,
+          "top": 522.671875,
+          "right": 1100.34375,
+          "bottom": 566.671875,
+          "left": 999.125
+        }
+      },
+      {
+        "label": "\u2190",
+        "disabled": false,
+        "rect": {
+          "x": 313,
+          "y": 639.671875,
+          "width": 44,
+          "height": 44,
+          "top": 639.671875,
+          "right": 357,
+          "bottom": 683.671875,
+          "left": 313
+        }
+      }
+    ],
+    "contrast": {
+      "minimum": 6.161887829123643,
+      "count": 19,
+      "failures": []
+    }
+  },
+  {
+    "width": 1280,
+    "scroll": 1280,
+    "client": 1280,
+    "controls": [
+      {
+        "label": "Crear Decision Case",
+        "disabled": false,
+        "rect": {
+          "x": 288,
+          "y": 273.96875,
+          "width": 829.625,
+          "height": 44,
+          "top": 273.96875,
+          "right": 1117.625,
+          "bottom": 317.96875,
+          "left": 288
+        }
+      },
+      {
+        "label": "01 \u00b7 Logistics Models",
+        "disabled": false,
+        "rect": {
+          "x": 288,
+          "y": 366.96875,
+          "width": 190,
+          "height": 44,
+          "top": 366.96875,
+          "right": 478,
+          "bottom": 410.96875,
+          "left": 288
+        }
+      },
+      {
+        "label": "02 \u00b7 Decision Case",
+        "disabled": false,
+        "rect": {
+          "x": 288,
+          "y": 420.96875,
+          "width": 190,
+          "height": 44,
+          "top": 420.96875,
+          "right": 478,
+          "bottom": 464.96875,
+          "left": 288
+        }
+      },
+      {
+        "label": "03 \u00b7 Data Preparation",
+        "disabled": true,
+        "rect": {
+          "x": 288,
+          "y": 474.96875,
+          "width": 190,
+          "height": 44,
+          "top": 474.96875,
+          "right": 478,
+          "bottom": 518.96875,
+          "left": 288
+        }
+      },
+      {
+        "label": "j102_case_search",
+        "disabled": false,
+        "rect": {
+          "x": 502,
+          "y": 394.46875,
+          "width": 370,
+          "height": 44,
+          "top": 394.46875,
+          "right": 872,
+          "bottom": 438.46875,
+          "left": 502
+        }
+      },
+      {
+        "label": "j102_case_filter",
+        "disabled": false,
+        "rect": {
+          "x": 888,
+          "y": 394.46875,
+          "width": 200,
+          "height": 44,
+          "top": 394.46875,
+          "right": 1088,
+          "bottom": 438.46875,
+          "left": 888
+        }
+      },
+      {
+        "label": "Buscar Cases",
+        "disabled": false,
+        "rect": {
+          "x": 1104,
+          "y": 394.46875,
+          "width": 120,
+          "height": 44,
+          "top": 394.46875,
+          "right": 1224,
+          "bottom": 438.46875,
+          "left": 1104
+        }
+      },
+      {
+        "label": "Reintentar Cases",
+        "disabled": false,
+        "rect": {
+          "x": 872,
+          "y": 458.46875,
+          "width": 352,
+          "height": 44,
+          "top": 458.46875,
+          "right": 1224,
+          "bottom": 502.46875,
+          "left": 872
+        }
+      },
+      {
+        "label": "Cases anteriores",
+        "disabled": false,
+        "rect": {
+          "x": 705.640625,
+          "y": 522.46875,
+          "width": 138.78125,
+          "height": 44,
+          "top": 522.46875,
+          "right": 844.421875,
+          "bottom": 566.46875,
+          "left": 705.640625
+        }
+      },
+      {
+        "label": "M\u00e1s Cases",
+        "disabled": true,
+        "rect": {
+          "x": 919.125,
+          "y": 522.46875,
+          "width": 101.21875,
+          "height": 44,
+          "top": 522.46875,
+          "right": 1020.34375,
+          "bottom": 566.46875,
+          "left": 919.125
+        }
+      },
+      {
+        "label": "\u2190",
+        "disabled": false,
+        "rect": {
+          "x": 313,
+          "y": 639.46875,
+          "width": 44,
+          "height": 44,
+          "top": 639.46875,
+          "right": 357,
+          "bottom": 683.46875,
+          "left": 313
+        }
+      }
+    ],
+    "contrast": {
+      "minimum": 6.161887829123643,
+      "count": 19,
+      "failures": []
+    }
+  },
+  {
+    "width": 768,
+    "scroll": 768,
+    "client": 768,
+    "controls": [
+      {
+        "label": "Crear Decision Case",
+        "disabled": false,
+        "rect": {
+          "x": 114,
+          "y": 264.171875,
+          "width": 505.625,
+          "height": 44,
+          "top": 264.171875,
+          "right": 619.625,
+          "bottom": 308.171875,
+          "left": 114
+        }
+      },
+      {
+        "label": "01 \u00b7 Logistics Models",
+        "disabled": false,
+        "rect": {
+          "x": 114,
+          "y": 357.171875,
+          "width": 197.328125,
+          "height": 44,
+          "top": 357.171875,
+          "right": 311.328125,
+          "bottom": 401.171875,
+          "left": 114
+        }
+      },
+      {
+        "label": "02 \u00b7 Decision Case",
+        "disabled": false,
+        "rect": {
+          "x": 321.328125,
+          "y": 357.171875,
+          "width": 197.328125,
+          "height": 44,
+          "top": 357.171875,
+          "right": 518.65625,
+          "bottom": 401.171875,
+          "left": 321.328125
+        }
+      },
+      {
+        "label": "03 \u00b7 Data Preparation",
+        "disabled": true,
+        "rect": {
+          "x": 528.65625,
+          "y": 357.171875,
+          "width": 197.328125,
+          "height": 44,
+          "top": 357.171875,
+          "right": 725.984375,
+          "bottom": 401.171875,
+          "left": 528.65625
+        }
+      },
+      {
+        "label": "j102_case_search",
+        "disabled": false,
+        "rect": {
+          "x": 114,
+          "y": 446.671875,
+          "width": 612,
+          "height": 44,
+          "top": 446.671875,
+          "right": 726,
+          "bottom": 490.671875,
+          "left": 114
+        }
+      },
+      {
+        "label": "j102_case_filter",
+        "disabled": false,
+        "rect": {
+          "x": 114,
+          "y": 534.171875,
+          "width": 612,
+          "height": 44,
+          "top": 534.171875,
+          "right": 726,
+          "bottom": 578.171875,
+          "left": 114
+        }
+      },
+      {
+        "label": "Buscar Cases",
+        "disabled": false,
+        "rect": {
+          "x": 114,
+          "y": 594.171875,
+          "width": 612,
+          "height": 44,
+          "top": 594.171875,
+          "right": 726,
+          "bottom": 638.171875,
+          "left": 114
+        }
+      },
+      {
+        "label": "Reintentar Cases",
+        "disabled": false,
+        "rect": {
+          "x": 114,
+          "y": 698.5625,
+          "width": 612,
+          "height": 44,
+          "top": 698.5625,
+          "right": 726,
+          "bottom": 742.5625,
+          "left": 114
+        }
+      },
+      {
+        "label": "Cases anteriores",
+        "disabled": false,
+        "rect": {
+          "x": 262.640625,
+          "y": 762.5625,
+          "width": 138.78125,
+          "height": 44,
+          "top": 762.5625,
+          "right": 401.421875,
+          "bottom": 806.5625,
+          "left": 262.640625
+        }
+      },
+      {
+        "label": "M\u00e1s Cases",
+        "disabled": true,
+        "rect": {
+          "x": 476.125,
+          "y": 762.5625,
+          "width": 101.21875,
+          "height": 44,
+          "top": 762.5625,
+          "right": 577.34375,
+          "bottom": 806.5625,
+          "left": 476.125
+        }
+      },
+      {
+        "label": "\u2190",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 879.5625,
+          "width": 44,
+          "height": 44,
+          "top": 879.5625,
+          "right": 183,
+          "bottom": 923.5625,
+          "left": 139
+        }
+      }
+    ],
+    "contrast": {
+      "minimum": 6.161887829123643,
+      "count": 19,
+      "failures": []
+    }
+  },
+  {
+    "width": 375,
+    "scroll": 375,
+    "client": 375,
+    "controls": [
+      {
+        "label": "Crear Decision Case",
+        "disabled": false,
+        "rect": {
+          "x": 92,
+          "y": 359.75,
+          "width": 251,
+          "height": 44,
+          "top": 359.75,
+          "right": 343,
+          "bottom": 403.75,
+          "left": 92
+        }
+      },
+      {
+        "label": "01 \u00b7 Logistics Models",
+        "disabled": false,
+        "rect": {
+          "x": 92,
+          "y": 452.75,
+          "width": 251,
+          "height": 44,
+          "top": 452.75,
+          "right": 343,
+          "bottom": 496.75,
+          "left": 92
+        }
+      },
+      {
+        "label": "02 \u00b7 Decision Case",
+        "disabled": false,
+        "rect": {
+          "x": 92,
+          "y": 506.75,
+          "width": 251,
+          "height": 44,
+          "top": 506.75,
+          "right": 343,
+          "bottom": 550.75,
+          "left": 92
+        }
+      },
+      {
+        "label": "03 \u00b7 Data Preparation",
+        "disabled": true,
+        "rect": {
+          "x": 92,
+          "y": 560.75,
+          "width": 251,
+          "height": 44,
+          "top": 560.75,
+          "right": 343,
+          "bottom": 604.75,
+          "left": 92
+        }
+      },
+      {
+        "label": "j102_case_search",
+        "disabled": false,
+        "rect": {
+          "x": 92,
+          "y": 650.25,
+          "width": 251,
+          "height": 44,
+          "top": 650.25,
+          "right": 343,
+          "bottom": 694.25,
+          "left": 92
+        }
+      },
+      {
+        "label": "j102_case_filter",
+        "disabled": false,
+        "rect": {
+          "x": 92,
+          "y": 737.75,
+          "width": 251,
+          "height": 44,
+          "top": 737.75,
+          "right": 343,
+          "bottom": 781.75,
+          "left": 92
+        }
+      },
+      {
+        "label": "Buscar Cases",
+        "disabled": false,
+        "rect": {
+          "x": 92,
+          "y": 797.75,
+          "width": 251,
+          "height": 44,
+          "top": 797.75,
+          "right": 343,
+          "bottom": 841.75,
+          "left": 92
+        }
+      },
+      {
+        "label": "Reintentar Cases",
+        "disabled": false,
+        "rect": {
+          "x": 92,
+          "y": 924.53125,
+          "width": 251,
+          "height": 44,
+          "top": 924.53125,
+          "right": 343,
+          "bottom": 968.53125,
+          "left": 92
+        }
+      },
+      {
+        "label": "Cases anteriores",
+        "disabled": false,
+        "rect": {
+          "x": 116.75,
+          "y": 988.53125,
+          "width": 138.78125,
+          "height": 44,
+          "top": 988.53125,
+          "right": 255.53125,
+          "bottom": 1032.53125,
+          "left": 116.75
+        }
+      },
+      {
+        "label": "M\u00e1s Cases",
+        "disabled": true,
+        "rect": {
+          "x": 166.890625,
+          "y": 1044.53125,
+          "width": 101.21875,
+          "height": 44,
+          "top": 1044.53125,
+          "right": 268.109375,
+          "bottom": 1088.53125,
+          "left": 166.890625
+        }
+      },
+      {
+        "label": "\u2190",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 1153.53125,
+          "width": 44,
+          "height": 44,
+          "top": 1153.53125,
+          "right": 153,
+          "bottom": 1197.53125,
+          "left": 109
+        }
+      }
+    ],
+    "contrast": {
+      "minimum": 6.161887829123643,
+      "count": 19,
+      "failures": []
+    }
+  }
+]

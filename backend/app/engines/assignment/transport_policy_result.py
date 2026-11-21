@@ -108,6 +108,14 @@ def _produce(request,goal=None,model_budget=None,kernel_budget=Decimal(1),compar
         'model_deterministic_budget':model_budget,'kernel_deterministic_budget':kernel_budget,'local_comparison_budget':comparison_budget,**search.normalization}
     for i,(label,native,value,bound) in enumerate(search.stages):
         facts.update({f'stage_{i}_name':label,f'stage_{i}_status':native,f'stage_{i}_value':value,f'stage_{i}_bound':bound})
+    if request.context.decision_definition:
+        binding=request.context.decision_definition
+        tie=next((s for s in search.stages if s[0]=='PREFER_OWN_FLEET_ON_COST_TIE'),None)
+        cost=next((s for s in search.stages if s[0]=='MINIMIZE_COST'),None)
+        facts.update(definition_revision_id=str(binding.definition_revision_id),definition_hash=binding.definition_hash,
+            own_fleet_tie_basis='SCALED_PRIMARY_QUANTITY_ON_EXISTING_COVERAGE_FRONTIER',cost_scale=request.context.currency_policy.minor_units,
+            own_fleet_tie_state='NOT_CONFIGURED' if not binding.business_rules.prefer_own_fleet_on_cost_tie else
+                'CERTIFIED' if complete and cost and tie and cost[1]=='OPTIMAL' and tie[1]=='OPTIMAL' else 'UNVERIFIED_TIE_BREAK')
     constraints.append(c.ConstraintEvidence(evidence_id=proof_id,code='POLICY_CERTIFICATE',status='SATISFIED' if usable else 'VIOLATED' if infeasible else 'UNKNOWN',hard=True,facts=facts))
     high_requested=sum((getattr(o.requested,request.model.primary_dimension) for o in request.demands if o.priority=='HIGH'),Decimal(0))
     high_assigned=sum((getattr(o.assigned,request.model.primary_dimension) for o in structural.demand_resolution if o.priority=='HIGH'),Decimal(0))

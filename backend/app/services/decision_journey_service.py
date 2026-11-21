@@ -91,8 +91,23 @@ async def cleanup(ctx,pid):
 
 async def finalize(ctx,pid,payload):
     data=await state(ctx,pid);s=data['session'];body=payload.case.model_dump(mode='json')
+    if body.get('definition_v2'):
+        from app.services.decision_case_v2_service import require_writes
+        from app.results.canonical import canonical_tree
+        await require_writes(ctx)
+        body['definition_v2']=canonical_tree(payload.case.definition_v2)
+        if body['definition_v2'].get('provenance',{}):
+            if body['definition_v2']['provenance']['parent_case_id']!=s['parent_case_id']:
+                raise HTTPException(409,'La preparación no pertenece al origen de la definición.')
+        elif s['parent_case_id'] is not None:
+            raise HTTPException(409,'La preparación derivada requiere su origen explícito.')
     # Read/validate all selected private snapshots BEFORE freezing/creating a Case.
     selected=[u for u in data['uploads'] if u['selected']];verified=[];records={}
+    if body.get('definition_v2') and s['status']!='CONSUMED':
+        from app.services.decision_case_v2_service import validate as validate_definition
+        if {u['entity'] for u in selected if u['ready']}!=set(contracts(data)):
+            raise HTTPException(409,'Guardá y validá todos los archivos de esta versión antes de crear el Case V2.')
+        if s['status']!='FINALIZING':await validate_definition(ctx,payload.case.definition_v2)
     if s['status']!='CONSUMED':
         for u in selected:
             if not u['ready']:raise HTTPException(409,'Recuperá los candidatos pendientes antes de finalizar.')
@@ -112,7 +127,9 @@ async def finalize(ctx,pid,payload):
     data=await call(ctx,'begin',preparation_id=str(pid),expected_revision=payload.expected_revision,creation_body=body,creation_hash=models.snapshot_hash('journey_case_creation_v1',body))
     s=data['session'];cid=body['id']
     if s['status']!='CONSUMED':
-        await models.create_case(ctx,UltimateCaseCreate.model_validate(s['creation_body']))
+        from app.models.decision_case_v2 import UltimateCaseCreateV2
+        create_type=UltimateCaseCreateV2 if s['creation_body'].get('definition_v2') else UltimateCaseCreate
+        await models.create_case(ctx,create_type.model_validate(s['creation_body']))
         selection=[]
         for u,raw in verified:
             j=await packs.upload(ctx,cid,u['entity'],raw,u['metadata']['filename'],uuid5(UUID(u['id']),'case-upload-v1'),u['metadata']['contract_hash'])

@@ -38,6 +38,9 @@ class TransportPlanInput(ContractModel):
     @model_validator(mode='after')
     def pinned_inputs(self):
         m, c = self.model, self.context
+        if c.decision_definition and c.decision_definition.business_rules.prefer_own_fleet_on_cost_tie:
+            if c.node_policy.primary_goal!='MINIMIZE_COST' or c.node_policy.preferences:
+                raise ValueError('La política de nodo no puede sustituir el costo primario del desempate J1.02.')
         if (m.workspace_id,m.model_id,m.version_id,m.version,m.configuration_hash,m.currency_policy,m.primary_dimension,set(m.active_dimensions)) != (c.workspace_id,c.logistics_model_id,c.logistics_model_version_id,c.logistics_model_version,c.model_hash,c.currency_policy,c.primary_dimension,set(c.active_dimensions)):
             raise ValueError('Model and Frozen Case context do not match')
         cfg=getattr(m,'configuration',None)

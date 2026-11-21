@@ -13,7 +13,7 @@ function preparationLabel(item){
  return date+' · '+(states[item.status]||'Preparación guardada');
 }
 
-export function mountCorePreparation(root,scope,{canAssign,draft,onDraft,onContinue,onRecovered,parentCaseId=null}){
+export function mountCorePreparation(root,scope,{canAssign,draft,onDraft,onContinue,onRecovered,parentCaseId=null,readExisting=false,caseIntentId=null,onStateChange}){
  const status=el('p','Seleccioná una Model Version publicada para preparar datos.','journey-preparation-status');status.role='status';status.setAttribute('aria-live','polite');root.append(status);
  const ownerRow=el('div',undefined,'journey-session-row');root.append(ownerRow);
  const ownerControls=decisionCard(ownerRow,'Responsable de datos','Gestiona la preparación de los datos.','people'),ownerArea=ownerControls.parentElement;ownerArea.classList.add('journey-data-owner','core-owner-card');ownerArea.dataset.dationTest='preparation-owner-card';
@@ -78,6 +78,7 @@ export function mountCorePreparation(root,scope,{canAssign,draft,onDraft,onConti
    if(!scope.active||own!==sessionEpoch)return;
    if(key!==lookupKey())throw new Error('La preparación actual cambió. Volvé a elegir la sesión.');
    if(current?.session?.id!==item.id||!compatible(current.session)||(current.session.status==='FINALIZING'?!current.session.creation_intent:!!current.session.creation_intent))throw new Error('La sesión ya no está disponible. Actualizá la lista.');
+   if(caseIntentId&&current.session.creation_intent&&current.session.creation_intent.id!==caseIntentId)throw new Error('La creación de esta sesión pertenece a otro borrador de Case. No se reemplazó el actual.');
    if(pending.size||data?.session.creation_intent){switching=false;canSwitch();return;}
    draft.id=item.id;draft.version_id=item.model_version_id;onDraft();pickerOpen=false;const recovery=refresh(),recoveryGeneration=generation;await recovery;
    if(scope.active&&generation===recoveryGeneration&&(data?.session.id!==item.id||errorMessage))throw new Error(errorMessage||'No se confirmó la sesión elegida.');
@@ -116,6 +117,7 @@ export function mountCorePreparation(root,scope,{canAssign,draft,onDraft,onConti
    footer.copy.textContent=n===total?(verified?total+' archivos validados · publicación al finalizar el Case':'Relaciones entre archivos pendientes de validación'):n?'Falta '+missing.join(' y '):'Preparación pendiente · podés continuar sin datos';
   }
   if(!busy&&data)void lookupSessions();
+  onStateChange?.();
  }
 
  function tell(e){errorMessage=e.message;status.textContent=e.message;status.role='alert';}
@@ -150,10 +152,12 @@ export function mountCorePreparation(root,scope,{canAssign,draft,onDraft,onConti
     const okay=await confirmAction(root,scope,'Cambió la Model Version','Los candidatos guardados de la preparación anterior se conservan en privado. Los archivos locales sin guardar deberán volver a adjuntarse. ¿Preparar archivos para esta versión?','Preparar esta versión');if(!okay)throw new Error('Se conserva la preparación anterior. Volvé a seleccionar su Model Version para retomarla.');pending.clear();draft.id=null;
    }
    draft.id||=crypto.randomUUID();draft.version_id=snapshot.version_id;onDraft();
-   const resolved=await post('/api/platform/data-preparations',{id:draft.id,model_version_id:snapshot.version_id,parent_case_id:parentCaseId},{signal:scope.signal});
+   const resolved=readExisting?await json('/api/platform/data-preparations/'+draft.id):await post('/api/platform/data-preparations',{id:draft.id,model_version_id:snapshot.version_id,parent_case_id:parentCaseId},{signal:scope.signal});
+   if(resolved.session.model_version_id!==snapshot.version_id||(resolved.session.parent_case_id||null)!==parentCaseId)throw new Error('La preparación no pertenece a la versión y origen elegidos.');
+   if(caseIntentId&&resolved.session.creation_intent&&resolved.session.creation_intent.id!==caseIntentId)throw new Error('La creación congelada pertenece a otro borrador de Case.');
    if(!scope.active||own!==generation)return;data=resolved;saved();root.querySelector('[data-stage-recovery]')?.remove();
    if(data.session.status==='EXPIRED'){
-    const actions=el('div');actions.dataset.stageRecovery='';actions.append(button('Limpiar preparación expirada e iniciar otra',async()=>{if(!await confirmAction(root,scope,'Iniciar otra preparación','Se eliminarán sólo los CSV privados del borrador expirado. Los datos publicados de Cases se conservan.','Limpiar e iniciar'))return;try{await post(base()+'/cleanup',{}, {signal:scope.signal});if(!scope.active||own!==generation)return;draft.id=crypto.randomUUID();onDraft();await resolve(pair,snapshot,ui);}catch(e){tell(e);}}));root.append(actions);throw new Error('La preparación venció después de 24 horas. Podés limpiarla e iniciar otra sin modificar Cases publicados.');
+    const actions=el('div');actions.dataset.stageRecovery='';actions.append(button('Limpiar preparación expirada e iniciar otra',async()=>{if(!await confirmAction(root,scope,'Iniciar otra preparación','Se eliminarán sólo los CSV privados del borrador expirado. Los datos publicados de Cases se conservan.','Limpiar e iniciar'))return;try{await post(base()+'/cleanup',{}, {signal:scope.signal});if(!scope.active||own!==generation)return;draft.id=crypto.randomUUID();onDraft();if(readExisting)await post('/api/platform/data-preparations',{id:draft.id,model_version_id:snapshot.version_id,parent_case_id:parentCaseId},{signal:scope.signal});await resolve(pair,snapshot,ui);}catch(e){tell(e);}}));root.append(actions);throw new Error('La preparación venció después de 24 horas. Podés limpiarla e iniciar otra sin modificar Cases publicados.');
    }
    if(data.session.creation_intent){const recover=button('Recuperar creación del Case',async()=>{recover.disabled=true;try{const result=await post(base()+'/finalize',{expected_revision:data.session.revision,case:data.session.creation_intent},{signal:scope.signal});onRecovered?.(result.context);}catch(e){tell(e);recover.disabled=false;}});recover.dataset.stageRecovery='';root.append(recover);}
    await renderUploads(ui.grid,own);owner.value=data.session.data_owner_user_id||'';

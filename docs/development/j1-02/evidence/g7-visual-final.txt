@@ -1,0 +1,9 @@
+test_12_server_library_pagination_error_exact_history_and_derive (test_decision_case_j102_visual.DecisionCaseV2VisualTests.test_12_server_library_pagination_error_exact_history_and_derive) ... Executing <Task finished name='Task-1' coro=<Saga10WizardTests.asyncSetUp() done, defined at /workspace/work/dation-j1-02/backend/tests/browser/test_saga10_wizard.py:24> result=None created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.131 seconds
+Executing <Task finished name='Task-5' coro=<DecisionCaseV2VisualTests.test_12_server_library_pagination_error_exact_history_and_derive() done, defined at /workspace/work/dation-j1-02/backend/tests/browser/test_decision_case_j102_visual.py:58> result=None created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.101 seconds
+Executing <Task pending name='Task-10' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-j1-02/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.246 seconds
+ok
+
+----------------------------------------------------------------------
+Ran 1 test in 29.474s
+
+OK

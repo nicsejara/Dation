@@ -36,6 +36,10 @@ class PolicySearch:
     def optimize(self,model,slots,orders,denominators,by_order):
         request=self.request;policy=request.context.node_policy
         goal=self.goal or policy.primary_goal
+        binding=request.context.decision_definition
+        prefer_own=bool(binding and binding.business_rules.prefer_own_fleet_on_cost_tie)
+        if prefer_own and (goal!='MINIMIZE_COST' or policy.preferences):
+            raise PolicyRequirementsError('El desempate J1.02 sólo admite costo primario sin preferencias adicionales.')
         primary=request.model.primary_dimension
         total_requested=sum(scaled_integer(getattr(o.requested,primary),QUANTITY_SCALES[primary]) for o in orders)
         assigned=sum(denominators[i][1][primary]*x for i in range(len(orders)) for x in by_order[i])
@@ -97,6 +101,10 @@ class PolicySearch:
         elif goal=='MAXIMIZE_SERVICE':stages.append((goal,assigned,True))
         else:raise ValueError('Unknown policy goal')
         if weights and goal not in ('BALANCED','CUSTOM'):stages.append(('PREFERENCES',normalized(weights,'pref'),False))
+        if prefer_own:
+            # The loop fixes every OPTIMAL integer objective before entering
+            # the next stage. No epsilon, extra money or FEASIBLE-cost tie.
+            stages.append(('PREFER_OWN_FLEET_ON_COST_TIE',own_load,True))
         stages.append(('STABLE_RESOURCE_TIE',sum((i+1)*s.present for i,s in enumerate(slots)),False))
         if len(model.proto.variables)>request.options.max_variables:return None,['UNKNOWN'],['POLICY_VARIABLE_BUDGET']
         if model.validate():raise ValueError('Invalid policy model: '+model.validate())

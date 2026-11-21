@@ -1,0 +1,8 @@
+test_01_real_d1_result_kpi_and_manual_approval_are_separate (tests.e2e.test_decision_case_j102.DecisionCaseV2ExecutionE2E.test_01_real_d1_result_kpi_and_manual_approval_are_separate) ... ok
+test_02_metadata_revision_does_not_rebind_approved_d1_or_d2 (tests.e2e.test_decision_case_j102.DecisionCaseV2ExecutionE2E.test_02_metadata_revision_does_not_rebind_approved_d1_or_d2) ... ok
+test_03_legacy_approval_reconciliation_drains_without_exposing_v2_history (tests.e2e.test_decision_case_j102.DecisionCaseV2ExecutionE2E.test_03_legacy_approval_reconciliation_drains_without_exposing_v2_history) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 29.193s
+
+OK

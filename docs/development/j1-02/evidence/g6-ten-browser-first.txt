@@ -1,0 +1,129 @@
+test_01_manual_six_blocks_confirm_review_without_creating_case (test_decision_case_j102.DecisionCaseV2BrowserTests.test_01_manual_six_blocks_confirm_review_without_creating_case) ... Executing <Task finished name='Task-1' coro=<Saga10WizardTests.asyncSetUp() done, defined at /workspace/work/dation-j1-02/backend/tests/browser/test_saga10_wizard.py:24> result=None created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.109 seconds
+Executing <Task finished name='Task-5' coro=<DecisionCaseV2BrowserTests.test_01_manual_six_blocks_confirm_review_without_creating_case() done, defined at /workspace/work/dation-j1-02/backend/tests/browser/test_decision_case_j102.py:73> result=None created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.107 seconds
+Executing <Task pending name='Task-6' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-j1-02/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.248 seconds
+ok
+test_02_two_contract_bridge_reload_finalize_and_graph_review (test_decision_case_j102.DecisionCaseV2BrowserTests.test_02_two_contract_bridge_reload_finalize_and_graph_review) ... Executing <Task pending name='Task-16' coro=<DecisionCaseV2BrowserTests.test_02_two_contract_bridge_reload_finalize_and_graph_review() running at /workspace/work/dation-j1-02/backend/tests/browser/test_decision_case_j102.py:86> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.110 seconds
+Executing <Task pending name='Task-18' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-j1-02/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.242 seconds
+ok
+test_03_catalog_three_contracts_use_exact_physical_version (test_decision_case_j102.DecisionCaseV2BrowserTests.test_03_catalog_three_contracts_use_exact_physical_version) ... Executing <Task pending name='Task-30' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-j1-02/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.267 seconds
+ok
+test_04_models_round_trip_preserves_work_and_selection (test_decision_case_j102.DecisionCaseV2BrowserTests.test_04_models_round_trip_preserves_work_and_selection) ... Executing <Task pending name='Task-41' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-j1-02/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.214 seconds
+ok
+test_05_dirty_guard_cancel_and_recover_independent_copies (test_decision_case_j102.DecisionCaseV2BrowserTests.test_05_dirty_guard_cancel_and_recover_independent_copies) ... Executing <Task pending name='Task-52' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-j1-02/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.228 seconds
+ok
+test_06_cancel_edit_restores_confirmed_draft_and_reconfirmation_is_required (test_decision_case_j102.DecisionCaseV2BrowserTests.test_06_cancel_edit_restores_confirmed_draft_and_reconfirmation_is_required) ... Executing <Task pending name='Task-62' coro=<DecisionCaseV2BrowserTests.test_06_cancel_edit_restores_confirmed_draft_and_reconfirmation_is_required() running at /workspace/work/dation-j1-02/backend/tests/browser/test_decision_case_j102.py:120> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.109 seconds
+Executing <Task pending name='Task-63' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-j1-02/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.225 seconds
+ok
+test_07_lost_finalize_response_recovers_one_case_pack_and_fixed_intent (test_decision_case_j102.DecisionCaseV2BrowserTests.test_07_lost_finalize_response_recovers_one_case_pack_and_fixed_intent) ... Executing <Task finished name='Task-69' coro=<Saga10WizardTests.asyncSetUp() done, defined at /workspace/work/dation-j1-02/backend/tests/browser/test_saga10_wizard.py:24> result=None created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.101 seconds
+Executing <Task pending name='Task-81' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-j1-02/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.238 seconds
+ok
+test_08_persisted_metadata_history_derive_and_original_integrity (test_decision_case_j102.DecisionCaseV2BrowserTests.test_08_persisted_metadata_history_derive_and_original_integrity) ... Executing <Task pending name='Task-91' coro=<DecisionCaseV2BrowserTests.test_08_persisted_metadata_history_derive_and_original_integrity() running at /workspace/work/dation-j1-02/backend/tests/browser/test_decision_case_j102.py:143> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.106 seconds
+FAIL
+Executing <Task pending name='Task-93' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-j1-02/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.270 seconds
+test_09_two_tab_cas_preserves_second_copy (test_decision_case_j102.DecisionCaseV2BrowserTests.test_09_two_tab_cas_preserves_second_copy) ... FAIL
+Executing <Task pending name='Task-105' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-j1-02/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.278 seconds
+test_10_direct_empty_finalize_denied_and_viewer_cannot_create (test_decision_case_j102.DecisionCaseV2BrowserTests.test_10_direct_empty_finalize_denied_and_viewer_cannot_create) ... Executing <Task pending name='Task-117' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-j1-02/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.230 seconds
+ok
+
+======================================================================
+FAIL: test_08_persisted_metadata_history_derive_and_original_integrity (test_decision_case_j102.DecisionCaseV2BrowserTests.test_08_persisted_metadata_history_derive_and_original_integrity)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/usr/lib/python3.13/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/usr/lib/python3.13/asyncio/base_events.py", line 725, in run_until_complete
+    return future.result()
+           ~~~~~~~~~~~~~^^
+  File "/workspace/work/dation-j1-02/backend/tests/browser/test_decision_case_j102.py", line 146, in test_08_persisted_metadata_history_derive_and_original_integrity
+    await self.page.get_by_role('button',name='Editar configuración',exact=True).click();await self.ready_case()
+                                                                                         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/work/dation-j1-02/backend/tests/browser/test_decision_case_j102.py", line 19, in ready_case
+    await expect(self.page.locator('.j102-shell')).to_have_attribute('data-j102-ready','true')
+  File "/workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/async_api/_generated.py", line 22206, in to_have_attribute
+    await self._impl_obj.to_have_attribute(
+    ...<4 lines>...
+    )
+  File "/workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_assertions.py", line 349, in to_have_attribute
+    await self._expect_impl(
+    ...<7 lines>...
+    )
+  File "/workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_assertions.py", line 128, in _expect_impl
+    _record_soft_or_raise(
+    ~~~~~~~~~~~~~~~~~~~~~^
+        AssertionError(
+        ^^^^^^^^^^^^^^^
+    ...<2 lines>...
+        self._is_soft,
+        ^^^^^^^^^^^^^^
+    )
+    ^
+  File "/workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_assertions.py", line 60, in _record_soft_or_raise
+    raise error
+AssertionError: Locator expected to have attribute 'true'
+Actual value: None 
+Call log:
+  - Expect "to_have_attribute" locator(".j102-shell") with timeout 5000ms
+  - waiting for locator(".j102-shell")
+    11 × locator resolved to <div id="ultimate-case-setup-root" class="dispatch d-platform ultimate-foundation j102-shell">…</div>
+       - unexpected value "null"
+
+Aria snapshot:
+- heading "No pudimos conectar con Dation" [level=2]
+- alert: Revisá tu conexión y reintentá. Los datos ya guardados se conservan.
+- group: Detalles del problema
+- button "Reintentar"
+
+======================================================================
+FAIL: test_09_two_tab_cas_preserves_second_copy (test_decision_case_j102.DecisionCaseV2BrowserTests.test_09_two_tab_cas_preserves_second_copy)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/usr/lib/python3.13/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/usr/lib/python3.13/asyncio/base_events.py", line 725, in run_until_complete
+    return future.result()
+           ~~~~~~~~~~~~~^^
+  File "/workspace/work/dation-j1-02/backend/tests/browser/test_decision_case_j102.py", line 161, in test_09_two_tab_cas_preserves_second_copy
+    await self.page.goto(url);await self.ready_case();await self.page.get_by_role('button',name='Editar configuración',exact=True).click();await self.ready_case()
+                                                                                                                                           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/work/dation-j1-02/backend/tests/browser/test_decision_case_j102.py", line 19, in ready_case
+    await expect(self.page.locator('.j102-shell')).to_have_attribute('data-j102-ready','true')
+  File "/workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/async_api/_generated.py", line 22206, in to_have_attribute
+    await self._impl_obj.to_have_attribute(
+    ...<4 lines>...
+    )
+  File "/workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_assertions.py", line 349, in to_have_attribute
+    await self._expect_impl(
+    ...<7 lines>...
+    )
+  File "/workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_assertions.py", line 128, in _expect_impl
+    _record_soft_or_raise(
+    ~~~~~~~~~~~~~~~~~~~~~^
+        AssertionError(
+        ^^^^^^^^^^^^^^^
+    ...<2 lines>...
+        self._is_soft,
+        ^^^^^^^^^^^^^^
+    )
+    ^
+  File "/workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_assertions.py", line 60, in _record_soft_or_raise
+    raise error
+AssertionError: Locator expected to have attribute 'true'
+Actual value: None 
+Call log:
+  - Expect "to_have_attribute" locator(".j102-shell") with timeout 5000ms
+  - waiting for locator(".j102-shell")
+    12 × locator resolved to <div id="ultimate-case-setup-root" class="dispatch d-platform ultimate-foundation j102-shell">…</div>
+       - unexpected value "null"
+
+Aria snapshot:
+- heading "No pudimos conectar con Dation" [level=2]
+- alert: Revisá tu conexión y reintentá. Los datos ya guardados se conservan.
+- group: Detalles del problema
+- button "Reintentar"
+
+----------------------------------------------------------------------
+Ran 10 tests in 72.464s
+
+FAILED (failures=2)

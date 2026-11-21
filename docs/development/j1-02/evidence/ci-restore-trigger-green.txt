@@ -1,0 +1,6 @@
+test_11_service_projection_keeps_private_history_permissions_and_legacy_writes (tests.integration.test_decision_case_j102.DecisionCaseV2SQLTests.test_11_service_projection_keeps_private_history_permissions_and_legacy_writes) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 6.639s
+
+OK

@@ -70,6 +70,16 @@ def _check(request,result):
             require(d==0 or (n<=guard.limit*d if guard.kind=='MAXIMUM_EXTERNAL_SHARE' else n>=guard.limit*d),'Hard guardrail relaxed')
     proof=next(c for c in evidence.constraints if c.code=='POLICY_CERTIFICATE')
     require(proof.facts['goal']==result.exploration_goal,'Wrong exploration policy')
+    binding=request.context.decision_definition
+    if binding:
+        require(proof.facts['definition_revision_id']==str(binding.definition_revision_id) and proof.facts['definition_hash']==binding.definition_hash,'Definition certificate changed')
+        if binding.business_rules.prefer_own_fleet_on_cost_tie and proof.facts['own_fleet_tie_state']=='CERTIFIED':
+            stages={v:k.removesuffix('_name') for k,v in proof.facts.items() if k.endswith('_name')}
+            require('MINIMIZE_COST' in stages and 'PREFER_OWN_FLEET_ON_COST_TIE' in stages,'Missing lexicographic stages')
+            first,second=stages['MINIMIZE_COST'],stages['PREFER_OWN_FLEET_ON_COST_TIE']
+            require(int(first.split('_')[1])<int(second.split('_')[1]),'Own preference precedes cost')
+            require(all(proof.facts[s+'_status']=='OPTIMAL' and proof.facts[s+'_value']==proof.facts[s+'_bound'] for s in [first,second]),'Unproven cost tie')
+            require(result.structural.search.candidate_set_complete,'Tie scope is incomplete')
     if core.engine.solver_status=='OPTIMAL':
         require(result.structural.search.candidate_set_complete,'Incomplete candidate-set optimum')
         states=[v for k,v in proof.facts.items() if k.endswith('_status')]

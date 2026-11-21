@@ -62,6 +62,7 @@ export async function mountModelLibrary(root,{route,navigate,caps,scope}){
  const target=route.modelReturnId?resolveReturn(route.modelReturnId,identity):null;
  const next=button(target?'Volver al contexto de origen':'Continuar a Decision Case',()=>{
   if(target)return navigate(target.view,target);
+  if(caps.decision_case_v2_enabled)return navigate('logistics-case-setup',{caseId:null,modelId:null,journeyVersion:'v2',caseView:'library'});
   return navigate('logistics-case-setup',{caseId:null,modelId:null,coreStep:1});
  });
  if(!target&&!caps.can_create_case)next.disabled=true;

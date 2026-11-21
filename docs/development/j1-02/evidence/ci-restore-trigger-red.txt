@@ -1,0 +1,24 @@
+test_11_service_projection_keeps_private_history_permissions_and_legacy_writes (tests.integration.test_decision_case_j102.DecisionCaseV2SQLTests.test_11_service_projection_keeps_private_history_permissions_and_legacy_writes) ... FAIL
+
+======================================================================
+FAIL: test_11_service_projection_keeps_private_history_permissions_and_legacy_writes (tests.integration.test_decision_case_j102.DecisionCaseV2SQLTests.test_11_service_projection_keeps_private_history_permissions_and_legacy_writes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/work/dation-j1-02/backend/tests/integration/test_decision_case_j102.py", line 142, in test_11_service_projection_keeps_private_history_permissions_and_legacy_writes
+    self.sql(f"SET ROLE service_role; UPDATE public.decision_cases SET last_activity_at=clock_timestamp() WHERE id='{cid}';")
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/work/dation-j1-02/backend/tests/integration/test_ultimate_case_models.py", line 54, in sql
+    def sql(self,sql):return self.command(sql).stdout.strip()
+                             ~~~~~~~~~~~~^^^^^
+  File "/workspace/work/dation-j1-02/backend/tests/integration/ultimate_sql_support.py", line 91, in command
+    raise AssertionError(result.stderr)
+AssertionError: ERROR:  42501: permission denied for table case_definition_revisions
+CONTEXT:  SQL statement "SELECT *               FROM dation_private.case_definition_revisions WHERE workspace_id=NEW.workspace_id AND case_id=NEW.id ORDER BY revision DESC LIMIT 1"
+PL/pgSQL function dation_private.j102_capture_case() line 4 at SQL statement
+LOCATION:  aclcheck_error, aclchk.c:2843
+
+
+----------------------------------------------------------------------
+Ran 1 test in 5.230s
+
+FAILED (failures=1)

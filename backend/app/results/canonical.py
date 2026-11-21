@@ -114,6 +114,11 @@ def input_context_projection(context, runtime_identity, upstream=None):
     value = dict(_data(context))
     value.pop('case_name', None)
     value.pop('display_metadata', None)
+    if value.get('decision_definition') is not None:
+        # Full revision identity remains in the immutable result context, but
+        # metadata-only revisions must not change mathematical fingerprints.
+        value['decision_definition']={k:v for k,v in value['decision_definition'].items()
+                                      if k not in ('definition_revision_id','definition_hash')}
     value['case_policy'] = policy_projection(value['case_policy'])
     value['node_policy'] = policy_projection(value['node_policy'])
     value['read_set'] = sorted(value['read_set'], key=lambda item:item['slot'])

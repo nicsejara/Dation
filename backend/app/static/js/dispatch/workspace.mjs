@@ -872,6 +872,7 @@ async function navigateResource(view,options={}){
   if(['logistics-models','logistics-case-setup'].includes(publicView))next.modelId=options.modelId||null;
   if(publicView==='logistics-models')for(const key of ['modelView','modelVersionId','modelWorkId','modelReturnId'])next[key]=options[key]||null;
   if(publicView==='logistics-case-setup')for(const key of ['coreStep','preparationId','parentCaseId','returnView','returnNode','returnRun','returnCenter'])next[key]=options[key]||null;
+  if(publicView==='logistics-case-setup')for(const key of ['journeyVersion','caseView','caseMode','caseWorkId','definitionRevisionId'])next[key]=options[key]||null;
   saveDraft();routeController?.abort();routeController=new AbortController();const generation=++routeGeneration;
   runPolling.stop();pollGeneration++;
   for(const root of Object.values(roots)){disposeScope(root);root.replaceChildren();root.className='dispatch';delete root.dataset.ultimateReady;delete root.dataset.graphReady;delete root.dataset.ux05Ready;}

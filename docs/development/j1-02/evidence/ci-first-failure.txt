@@ -1,0 +1,22 @@
+Run 44919018589; candidate 2cc9123dfd8d763f1edbd49c465e498afdca2695
+FAST + full/browser success; full/tests fails in PostgreSQL restore regression.
+
+FAIL: test_clean_slate_upgrade_restore_and_dual_compatible_image (tests.integration.test_ultimate_restore.UltimateRestoreTests.test_clean_slate_upgrade_restore_and_dual_compatible_image)
+2026-11-21T15:34:22.2173659Z ----------------------------------------------------------------------
+2026-11-21T15:34:22.2173897Z Traceback (most recent call last):
+2026-11-21T15:34:22.2174372Z   File "/home/runner/work/Dation/Dation/backend/tests/integration/test_ultimate_restore.py", line 65, in test_clean_slate_upgrade_restore_and_dual_compatible_image
+2026-11-21T15:34:22.2174943Z     wait_for(lambda:s.sql("SELECT count(*) FROM decision_case_reconciliations WHERE workspace_id='"+s.workspace_b+"';")=='0',
+2026-11-21T15:34:22.2175337Z     ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-11-21T15:34:22.2175623Z         'legacy tenant reconciliation before restore snapshot')
+2026-11-21T15:34:22.2175852Z         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-11-21T15:34:22.2176152Z   File "/home/runner/work/Dation/Dation/backend/tests/e2e/sandbox.py", line 44, in wait_for
+2026-11-21T15:34:22.2176464Z     raise AssertionError('Timed out: '+description)
+2026-11-21T15:34:22.2176760Z AssertionError: Timed out: legacy tenant reconciliation before restore snapshot
+2026-11-21T15:34:22.2176952Z 
+2026-11-21T15:34:22.2177089Z ----------------------------------------------------------------------
+2026-11-21T15:34:22.2177296Z Ran 219 tests in 243.569s
+2026-11-21T15:34:22.2177418Z 
+2026-11-21T15:34:22.2177483Z FAILED (failures=1)
+2026-11-21T15:34:22.2177562Z 
+2026-11-21T15:34:22.2230967Z ##[error]24-7d7b6b025c58","trace_id":"f9de16b0a6df47efb21300d61f42b22e","span_id":"ff0fc6b1513c43f4","dependency":"supabase_rest","method":"GET","outcome":"ok","duration_ms":3.778,"status_code":200,"logging.googleapis.com/trace":"projects/dation-runtime-v2-2026/traces/f9de16b0a6df47efb21300d61f42b22e","logging.googleapis.com/spanId":"ff0fc6b1513c43f4"}
+{"timestamp":"2026-11-21T15:33:24.762099+00:00","severity":"WARNING","component":"api","event":"dependency_finished","logger":"dation","revision":"local","request_id":"5ab2b952-de8c-46a8-b024-7d7b6b025c58","trace_id":"f9de16b0a6df47efb21300d61f42b22e","span_id":"ff0fc6b1513c43f4","dependency":"supabase_rest","method":"PATCH","outcome":"http_error","duration_ms":8.045,"

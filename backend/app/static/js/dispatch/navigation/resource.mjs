@@ -32,6 +32,16 @@ export function readResource(url){
     if(resource.modelVersionId&&(!resource.modelId||resource.modelId==='new')||resource.modelView==='review'&&(!resource.modelVersionId||!resource.modelId)||resource.modelView==='history'&&(!resource.modelId||resource.modelId==='new'))throw new Error('Indicá el Model y la versión exacta para revisar.');
   }
   if(resource.view==='logistics-case-setup'){
+    resource.journeyVersion=q.get('journey_version');
+    if(resource.journeyVersion&&!['v2'].includes(resource.journeyVersion))throw new Error('Versión del Journey inválida.');
+    if(resource.journeyVersion==='v2'){
+      if(q.has('core_step'))throw new Error('El paso heredado no se puede reinterpretar como Journey V2.');
+      resource.caseView=q.get('case_view')||(resource.caseId?'definition':'library');
+      resource.caseMode=q.get('case_mode')||'review';
+      if(!['library','definition','history','runs','data','inputs','model'].includes(resource.caseView)||!['configure','review','edit'].includes(resource.caseMode))throw new Error('Vista o modo del Case inválido.');
+      for(const [key,param]of [['caseWorkId','case_work_id'],['definitionRevisionId','definition_revision_id']]){resource[key]=q.get(param);if(resource[key]&&!UUID.test(resource[key]))throw new Error('Identidad de Case/definición inválida.');}
+      if(resource.definitionRevisionId&&!resource.caseId||['history','runs','inputs','model'].includes(resource.caseView)&&!resource.caseId||resource.caseView==='data'&&(!resource.caseWorkId||resource.caseId)||resource.caseView==='definition'&&!resource.caseId&&!resource.caseWorkId)throw new Error('Indicá el Case o su borrador exacto.');
+    }
     resource.coreStep=q.has('core_step')?Number(q.get('core_step')):null;
     if(resource.coreStep!==null&&![1,2,3].includes(resource.coreStep))throw new Error('Paso de Core inválido.');
     for(const [key,param]of [['preparationId','preparation_id'],['parentCaseId','parent_case_id'],['returnRun','return_run']]){resource[key]=q.get(param);if(resource[key]&&!UUID.test(resource[key]))throw new Error('Identidad de preparación/retorno inválida.');}
@@ -43,7 +53,7 @@ export function readResource(url){
 }
 export function resourceUrl(url,resource){
   const next=new URL(url,'http://localhost');
-  for(const key of ['view','case_id','node_id','run_id','dda','settings_tab','model_id','model_view','model_version_id','model_work_id','model_return_id','core_step','preparation_id','parent_case_id','return_view','return_node','return_run','return_center',...HUB_KEYS,...CENTER_KEYS])next.searchParams.delete(key);
+  for(const key of ['view','case_id','node_id','run_id','dda','settings_tab','model_id','model_view','model_version_id','model_work_id','model_return_id','journey_version','case_view','case_mode','case_work_id','definition_revision_id','core_step','preparation_id','parent_case_id','return_view','return_node','return_run','return_center',...HUB_KEYS,...CENTER_KEYS])next.searchParams.delete(key);
   next.pathname=PLATFORM_PATHS[resource.view]||'/app';
   next.searchParams.set('view',resource.view);
   if(resource.caseId&&['overview','logistics-overview','logistics-data','logistics-map','logistics-config','decision-dashboard','traceability','library','logistics-case-setup','logistics-case-data'].includes(resource.view))next.searchParams.set('case_id',resource.caseId);
@@ -55,6 +65,7 @@ export function resourceUrl(url,resource){
   if(resource.view==='platform-decisions')writeCenterResource(next,resource.center);
   if(resource.view==='settings')writeSettingsTab(next,resource.settingsTab);
   if(resource.view==='logistics-case-setup')for(const [key,param]of [['coreStep','core_step'],['preparationId','preparation_id'],['parentCaseId','parent_case_id'],['returnView','return_view'],['returnNode','return_node'],['returnRun','return_run']])if(resource[key])next.searchParams.set(param,resource[key]);
+  if(resource.view==='logistics-case-setup'&&resource.journeyVersion==='v2')for(const [key,param]of [['journeyVersion','journey_version'],['caseView','case_view'],['caseMode','case_mode'],['caseWorkId','case_work_id'],['definitionRevisionId','definition_revision_id']])if(resource[key])next.searchParams.set(param,resource[key]);
   if(resource.view==='logistics-case-setup'&&resource.returnCenter){const c=new URL('http://localhost');writeCenterResource(c,resource.returnCenter);next.searchParams.set('return_center',c.search);}
   return next;
 }
