@@ -16,6 +16,7 @@ from tests.test_ultimate_data_contracts import model
 from tests.test_decision_case_j102 import definition
 from app.models.decision_case_v2 import UltimateCaseCreateV2
 from app.results.canonical import canonical_tree
+from sandbox import wait_for
 
 
 class CaseV2Sandbox(DaySandbox):
@@ -70,4 +71,17 @@ class DecisionCaseV2ExecutionE2E(unittest.TestCase):
         evaluated=ok(self.s.api_client.get(base+'/acceptance',params={'run_id':child}));self.assertEqual(evaluated['run_id'],rid);self.assertEqual(evaluated['referenced_by_d2_run_id'],child)
         source=ok(self.s.api_client.get(base+'/definitions/from-run/'+child));self.assertEqual(source['revision']['id'],self.c['case_definition']['id'])
         ok(day_approve(self.s,self.cid,child));self.assertIsNotNone(row(self.s,child)['approved_at'])
+
+    def test_03_legacy_approval_reconciliation_drains_without_exposing_v2_history(self):
+        from unittest.mock import patch
+        # Reuse the exact restore scenario without changing suite import order.
+        with patch.object(sys,'path',[str(Path(__file__).resolve().parents[1]/'integration'),*sys.path]):
+            from tests.integration.test_ultimate_restore import legacy_case
+        self.s.start_worker();before=self.c['case_definition']
+        with httpx.Client(base_url=self.s.api_url,headers={'Authorization':'Bearer '+self.s.user_tokens[USER_B]},trust_env=False,timeout=45) as other:
+            legacy=legacy_case(self.s,other)
+        wait_for(lambda:self.s.sql("SELECT count(*) FROM decision_case_reconciliations WHERE workspace_id='"+self.s.workspace_b+"';")=='0',
+            'legacy tenant reconciliation before restore snapshot')
+        self.assertIsNotNone(row(self.s,legacy['run_id'])['approved_at'])
+        self.assertEqual(ok(self.s.api_client.get('/api/platform/logistics-cases/'+self.cid+'/context'))['case_definition'],before)
 

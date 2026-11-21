@@ -18,6 +18,9 @@ Clasificador vigente: **R3, FULL obligatorio**. No se modifica su política ni n
 | Presets, selector paginado, modalidad, CUSTOM y bounds | PASS | `evidence/g4-picker-presets-green.txt` |
 | Recuperación de preparación expirada | PASS, 19.061 s | `evidence/g6-expired-recovery-green.txt` |
 | Capturas / geometría / contraste | 44 PNG originales, 11 escenarios × 4 anchos | `evidence/visual/README.md` |
+| Regresión focal de privilegios del trigger | RED reproduce 42501; GREEN conserva ACL y validación de actor | `evidence/ci-restore-trigger-red.txt`, `evidence/ci-restore-trigger-green.txt` |
+| SQL después de la corrección | 36/36 PASS, 39.088 s | `evidence/ci-sql-regression-green.txt` |
+| D1/D2 y aprobación/reconciliación legacy reales | 3/3 PASS, 29.193 s | `evidence/ci-legacy-worker-regression-green.txt` |
 
 Las filas se superponen; no sumarlas como si fueran tests únicos. FULL añade la regresión completa histórica, SQL y browser requerida. No se usa un conteo local como sustituto del required-gate remoto.
 
@@ -41,6 +44,8 @@ Los E2E crean y eliminan su propio entorno Docker; no configurar variables de Su
 - **Control correcto del contrato:** el catálogo estático no incluía todavía el binding aditivo. Regenerado desde el registry; la assertion no cambia.
 - **Fixture local / sincronización bajo ejecución concurrente:** una corrida conjunta dejó dos timeouts de montaje de ruta, un fallo de arranque TCP PostgreSQL para R6 y otro para workers. Los logs se conservan. Los mismos casos y R6 pasaron sin concurrencia y sin aumentar tiempos. No se atribuye una causa interna de PostgreSQL no capturada ni se presenta aquella ejecución fallida como verde. La ejecución integrada posterior pasó 20/20.
 - **Fixture del test negativo:** los contratos son inmutables; la primera prueba intentó modificar un mapa y fue rechazada. Se construyen copias de evidencia con certificado incompleto/FEASIBLE/UNKNOWN para verificar el rechazo, sin tocar el resultado original.
+- **Regresión funcional SQL detectada por FULL:** el trigger nuevo no tenía contexto de ejecución para consultar historia privada en actualizaciones legítimas de reconciliación legacy. Se corrigió únicamente con SECURITY DEFINER de search_path fijo; se mantienen ACL privadas y rechazo de metadata sin actor. No se cambia la prueba de restauración, su espera ni las políticas de CI. Ver `IMPLEMENTATION.md` y evidencia RED/GREEN.
+- **Limitación del entorno local al ampliar la reproducción:** el Dockerfile sin cambios encontró una cadena TLS local no confiable hacia PyPI. Se ensayó una imagen de pruebas sin red, con la única dependencia diferente descargada y verificada contra el lockfile, pero faltó espacio local. Se descartó esa ruta, se eliminó sólo su caché identificada y se repitieron SQL y el escenario de worker con éxito. No se deshabilitó TLS ni se modificaron dependencias/Dockerfile. El ensayo completo de restauración con imagen real sigue siendo obligatorio en FULL remoto; no se sustituye por esta reproducción focal. La interrupción local por ENOSPC se conserva por separado en `ci-sql-local-disk-error.txt`.
 
 ## Cierre remoto
 

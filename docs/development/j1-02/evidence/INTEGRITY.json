@@ -29,6 +29,20 @@
   },
   "baseline": "a41d644c4e25c7c9b85a8b9881ab3f4fb61989fc",
   "package_manifest_entries_verified": 33,
-  "recorded_utc": "2026-11-21T15:23:39.986510+00:00",
-  "source_file_count": 42
+  "recorded_utc": "2026-11-21T19:00:36.877301+00:00",
+  "source_file_count": 42,
+  "first_ci": {
+    "run": 44919018589,
+    "status": "failure",
+    "cause": "J1.02 trigger lacked private SELECT context for legacy service projection; SQL 42501 reproduced",
+    "browser_tests_passed": 481,
+    "python_tests_passed": 798,
+    "node_tests_passed": 204
+  },
+  "correction": {
+    "scope": "SECURITY DEFINER on checked trigger only; no additional grants",
+    "sql_regression_passed": 36,
+    "real_worker_regression_passed": 3,
+    "direct_private_access_denied": true
+  }
 }

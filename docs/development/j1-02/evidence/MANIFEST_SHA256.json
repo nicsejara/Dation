@@ -178,13 +178,13 @@
     },
     {
       "path": "backend/tests/e2e/test_decision_case_j102.py",
-      "bytes": 6156,
-      "sha256": "3a1aa6a211981bda363b8694d2abf243c990517aa1d020a7d53cbadb6c934029"
+      "bytes": 7250,
+      "sha256": "0468099171a753a0fc89b51d59c49f5ed2a048f6ba7e359a946dd4d564cec203"
     },
     {
       "path": "backend/tests/integration/test_decision_case_j102.py",
-      "bytes": 11791,
-      "sha256": "44ccb57c1c24730b8d0918b23fe22e623bd3f129a5f048c64e2d7fa5955efeaa"
+      "bytes": 13028,
+      "sha256": "0166ecaac60d4ad7e6694cdc6f23702b9b069d4998372e9154a28e9ec13cae99"
     },
     {
       "path": "backend/tests/test_decision_case_j102.py",
@@ -208,8 +208,8 @@
     },
     {
       "path": "docs/development/j1-02/ACCEPTANCE.csv",
-      "bytes": 26911,
-      "sha256": "6799e894d8beabf4ea772b3c76392eb05947cb77e6fc409df30a1c9091f304e6"
+      "bytes": 27708,
+      "sha256": "1c6cd84d429bf3d78b72b0d876d56a593eff6cfbdccc32409c2989aaf93e3621"
     },
     {
       "path": "docs/development/j1-02/ACTIVATION_AND_ROLLBACK.md",
@@ -238,18 +238,48 @@
     },
     {
       "path": "docs/development/j1-02/IMPLEMENTATION.md",
-      "bytes": 6595,
-      "sha256": "8f67148cb96d9d6c2d5d6ff199978aac612359da0c32fec3ac614dd469434483"
+      "bytes": 7858,
+      "sha256": "c79bcf681d0878bbbb2541617327233684fb6ceb1a92b4e4251b708481b964a2"
     },
     {
       "path": "docs/development/j1-02/TEST_RESULTS.md",
-      "bytes": 4905,
-      "sha256": "102e42f619337c9478996c99085e49a89d35676ebba6c711258a4439c03522be"
+      "bytes": 6478,
+      "sha256": "2c9cab9935e60d635eeff643fd38dc9a7a334f5443b8981737bace9ee15f11e0"
     },
     {
       "path": "docs/development/j1-02/evidence/INTEGRITY.json",
-      "bytes": 963,
-      "sha256": "78402dee259c629beea84e1f3ebb8b7d89f5c36b482a5f0e6f04b4f85fba2636"
+      "bytes": 1455,
+      "sha256": "ac013b67a13bad2ec222c07b7e1c47f7942aa88a81501a338c1f35b9176220c2"
+    },
+    {
+      "path": "docs/development/j1-02/evidence/ci-first-failure.txt",
+      "bytes": 2550,
+      "sha256": "f1aee9b643cae9ee8950cf8f66ed97dcd1e56ef961cda486fa889ffdd37108a8"
+    },
+    {
+      "path": "docs/development/j1-02/evidence/ci-legacy-worker-regression-green.txt",
+      "bytes": 697,
+      "sha256": "9f5c80d371005c1d38111eb2ca9dd8a07cfd7870e8cfc7bf711c89a416a1fd4e"
+    },
+    {
+      "path": "docs/development/j1-02/evidence/ci-restore-trigger-green.txt",
+      "bytes": 329,
+      "sha256": "940282ede921e2ab184ff5a62b7978e8276a034c3fae1b0dafc9924b054686b7"
+    },
+    {
+      "path": "docs/development/j1-02/evidence/ci-restore-trigger-red.txt",
+      "bytes": 1946,
+      "sha256": "c352c6f135b14b451a3af3a9455b7cc5308411e6535053084877a0c7710033aa"
+    },
+    {
+      "path": "docs/development/j1-02/evidence/ci-sql-local-disk-error.txt",
+      "bytes": 13758,
+      "sha256": "c7ea4ed7458c898b43e02602c264ebcb60223902a0ca9d37e2e2bb0d7c36577b"
+    },
+    {
+      "path": "docs/development/j1-02/evidence/ci-sql-regression-green.txt",
+      "bytes": 6926,
+      "sha256": "36508ae5b10e233fe257a331db989f0b652581d477cde1da76152d971d5ba70f"
     },
     {
       "path": "docs/development/j1-02/evidence/g0-contracts.txt",
@@ -398,8 +428,8 @@
     },
     {
       "path": "docs/development/j1-02/evidence/g7-static.txt",
-      "bytes": 9195,
-      "sha256": "92fe7fa2ed5a740e98418a1c1b58b7717c09af888d99a0427230b56469a2cf25"
+      "bytes": 9731,
+      "sha256": "28fa8c1cd5f568b138e626f548156e6004f49e1719917b90f3eeff5eeacd81ca"
     },
     {
       "path": "docs/development/j1-02/evidence/g7-visual-final.txt",
@@ -413,8 +443,8 @@
     },
     {
       "path": "docs/development/j1-02/evidence/impact-local.json",
-      "bytes": 17228,
-      "sha256": "8ecb780fb956cf84452e3b9e43983283ba94d686ce0b54112c87a2b16ae649cb"
+      "bytes": 18228,
+      "sha256": "d1de3660705c154cbd745be76be41b89f204b9885a3287d3f3d963cb8b6085ed"
     },
     {
       "path": "docs/development/j1-02/evidence/visual/README.md",
@@ -703,8 +733,8 @@
     },
     {
       "path": "supabase/migrations/20261121141444_j102_decision_case_definitions.sql",
-      "bytes": 25117,
-      "sha256": "61712b8a85ce9aada57bda96d5f8aeec0f1c742621c0540bd3b5000bc11aa342"
+      "bytes": 25287,
+      "sha256": "f05466f17794719a8973a0e6ead8fddc6a5df18ae4845cb848a6131da718b519"
     }
   ]
 }

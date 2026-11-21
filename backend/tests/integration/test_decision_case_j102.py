@@ -137,3 +137,15 @@ class DecisionCaseV2SQLTests(UltimateSQLSandbox,unittest.TestCase):
         self.assertEqual(self.rpc('case_create',args)['case_definition'],c['case_definition'])
         self.assertEqual(self.rpc('case_get',{'case_id':c['case']['id']})['model_version'],c['model_version'])
 
+    def test_11_service_projection_keeps_private_history_permissions_and_legacy_writes(self):
+        legacy=baseline.UltimateCaseSQLTests.case(self);cid=legacy['case']['id']
+        self.sql(f"SET ROLE service_role; UPDATE public.decision_cases SET last_activity_at=clock_timestamp() WHERE id='{cid}';")
+        self.assertEqual(self.v2('history',{'case_id':cid})['total'],0)
+        current,_=self.new_case();cid=current['case']['id'];revision=current['case_definition']
+        self.sql(f"SET ROLE service_role; UPDATE public.decision_cases SET last_activity_at=clock_timestamp() WHERE id='{cid}';")
+        self.assertEqual(self.rpc('case_get',{'case_id':cid})['case_definition'],revision)
+        self.reject(f"SET ROLE service_role; UPDATE public.decision_cases SET label='No actor' WHERE id='{cid}';",'42501')
+        self.assertEqual(self.rpc('case_get',{'case_id':cid})['case_definition'],revision)
+        self.reject('SET ROLE service_role; SELECT * FROM dation_private.case_definition_revisions;','42501')
+        self.assertEqual(self.sql("SELECT NOT has_table_privilege('authenticated','public.decision_cases','UPDATE') AND NOT has_function_privilege('service_role','dation_private.j102_capture_case()','EXECUTE');"),'t')
+

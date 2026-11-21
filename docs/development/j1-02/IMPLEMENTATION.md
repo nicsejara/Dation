@@ -42,3 +42,11 @@ Baseline: `a41d644c4e25c7c9b85a8b9881ab3f4fb61989fc`, posterior a PR #133 y #134
 Los logs RED se conservan. Se corrigieron: alias SQL de proyección; normalización de `case_mode=null` al regresar desde Graph; descripción canónica `null` al hidratar Edit; compatibilidad de rutas de modelo/datos; creación explícita de una sesión nueva después de limpiar una preparación expirada en modo GET-only. Ninguna aserción de integridad se eliminó. El catálogo JSON estático del contrato se regeneró al detectar correctamente la adición del binding; su prueba permanece intacta.
 
 La migración se generó con Supabase CLI y se probó únicamente en PostgreSQL 17 local aislado. Los valores de fixture son sintéticos. Los seeds SQL de persistencia se diferencian de los E2E, que suben CSV reales y ejecutan workers locales. No hay prueba productiva ni declaración de disponibilidad en Cloud Run.
+
+## Corrección de compatibilidad detectada por FULL
+
+La primera CI `44919018589`, candidato `2cc9123dfd8d763f1edbd49c465e498afdca2695`, aprobó FAST, 798 pruebas Python, 204 Node y los 481 escenarios de navegador. SQL obtuvo 218/219: falló el ensayo de restauración porque la reconciliación legacy recibía HTTP 403. No fue una expectativa obsoleta ni un timeout que se deba aumentar.
+
+La reproducción focal mostró `42501: permission denied for table case_definition_revisions` dentro de `j102_capture_case`: un UPDATE legítimo de proyección por service_role invocaba un trigger sin acceso a su tabla privada. El cambio se limita a declarar ese trigger `SECURITY DEFINER`, con `search_path=pg_catalog` y la misma selección exacta de workspace/Case. Se conservan los REVOKE, las comprobaciones de actor y los RPC comprobados. No se otorga acceso directo a la tabla ni a la función.
+
+La regresión nueva prueba que una proyección sin definición V2 funciona sin crear historia, que una actualización de actividad V2 no agrega revisión y que editar metadatos sin actor o leer directamente la historia continúa rechazado. Evidencia RED/GREEN en `evidence/ci-restore-trigger-*`. El SHA corregido y su CI terminal se registran en el cierre remoto del PR.

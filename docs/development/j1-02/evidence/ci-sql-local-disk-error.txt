@@ -1,0 +1,118 @@
+test_01_atomic_initial_snapshot_and_replay_are_exact (tests.integration.test_decision_case_j102.DecisionCaseV2SQLTests.test_01_atomic_initial_snapshot_and_replay_are_exact) ... ok
+test_02_metadata_cas_history_and_mutation_recovery (tests.integration.test_decision_case_j102.DecisionCaseV2SQLTests.test_02_metadata_cas_history_and_mutation_recovery) ... ok
+test_03_model_is_pinned_and_frozen_math_requires_derivation (tests.integration.test_decision_case_j102.DecisionCaseV2SQLTests.test_03_model_is_pinned_and_frozen_math_requires_derivation) ... ok
+test_04_parent_revision_authorized_and_original_unchanged (tests.integration.test_decision_case_j102.DecisionCaseV2SQLTests.test_04_parent_revision_authorized_and_original_unchanged) ... ok
+test_05_tenants_viewers_and_private_privileges (tests.integration.test_decision_case_j102.DecisionCaseV2SQLTests.test_05_tenants_viewers_and_private_privileges) ... ok
+test_06_writers_off_history_still_readable_legacy_not_rewritten (tests.integration.test_decision_case_j102.DecisionCaseV2SQLTests.test_06_writers_off_history_still_readable_legacy_not_rewritten) ... ok
+test_07_batched_projection_scopes_rows_and_preserves_legacy (tests.integration.test_decision_case_j102.DecisionCaseV2SQLTests.test_07_batched_projection_scopes_rows_and_preserves_legacy) ... ok
+test_08_no_direct_v2_creation_without_exact_validated_preparation (tests.integration.test_decision_case_j102.DecisionCaseV2SQLTests.test_08_no_direct_v2_creation_without_exact_validated_preparation) ... ok
+test_09_python_sql_math_hash_matches_and_ignores_only_revision_identity (tests.integration.test_decision_case_j102.DecisionCaseV2SQLTests.test_09_python_sql_math_hash_matches_and_ignores_only_revision_identity) ... ok
+test_10_archived_model_keeps_committed_intent_and_case_history_readable (tests.integration.test_decision_case_j102.DecisionCaseV2SQLTests.test_10_archived_model_keeps_committed_intent_and_case_history_readable) ... ok
+test_11_service_projection_keeps_private_history_permissions_and_legacy_writes (tests.integration.test_decision_case_j102.DecisionCaseV2SQLTests.test_11_service_projection_keeps_private_history_permissions_and_legacy_writes) ... ok
+test_01_model_create_list_search_and_identity_replay (tests.integration.test_ultimate_case_models.UltimateCaseSQLTests.test_01_model_create_list_search_and_identity_replay) ... ok
+test_02_publish_is_append_only_and_replay_survives_draft_edit (tests.integration.test_ultimate_case_models.UltimateCaseSQLTests.test_02_publish_is_append_only_and_replay_survives_draft_edit) ... ok
+test_03_cases_reuse_one_version_and_new_version_does_not_rebind (tests.integration.test_ultimate_case_models.UltimateCaseSQLTests.test_03_cases_reuse_one_version_and_new_version_does_not_rebind) ... ok
+test_04_empty_case_pack_is_atomic_tenant_bound_and_reloads (tests.integration.test_ultimate_case_models.UltimateCaseSQLTests.test_04_empty_case_pack_is_atomic_tenant_bound_and_reloads) ... ok
+test_05_binding_is_immutable_even_before_admission (tests.integration.test_ultimate_case_models.UltimateCaseSQLTests.test_05_binding_is_immutable_even_before_admission) ... ok
+test_06_invalid_horizon_rolls_back_case_pack_and_owners (tests.integration.test_ultimate_case_models.UltimateCaseSQLTests.test_06_invalid_horizon_rolls_back_case_pack_and_owners) ... ok
+test_07_policy_and_modes_are_persisted_not_executed (tests.integration.test_ultimate_case_models.UltimateCaseSQLTests.test_07_policy_and_modes_are_persisted_not_executed) ... ok
+test_08_pre_admission_math_edit_changes_context_hash (tests.integration.test_ultimate_case_models.UltimateCaseSQLTests.test_08_pre_admission_math_edit_changes_context_hash) ... ok
+test_09_case_and_owner_cas_preserve_atomicity (tests.integration.test_ultimate_case_models.UltimateCaseSQLTests.test_09_case_and_owner_cas_preserve_atomicity) ... ok
+test_10_admin_owner_is_required_eligible_and_atomic (tests.integration.test_ultimate_case_models.UltimateCaseSQLTests.test_10_admin_owner_is_required_eligible_and_atomic) ... ok
+test_11_operator_can_create_pending_but_not_assign_or_publish (tests.integration.test_ultimate_case_models.UltimateCaseSQLTests.test_11_operator_can_create_pending_but_not_assign_or_publish) ... ok
+test_12_viewer_read_only_and_disabled_member_rejected (tests.integration.test_ultimate_case_models.UltimateCaseSQLTests.test_12_viewer_read_only_and_disabled_member_rejected) ... FAIL
+test_13_cross_workspace_cannot_read_or_bind (tests.integration.test_ultimate_case_models.UltimateCaseSQLTests.test_13_cross_workspace_cannot_read_or_bind) ... FAIL
+test_14_closed_flag_blocks_writes_keeps_existing_context_readable (tests.integration.test_ultimate_case_models.UltimateCaseSQLTests.test_14_closed_flag_blocks_writes_keeps_existing_context_readable) ... FAIL
+test_15_role_does_not_grant_permission_or_select_runtime (tests.integration.test_ultimate_case_models.UltimateCaseSQLTests.test_15_role_does_not_grant_permission_or_select_runtime) ... FAIL
+test_16_archived_model_prevents_new_binding_preserves_existing (tests.integration.test_ultimate_case_models.UltimateCaseSQLTests.test_16_archived_model_prevents_new_binding_preserves_existing) ... FAIL
+test_17_concurrent_publish_has_one_cas_winner (tests.integration.test_ultimate_case_models.UltimateCaseSQLTests.test_17_concurrent_publish_has_one_cas_winner) ... FAIL
+test_18_private_acl_and_direct_write_denials (tests.integration.test_ultimate_case_models.UltimateCaseSQLTests.test_18_private_acl_and_direct_write_denials) ... ok
+test_19_sql_rejects_invalid_policy_and_config_without_api (tests.integration.test_ultimate_case_models.UltimateCaseSQLTests.test_19_sql_rejects_invalid_policy_and_config_without_api) ... FAIL
+test_20_first_admission_freezes_sql_math_metadata_and_owner_remain_editable (tests.integration.test_ultimate_case_models.UltimateCaseSQLTests.test_20_first_admission_freezes_sql_math_metadata_and_owner_remain_editable) ... FAIL
+test_21_failed_admission_rolls_back_freeze (tests.integration.test_ultimate_case_models.UltimateCaseSQLTests.test_21_failed_admission_rolls_back_freeze) ... FAIL
+test_22_admission_and_context_update_serialize_on_workspace_lock (tests.integration.test_ultimate_case_models.UltimateCaseSQLTests.test_22_admission_and_context_update_serialize_on_workspace_lock) ... FAIL
+test_23_pack_failure_rolls_back_new_case_and_pack (tests.integration.test_ultimate_case_models.UltimateCaseSQLTests.test_23_pack_failure_rolls_back_new_case_and_pack) ... FAIL
+test_24_disabled_dda_denies_foundation_and_stale_model_cas (tests.integration.test_ultimate_case_models.UltimateCaseSQLTests.test_24_disabled_dda_denies_foundation_and_stale_model_cas) ... FAIL
+test_25_existing_archive_restore_keeps_binding_owners_and_pack (tests.integration.test_ultimate_case_models.UltimateCaseSQLTests.test_25_existing_archive_restore_keeps_binding_owners_and_pack) ... FAIL
+tearDownClass (tests.integration.test_ultimate_case_models.UltimateCaseSQLTests) ... ERROR
+
+======================================================================
+ERROR: tearDownClass (tests.integration.test_ultimate_case_models.UltimateCaseSQLTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/work/dation-j1-02/backend/tests/integration/ultimate_sql_support.py", line 142, in tearDownClass
+    def tearDownClass(cls):cls.drop_database(cls.database)
+                           ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "/workspace/work/dation-j1-02/backend/tests/integration/ultimate_sql_support.py", line 130, in drop_database
+    cls.command('DROP DATABASE '+name+';',database='postgres')
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/work/dation-j1-02/backend/tests/integration/ultimate_sql_support.py", line 91, in command
+    raise AssertionError(result.stderr)
+AssertionError: WARNING:  57P02: terminating connection because of crash of another server process
+DETAIL:  The postmaster has commanded this server process to roll back the current transaction and exit, because another server process exited abnormally and possibly corrupted shared memory.
+HINT:  In a moment you should be able to reconnect to the database and repeat your command.
+LOCATION:  quickdie, postgres.c:2960
+server closed the connection unexpectedly
+	This probably means the server terminated abnormally
+	before or while processing the request.
+connection to server was lost
+
+
+======================================================================
+FAIL: test_12_viewer_read_only_and_disabled_member_rejected (tests.integration.test_ultimate_case_models.UltimateCaseSQLTests.test_12_viewer_read_only_and_disabled_member_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/work/dation-j1-02/backend/tests/integration/test_ultimate_case_models.py", line 134, in test_12_viewer_read_only_and_disabled_member_rejected
+    c=self.case();self.assertFalse(self.rpc('case_get',{'case_id':c['case']['id']},user=VIEWER)['permissions']['can_edit'])
+  File "/workspace/work/dation-j1-02/backend/tests/integration/test_ultimate_case_models.py", line 74, in case
+    return self.invoke(service.create_case,UltimateCaseCreate(**values))
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/work/dation-j1-02/backend/tests/integration/test_ultimate_case_models.py", line 65, in invoke
+    with patch.object(service,'platform_call',bridge):return asyncio.run(method(ctx,*args))
+                                                             ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.13/asyncio/runners.py", line 195, in run
+    return runner.run(main)
+           ~~~~~~~~~~^^^^^^
+  File "/usr/lib/python3.13/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/usr/lib/python3.13/asyncio/base_events.py", line 725, in run_until_complete
+    return future.result()
+           ~~~~~~~~~~~~~^^
+  File "/workspace/work/dation-j1-02/backend/app/services/logistics_model_service.py", line 128, in create_case
+    result=await call(ctx,'case_create',{**body,'case_policy':policy,'case_policy_hash':policy_hash(payload.case_policy),
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        **empty_pack_snapshot(ctx.workspace_id,payload.id),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        'creation_intent_hash':snapshot_hash('case_creation_intent_v1',{'actor':ctx.user_id,**body})})
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/work/dation-j1-02/backend/app/services/logistics_model_service.py", line 37, in call
+    return await platform_call('platform_ultimate_foundation',{'target_workspace_id':ctx.workspace_id,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        'actor_user_id':ctx.user_id,'operation':operation,'arguments':arguments or {}})
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/work/dation-j1-02/backend/tests/integration/test_ultimate_case_models.py", line 64, in bridge
+    async def bridge(_name,body):return self.rpc(body['operation'],body['arguments'],user=body['actor_user_id'],workspace=body['target_workspace_id'])
+                                        ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/work/dation-j1-02/backend/tests/integration/test_ultimate_case_models.py", line 61, in rpc
+    def rpc(self,operation,args=None,**ctx):return json.loads(self.sql(self.rpc_sql(operation,args,**ctx)))
+                                                              ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/work/dation-j1-02/backend/tests/integration/test_ultimate_case_models.py", line 54, in sql
+    def sql(self,sql):return self.command(sql).stdout.strip()
+                             ~~~~~~~~~~~~^^^^^
+  File "/workspace/work/dation-j1-02/backend/tests/integration/ultimate_sql_support.py", line 91, in command
+    raise AssertionError(result.stderr)
+AssertionError: ERROR:  53100: could not extend file "base/18242/18277_fsm": No space left on device
+HINT:  Check free disk space.
+CONTEXT:  SQL statement "INSERT INTO public.decision_cases(id,workspace_id,schema_version,workflow_version,label,description,category,logistics_model_version_id,
+   planning_start,planning_end,horizon_type,operating_mode,case_policy_schema_version,case_policy_jsonb,case_policy_hash,graph_definition_version,created_by_user_id,creation_intent_hash)
+  VALUES(target,target_workspace_id,'decision_case_v2',2,arguments->>'name',arguments->>'description',
+   CASE arguments->>'horizon_type' WHEN 'WEEKLY' THEN 'weekly' WHEN 'MONTHLY' THEN 'monthly' WHEN 'DAILY' THEN 'live_operation' ELSE 'extraordinary' END,
+   v.id,(arguments->>'planning_start')::date,(arguments->>'planning_end')::date,arguments->>'horizon_type',arguments->>'operating_mode','case_policy_v1',arguments->'case_policy',arguments->>'case_policy_hash',v.graph_definition_version,actor_user_id,arguments->>'creation_intent_hash') RETURNING *"
+PL/pgSQL function dation_private.saga10_foundation_v1(uuid,uuid,text,jsonb) line 108 at SQL statement
+PL/pgSQL function dation_private.j102_foundation_legacy(uuid,uuid,text,jsonb) line 14 at assignment
+PL/pgSQL function public.platform_ultimate_foundation(uuid,uuid,text,jsonb) line 24 at assignment
+LOCATION:  mdzeroextend, md.c:620
+
+Traceback (most recent call last):
+Traceback (most recent call last):

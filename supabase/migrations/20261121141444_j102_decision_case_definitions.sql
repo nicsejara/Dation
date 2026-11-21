@@ -100,8 +100,10 @@ END $$;
 
 -- Capture allowed metadata edits even through older authorized APIs. Frozen
 -- snapshots are never updated, and unrelated freeze/activity updates add none.
+-- The checked trigger needs private history access even for service-role
+-- legacy projection writes. Do not grant that role direct history privileges.
 CREATE FUNCTION dation_private.j102_capture_case() RETURNS trigger
-LANGUAGE plpgsql SET search_path=pg_catalog AS $$
+LANGUAGE plpgsql SECURITY DEFINER SET search_path=pg_catalog AS $$
 DECLARE previous dation_private.case_definition_revisions; d jsonb; uid uuid; mid uuid;
 BEGIN
  SELECT * INTO previous FROM dation_private.case_definition_revisions WHERE workspace_id=NEW.workspace_id AND case_id=NEW.id ORDER BY revision DESC LIMIT 1;
