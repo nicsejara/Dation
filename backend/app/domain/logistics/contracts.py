@@ -7,6 +7,7 @@ from pydantic import Field, StrictBool, model_validator
 from .base import (ContractModel, Count, DecisionDate, Dimension, Identifier, NonNegative,
                    Positive, Priority, Ratio, ResourceSource, SHA256)
 from .units import CurrencyPolicy, QuantityVector, scaled_integer, DISTANCE_SCALE
+from .case_policy_v2 import CaseExecutionBindingV2
 
 Goal = Literal["MINIMIZE_COST", "MAXIMIZE_SERVICE", "MAXIMIZE_OWN_CAPACITY",
                "MINIMIZE_TRIPS", "BALANCED", "CUSTOM"]
@@ -197,6 +198,7 @@ class FrozenCaseContext(Horizon):
     active_dimensions: tuple[Dimension, ...]
     read_set: tuple[SemanticInput, ...]
     display_metadata: dict[str, str] = Field(default_factory=dict)
+    decision_definition: CaseExecutionBindingV2 | None = Field(default=None, exclude_if=lambda value: value is None)
 
     @model_validator(mode="after")
     def snapshot(self):

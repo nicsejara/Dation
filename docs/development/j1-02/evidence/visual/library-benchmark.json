@@ -1,0 +1,11 @@
+{
+  "initial_list_seconds": 0.9608386689797044,
+  "seeded_server_cases": 27,
+  "page_size": 25,
+  "second_page_filtered_rows": 1,
+  "batch_rpc_assertion": "test_decision_case_j102_gate.DecisionCaseV2GateTests.test_listing_adds_one_scoped_batch_not_one_rpc_per_case",
+  "same_case_history": [
+    "9246d0e9-0ce2-466a-93e4-f1c62b0fdd8a",
+    "f5bd4c4d-7ac3-4b3c-a309-b5ca3ed9947b"
+  ]
+}

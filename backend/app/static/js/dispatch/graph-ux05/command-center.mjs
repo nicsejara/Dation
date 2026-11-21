@@ -7,6 +7,7 @@ import {renderToolbar} from './command-toolbar.mjs';
 import {renderNodes} from './node-graph.mjs';
 import {contextualPanel,decisionContent} from './decision-popover.mjs';
 import {renderSummary} from './core-summary.mjs';
+import {mountCaseAcceptance} from '../cases/case-v2-acceptance.mjs';
 import {possibleActions,IMPLEMENTED} from './status-presentation.mjs';
 
 export async function mountCommandCenter(root,{scope,route,data,journey,navigate,onContext}){
@@ -75,7 +76,7 @@ export async function mountCommandCenter(root,{scope,route,data,journey,navigate
  }
  async function summary(trigger){
   cancelPicker();clearPanel();const current=panelView=contextualPanel(slot,viewScope,{trigger,title:'Resumen Core Configuration',id:'ux05-core-summary',onClose:()=>{panelView=null;}});current.panel.append(el('p','Recuperando contexto publicado…'));current.focus();
-  try{const context=await api(base+'/context',{signal:current.scope.signal});if(!current.scope.active)return;current.panel.lastElementChild.remove();renderSummary(current.panel,context,pack,data.responsibilities);}
+  try{const context=await api(base+'/context',{signal:current.scope.signal});if(!current.scope.active)return;current.panel.lastElementChild.remove();renderSummary(current.panel,context,pack,data.responsibilities);if(context.case_definition)await mountCaseAcceptance(current.panel,current.scope,{caseId:route.caseId});}
   catch(e){if(current.scope.active){current.panel.lastElementChild.textContent=e.message;current.panel.append(button('Reintentar resumen',()=>summary(trigger)));}}
  }
  let closing=false;

@@ -1,0 +1,46 @@
+[
+  {
+    "width": 1440,
+    "scroll": 1440,
+    "client": 1440,
+    "controls": [],
+    "contrast": {
+      "minimum": 5.429139914708745,
+      "count": 83,
+      "failures": []
+    }
+  },
+  {
+    "width": 1280,
+    "scroll": 1280,
+    "client": 1280,
+    "controls": [],
+    "contrast": {
+      "minimum": 5.429139914708745,
+      "count": 83,
+      "failures": []
+    }
+  },
+  {
+    "width": 768,
+    "scroll": 768,
+    "client": 768,
+    "controls": [],
+    "contrast": {
+      "minimum": 5.429139914708745,
+      "count": 83,
+      "failures": []
+    }
+  },
+  {
+    "width": 375,
+    "scroll": 375,
+    "client": 375,
+    "controls": [],
+    "contrast": {
+      "minimum": 5.429139914708745,
+      "count": 83,
+      "failures": []
+    }
+  }
+]

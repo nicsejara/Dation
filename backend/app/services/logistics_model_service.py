@@ -44,7 +44,10 @@ async def capabilities(ctx):
     caps=await call(ctx,'capabilities')
     library=bool(os.getenv('DATION_J101_LIBRARY_ENABLED','false').lower()=='true'
         and all(caps.get(key,False) for key in ('enabled','saga10_schema_enabled','saga10_ui_enabled')))
-    return {**caps,'unified_journey_enabled':await journey_capabilities(ctx),'models_library_enabled':library}
+    journey=await journey_capabilities(ctx)
+    case_v2=bool(os.getenv('DATION_J102_ENABLED','false').lower()=='true' and library and journey
+        and caps.get('decision_case_v2_write_enabled',False))
+    return {**caps,'unified_journey_enabled':journey,'models_library_enabled':library,'decision_case_v2_enabled':case_v2}
 
 
 async def require_schema(ctx,config):
@@ -118,6 +121,10 @@ def empty_pack_snapshot(workspace_id,case_id):
 
 async def create_case(ctx,payload):
     body=payload.model_dump(mode='json');policy=canonical_tree(payload.case_policy)
+    if body.get('definition_v2'):
+        from app.services.decision_case_v2_service import require_writes
+        await require_writes(ctx)
+        body['definition_v2']=canonical_tree(payload.definition_v2)
     result=await call(ctx,'case_create',{**body,'case_policy':policy,'case_policy_hash':policy_hash(payload.case_policy),
         **empty_pack_snapshot(ctx.workspace_id,payload.id),
         'creation_intent_hash':snapshot_hash('case_creation_intent_v1',{'actor':ctx.user_id,**body})})
@@ -125,6 +132,9 @@ async def create_case(ctx,payload):
 
 
 def enrich_context(result):
+    if result.get('case_definition'):
+        from app.services.decision_case_v2_service import checked_revision
+        checked_revision(result['case_definition'])
     row=result['case'];version=result['model_version'];pack=result['pack'];pv=result['pack_version']
     config=parse_configuration(version['config_jsonb'])
     model_class=LogisticsModelSnapshotV2 if config.version==2 else LogisticsModelVersion

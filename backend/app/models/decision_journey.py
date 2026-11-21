@@ -3,6 +3,7 @@ from uuid import UUID
 from pydantic import Field
 from app.domain.logistics.base import ContractModel
 from app.models.ultimate_foundation import UltimateCaseCreate
+from app.models.decision_case_v2 import UltimateCaseCreateV2
 
 class PreparationCreate(ContractModel):
     id: UUID
@@ -16,7 +17,7 @@ class PreparationOwner(PreparationRevision):
     data_owner_user_id: UUID | None
 
 class PreparationFinalize(PreparationRevision):
-    case: UltimateCaseCreate
+    case: UltimateCaseCreateV2 | UltimateCaseCreate
 
 class CaseClose(ContractModel):
     token: str = Field(pattern=r'^[0-9a-f]{32}$')

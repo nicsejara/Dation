@@ -60,6 +60,11 @@ async def enrich_center(ctx,items):
     if await journey.capabilities(ctx):
         events=await journey.call(ctx,'lifecycles',case_ids=[item['id'] for item in result if item.get('workflow_version')==2])
         result=[{**item,'unified_journey_enabled':True,'journey_lifecycle':events.get(item['id'])} if item.get('workflow_version')==2 else item for item in result]
+    import os
+    from app.services import logistics_model_service as models
+    if os.getenv('DATION_J102_ENABLED','false').lower()=='true' and (await models.capabilities(ctx)).get('decision_case_v2_schema_available'):
+        from app.services.decision_case_v2_service import enrich_listing
+        result=await enrich_listing(ctx,result)
     return result
 
 async def case_context(ctx,case_id):

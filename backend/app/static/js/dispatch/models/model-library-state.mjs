@@ -17,7 +17,7 @@ export function newModelDraft(currency){
 }
 export function modelRoute(values={}){return {view:'logistics-models',caseId:null,nodeId:null,runId:null,...values};}
 export function workingCopies(options){
- const storage=options.storage||localStorage,prefix='dation.models.working.v1.'+identity(options)+'.';
+ const storage=options.storage||localStorage,prefix=(options.kind==='case'?'dation.cases.working.v2.':'dation.models.working.v1.')+identity(options)+'.';
  const key=id=>{if(!uuid.test(id||''))throw new Error('Identidad del borrador inválida.');return prefix+id;};
  function read(id){const raw=storage.getItem(key(id));if(!raw)return null;
   let value;try{value=JSON.parse(raw);}catch{throw new Error('La copia local no se puede leer. Conservá el almacenamiento y recuperá el modelo desde el servidor.');}
@@ -43,9 +43,9 @@ export function resolveReturn(id,options){
 export function draftContent(draft){const value=copy(draft);if(value.guided_ux)delete value.guided_ux.openBlocks;return JSON.stringify(value);}
 // localStorage has no atomic compare-and-swap. Hold a browser lock for the
 // mounted working copy; distinct copies still use SQL revision CAS per model.
-export async function lockWorkingCopy(workId,scope){
+export async function lockWorkingCopy(workId,scope,kind='model'){
  if(!uuid.test(workId||'')||!navigator.locks)throw new Error('Este navegador no permite proteger el borrador entre pestañas. Usá un navegador compatible.');
- const name='dation-model-copy.'+identity(browserIdentity())+'.'+workId;
+ const name='dation-'+(kind==='case'?'case':'model')+'-copy.'+identity(browserIdentity())+'.'+workId;
  await new Promise((resolve,reject)=>{
   navigator.locks.request(name,{ifAvailable:true},async lock=>{
    if(!lock){reject(new Error('Este borrador ya está abierto en otra pestaña. Continuá allí o abrí otra copia desde la biblioteca.'));return;}

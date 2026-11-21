@@ -1,0 +1,10 @@
+test_19_expired_stage_explicit_cleanup_creates_one_new_private_session (test_decision_case_j102.DecisionCaseV2BrowserTests.test_19_expired_stage_explicit_cleanup_creates_one_new_private_session) ... Executing <Task finished name='Task-1' coro=<Saga10WizardTests.asyncSetUp() done, defined at /workspace/work/dation-j1-02/backend/tests/browser/test_saga10_wizard.py:24> result=None created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.122 seconds
+Executing <Task pending name='Task-5' coro=<DecisionCaseV2BrowserTests.test_19_expired_stage_explicit_cleanup_creates_one_new_private_session() running at /workspace/work/dation-j1-02/backend/tests/browser/test_decision_case_j102.py:263> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.288 seconds
+Executing <Task finished name='Task-5' coro=<DecisionCaseV2BrowserTests.test_19_expired_stage_explicit_cleanup_creates_one_new_private_session() done, defined at /workspace/work/dation-j1-02/backend/tests/browser/test_decision_case_j102.py:259> result=None created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.275 seconds
+Executing <Task pending name='Task-7' coro=<DecisionCaseV2BrowserTests.asyncTearDown() running at /workspace/work/dation-j1-02/backend/tests/browser/test_decision_case_j102.py:24> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.236 seconds
+ok
+
+----------------------------------------------------------------------
+Ran 1 test in 19.061s
+
+OK

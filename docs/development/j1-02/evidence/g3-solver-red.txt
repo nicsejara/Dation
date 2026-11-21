@@ -1,0 +1,23 @@
+test_create_envelope_cannot_substitute_model_or_policy (tests.test_decision_case_j102.DecisionCaseV2ContractTests.test_create_envelope_cannot_substitute_model_or_policy) ... ok
+test_definition_is_versioned_strict_and_canonical (tests.test_decision_case_j102.DecisionCaseV2ContractTests.test_definition_is_versioned_strict_and_canonical) ... ok
+test_rule_only_with_minimum_cost_and_one_hard_critical_guardrail (tests.test_decision_case_j102.DecisionCaseV2ContractTests.test_rule_only_with_minimum_cost_and_one_hard_critical_guardrail) ... ok
+test_equal_proven_min_cost_prefers_own_with_exact_stage_evidence (tests.test_decision_case_j102.DecisionCaseV2SolverTests.test_equal_proven_min_cost_prefers_own_with_exact_stage_evidence) ... FAIL
+test_hard_high_impossible_never_returns_80_percent_admissible (tests.test_decision_case_j102.DecisionCaseV2SolverTests.test_hard_high_impossible_never_returns_80_percent_admissible) ... ok
+test_legacy_and_mismatched_lineage_never_get_a_fake_kpi (tests.test_decision_case_j102.DecisionCaseV2SolverTests.test_legacy_and_mismatched_lineage_never_get_a_fake_kpi) ... ok
+test_meets_misses_and_no_high_never_approve (tests.test_decision_case_j102.DecisionCaseV2SolverTests.test_meets_misses_and_no_high_never_approve) ... ok
+test_no_own_and_unknown_budget_are_honest (tests.test_decision_case_j102.DecisionCaseV2SolverTests.test_no_own_and_unknown_budget_are_honest) ... ok
+test_secondary_never_pays_more_even_one_minor_unit (tests.test_decision_case_j102.DecisionCaseV2SolverTests.test_secondary_never_pays_more_even_one_minor_unit) ... ok
+
+======================================================================
+FAIL: test_equal_proven_min_cost_prefers_own_with_exact_stage_evidence (tests.test_decision_case_j102.DecisionCaseV2SolverTests.test_equal_proven_min_cost_prefers_own_with_exact_stage_evidence)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/work/dation-j1-02/backend/tests/test_decision_case_j102.py", line 75, in test_equal_proven_min_cost_prefers_own_with_exact_stage_evidence
+    self.assertEqual(r.output.core.transport_plan.trips[0].resource_source,'OWN')
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: <ResourceSource.EXTERNAL: 'EXTERNAL'> != 'OWN'
+
+----------------------------------------------------------------------
+Ran 9 tests in 0.155s
+
+FAILED (failures=1)

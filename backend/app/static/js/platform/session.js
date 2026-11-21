@@ -6,7 +6,7 @@
  function clearPrivateState({modelOwner=null}={}){for(const store of [sessionStorage,localStorage]){for(const key of Object.keys(store)){if(!key.startsWith('dation.'))continue;
   // A fresh tab may recover ONLY this authenticated subject's model copies.
   // Logout / identity changes call without an owner and still erase everything.
-  if(store===localStorage&&modelOwner&&key.startsWith('dation.models.working.v1.'+modelOwner+'.'))continue;
+  if(store===localStorage&&modelOwner&&['dation.models.working.v1.','dation.cases.working.v2.'].some(prefix=>key.startsWith(prefix+modelOwner+'.')))continue;
   store.removeItem(key);
  }}}
  async function load(){

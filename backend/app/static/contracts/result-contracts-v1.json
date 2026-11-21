@@ -954,6 +954,100 @@
       "title": "CargoProductPortion",
       "type": "object"
     },
+    "CaseAcceptancePolicyV2": {
+      "additionalProperties": false,
+      "properties": {
+        "basis": {
+          "const": "CANONICAL_MODEL_PRIMARY_DIMENSION",
+          "default": "CANONICAL_MODEL_PRIMARY_DIMENSION",
+          "title": "Basis",
+          "type": "string"
+        },
+        "comparator": {
+          "const": "GTE",
+          "default": "GTE",
+          "title": "Comparator",
+          "type": "string"
+        },
+        "metric": {
+          "const": "TOTAL_DEMAND_COVERAGE",
+          "default": "TOTAL_DEMAND_COVERAGE",
+          "title": "Metric",
+          "type": "string"
+        },
+        "threshold": {
+          "anyOf": [
+            {
+              "pattern": "^[+-]?(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+)(?:[eE][+-]?[0-9]+)?$",
+              "type": "string"
+            },
+            {
+              "type": "integer"
+            }
+          ],
+          "format": "exact-decimal",
+          "title": "Threshold"
+        },
+        "version": {
+          "const": 1,
+          "default": 1,
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "threshold"
+      ],
+      "title": "CaseAcceptancePolicyV2",
+      "type": "object"
+    },
+    "CaseBusinessRulesV2": {
+      "additionalProperties": false,
+      "properties": {
+        "prefer_own_fleet_on_cost_tie": {
+          "default": false,
+          "title": "Prefer Own Fleet On Cost Tie",
+          "type": "boolean"
+        },
+        "version": {
+          "const": 1,
+          "default": 1,
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "title": "CaseBusinessRulesV2",
+      "type": "object"
+    },
+    "CaseExecutionBindingV2": {
+      "additionalProperties": false,
+      "properties": {
+        "acceptance_policy": {
+          "$ref": "#/$defs/CaseAcceptancePolicyV2"
+        },
+        "business_rules": {
+          "$ref": "#/$defs/CaseBusinessRulesV2"
+        },
+        "definition_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Definition Hash",
+          "type": "string"
+        },
+        "definition_revision_id": {
+          "format": "uuid",
+          "title": "Definition Revision Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "definition_revision_id",
+        "definition_hash",
+        "business_rules",
+        "acceptance_policy"
+      ],
+      "title": "CaseExecutionBindingV2",
+      "type": "object"
+    },
     "CasePolicy": {
       "additionalProperties": false,
       "properties": {
@@ -3163,6 +3257,17 @@
           "format": "uuid",
           "title": "Data Pack Version Id",
           "type": "string"
+        },
+        "decision_definition": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CaseExecutionBindingV2"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
         },
         "display_metadata": {
           "additionalProperties": {

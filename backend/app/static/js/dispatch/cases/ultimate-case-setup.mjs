@@ -51,11 +51,17 @@ export async function mountCaseSetup(root,{route,navigate,onContext}){
  const scope=scopeFor(root);await ensureStylesheet('ultimate-foundation-styles','/static/css/ultimate-foundation.css','t3-v1');if(!scope.active)return;
  root.className='dispatch d-platform ultimate-foundation ultimate-core-setup';root.append(loadingState(route.caseId?'Recuperando contexto del Case…':'Inicializando Core Configuration…'));
  try{
-  const fresh=!route.caseId,[caps,current]=await Promise.all([api('/api/platform/ultimate-foundation/capabilities',{signal:scope.signal}),fresh?Promise.resolve(null):api('/api/platform/logistics-cases/'+route.caseId+'/context',{signal:scope.signal})]);
-  if(!scope.active)return;if(fresh&&!caps.can_create_case)throw Object.assign(new Error('La creación de Cases no está disponible para este acceso.'),{status:403});
+  const fresh=!route.caseId,[caps,current]=await Promise.all([api('/api/platform/ultimate-foundation/capabilities',{signal:scope.signal}),fresh?Promise.resolve(null):api('/api/platform/logistics-cases/'+route.caseId+'/context',{signal:scope.signal}).catch(async error=>{if(route.journeyVersion!=='v2'||error.status!==404)throw error;const legacy=await api('/api/platform/decisions/'+route.caseId,{signal:scope.signal});return {legacy:true,case:legacy};})]);
+  if(!scope.active)return;
+  const parent=fresh&&route.parentCaseId?await api('/api/platform/logistics-cases/'+route.parentCaseId+'/context',{signal:scope.signal}):null;
+  if(route.journeyVersion==='v2'||current?.case_definition||parent?.case_definition){
+   if(!current&&!caps.decision_case_v2_enabled){root.replaceChildren(el('h1','Decision Case V2 todavía no está activado','d-page-title'),el('p','Las definiciones guardadas se conservan. El recorrido vigente sigue disponible; no se habilitó ninguna escritura V2.','d-body'),button(parent?'Volver al Case de origen':'Volver al Core vigente',()=>navigate('logistics-case-setup',parent?{caseId:parent.case.id}:{caseId:null})));root.dataset.ultimateReady='true';return;}
+   const {mountDecisionCaseV2}=await import('./decision-case-v2.mjs');
+   return await mountDecisionCaseV2(root,{route:{...route,journeyVersion:'v2',caseView:route.caseView||(current&&route.coreStep===1?'model':current&&route.coreStep===2?'inputs':undefined)},navigate,onContext,caps,current,sourceParent:parent?.case_definition?parent:null,scope});
+  }
+  if(fresh&&!caps.can_create_case)throw Object.assign(new Error('La creación de Cases no está disponible para este acceso.'),{status:403});
   if(current)onContext?.(current);
   const unified=!!caps.unified_journey_enabled;window.dationUnifiedJourney=unified;
-  const parent=unified&&fresh&&route.parentCaseId?await api('/api/platform/logistics-cases/'+route.parentCaseId+'/context',{signal:scope.signal}):null;
   const row=current?.case,store=draftStore('case',route.caseId||(route.preparationId?'derived-'+route.preparationId:'new')),saved=store.read(),policy=(current||parent)?.planning_context.case_policy||{version:1,primary_goal:'MINIMIZE_COST',guardrails:[],preferences:[]};
   const initial={id:row?.id||crypto.randomUUID(),name:row?.label||'',description:row?.description||'',model_id:current?.model.id||route.modelId||'',logistics_model_version_id:row?.logistics_model_version_id||'',
    planning_start:row?.planning_start||'',planning_end:row?.planning_end||'',horizon_type:row?.horizon_type||'WEEKLY',operating_mode:row?.operating_mode||'OPERATIONAL',expected_updated_at:row?.updated_at||null,decision_owner_user_id:'',
