@@ -14,8 +14,10 @@ export async function mountModels(root,{route,navigate}){
  root.className='dispatch d-platform ultimate-foundation';root.append(loadingState('Cargando Logistics Models…'));
  try{
   const caps=await api('/api/platform/ultimate-foundation/capabilities',{signal:scope.signal});if(!scope.active)return;
+  if(caps.models_library_enabled){const {mountModelLibrary}=await import('./model-library.mjs');if(scope.active)await mountModelLibrary(root,{route,navigate,caps,scope});return;}
+  if(route.modelView&&route.modelView!=='library'||route.modelWorkId||route.modelVersionId||route.modelReturnId)throw Object.assign(new Error('La biblioteca J1.01 todavía no está activada para este entorno.'),{status:404});
   if(route.modelId)await editor(caps);else await library(caps);
- }catch(error){if(scope.active)errorBox(root,error,()=>navigate('logistics-models',{modelId:route.modelId}));}
+ }catch(error){if(scope.active)errorBox(root,error,()=>navigate('logistics-models',{...route,replace:true}));}
  async function library(caps){
   let offset=0,search='';root.replaceChildren();const header=pageHeader(root,'Logistics Models','Una configuración reusable de tu operación. Publicá versiones para usarlas en distintos Cases sin modificar su historia.');
   const actions=el('div',undefined,'d-page-header__actions');if(caps.can_manage_models)actions.append(button('Crear Model',()=>navigate('logistics-models',{modelId:'new'}),'primary'));

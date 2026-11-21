@@ -371,7 +371,7 @@
 
 /* UX04: opt-in Core + Studio composition; existing runtime and legacy shells remain. */
 .unified-journey .ultimate-disclosure>header { display:flex;align-items:flex-start;gap:var(--space-4);padding:var(--space-5);border-bottom:1px solid var(--color-border); }
-.unified-journey .ultimate-disclosure>header:focus { outline:2px solid var(--color-text-accent);outline-offset:-3px; }
+.unified-journey .ultimate-disclosure>header:focus { outline:none; }
 .unified-journey .ultimate-disclosure>header .ultimate-disclosure__status { margin-inline-start:auto; }
 .unified-journey .journey-preparation { display:grid;gap:var(--space-4);min-width:0;grid-column:1/-1; }
 .unified-journey .journey-data-owner { padding:var(--space-5);display:grid;gap:var(--space-3); }
@@ -978,5 +978,52 @@
 .ultimate-foundation .r6-model-review .r6-review-copy > p { min-block-size:0; }
 .r6-review-header .model-wizard-tile { display:grid;place-items:center;flex:none;inline-size:48px;block-size:48px;background:color-mix(in srgb,var(--color-text-accent) 8%,var(--color-surface));border-radius:10px; }
 .r6-review-header .model-wizard-tile svg { inline-size:28px;block-size:28px;color:var(--color-text-accent); }
+
+/* J1.01: the existing Models route; the R6 wizard retains its own geometry. */
+.j101-library { max-inline-size:1480px;margin-inline:auto;padding:24px;min-inline-size:0; }
+.j101-library .d-page-header { padding-block:12px 24px;gap:24px; }
+.j101-library :is(h1,h2,p,article,form,section,aside) { min-inline-size:0;overflow-wrap:anywhere; }
+.j101-toolbar { display:grid;grid-template-columns:minmax(0,1fr) minmax(160px,220px) auto;gap:16px;align-items:end;margin-block-end:24px; }
+.j101-toolbar .d-field :is(.d-field__help,.d-field__error):empty { display:none; }
+.j101-library.d-platform :is(.j101-footer,.d-page-header,.j101-toolbar,.j101-pager,.j101-model-card,.j101-version,.j101-empty,.d-modal__actions) .d-button:not(.d-button--workflow) { --platform-button-height:44px;min-block-size:44px;white-space:normal; }
+.j101-toolbar > .d-button { margin-block-end:0; }
+.j101-model-grid { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;min-block-size:250px;align-items:stretch; }
+.j101-model-card { display:flex;flex-direction:column;align-items:stretch;gap:14px;padding:24px;min-inline-size:0; }
+.j101-model-card .d-card-title { font-size:18px;line-height:1.4; }
+.j101-model-card .ultimate-disclosure__status { align-self:flex-start; }
+.j101-model-card .j101-actions { margin-block-start:auto; }
+.j101-actions { display:flex;flex-wrap:wrap;align-items:center;gap:10px;min-inline-size:0; }
+.j101-pager { display:flex;align-items:center;justify-content:center;gap:16px;padding-block:20px; }
+.j101-empty { grid-column:1/-1;text-align:center;display:grid;justify-items:center;align-content:center;gap:16px;padding:32px; }
+.j101-footer { display:grid;grid-template-columns:44px minmax(110px,.8fr) minmax(150px,1fr) minmax(0,auto);gap:20px;align-items:center;margin-block-start:24px;padding:20px; }
+.j101-back { inline-size:44px;padding:0; }
+.j101-footer > p { margin:0; }
+.j101-footer .j101-actions { justify-content:flex-end; }
+.j101-editor { display:block; }
+.j101-version-list { display:grid;gap:16px; }
+.j101-version { display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px 24px;padding:24px; }
+.j101-version > .d-metadata { grid-column:1; }
+.j101-version > .d-button { grid-column:2;grid-row:1/4;align-self:center; }
+.j101-library .model-wizard-feedback:empty { display:none; }
+.j101-library .r6-model-review[data-review-context=library] .r6-review-actions { grid-template-columns:220px; }
+@media(max-width:1000px) {
+ .j101-model-grid { grid-template-columns:minmax(0,1fr); }
+ .j101-footer { grid-template-columns:44px minmax(0,1fr);gap:16px; }
+ .j101-footer > :nth-child(3),.j101-footer > .j101-actions { grid-column:2; }
+ .j101-footer > .j101-actions { justify-content:flex-start; }
+}
+@media(max-width:760px) {
+ .j101-library { padding:16px; }
+ .j101-toolbar { grid-template-columns:minmax(0,1fr);gap:12px; }
+ .j101-model-grid { grid-template-columns:minmax(0,1fr); }
+ .j101-model-card { padding:20px; }
+ .j101-version { grid-template-columns:minmax(0,1fr);padding:16px; }
+ .j101-version > .d-button { grid-column:1;grid-row:auto; }
+ .j101-library .r6-model-review[data-review-context=library] .r6-review-actions { grid-template-columns:minmax(0,1fr); }
+ .j101-footer { padding:16px; }
+ .j101-pager { gap:10px;flex-wrap:wrap; }
+}
 .unified-journey .r6-model-review > .journey-step-footer { grid-template-columns:44px minmax(0,1fr);grid-template-rows:auto;min-block-size:72px; }
 .r6-model-review > .journey-step-footer > :is(.journey-step-actions,.journey-step-context):empty { display:none; }
+
+.j101-library .d-recovery__actions button { min-inline-size:44px;min-block-size:44px;padding:8px 16px; }

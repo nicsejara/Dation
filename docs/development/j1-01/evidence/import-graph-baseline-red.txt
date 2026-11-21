@@ -1,0 +1,25 @@
+test_template_entrypoints_and_relative_imports_resolve (test_frontend_import_graph.FrontendImportGraphTests.test_template_entrypoints_and_relative_imports_resolve) ... FAIL
+
+======================================================================
+FAIL: test_template_entrypoints_and_relative_imports_resolve (test_frontend_import_graph.FrontendImportGraphTests.test_template_entrypoints_and_relative_imports_resolve)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/j101-baseline-imports/backend/tests/test_frontend_import_graph.py", line 40, in test_template_entrypoints_and_relative_imports_resolve
+    self.assertEqual(sorted(str(p.relative_to(static)) for p in graph.keys() - visited), [],
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                     "Frontend modules have no template/import consumer")
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: ['js/dispatch/models/cargo-editor.mjs', 'j[36 chars]mjs'] != []
+
+First list contains 2 additional elements.
+First extra element 0:
+'js/dispatch/models/cargo-editor.mjs'
+
++ []
+- ['js/dispatch/models/cargo-editor.mjs',
+-  'js/dispatch/models/model-editor-mode.mjs'] : Frontend modules have no template/import consumer
+
+----------------------------------------------------------------------
+Ran 1 test in 0.083s
+
+FAILED (failures=1)

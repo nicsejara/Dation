@@ -1,0 +1,22 @@
+test_dialog_geometry (__main__.DialogProbe.test_dialog_geometry) ... Executing <Task finished name='Task-1' coro=<Saga10WizardTests.asyncSetUp() done, defined at /workspace/work/dation-j1-01/backend/tests/browser/test_saga10_wizard.py:24> result=None created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.115 seconds
+FAIL
+Executing <Task pending name='Task-6' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-j1-01/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.245 seconds
+
+======================================================================
+FAIL: test_dialog_geometry (__main__.DialogProbe.test_dialog_geometry)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/usr/lib/python3.13/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/usr/lib/python3.13/asyncio/base_events.py", line 725, in run_until_complete
+    return future.result()
+           ~~~~~~~~~~~~~^^
+  File "<stdin>", line 7, in test_dialog_geometry
+AssertionError: False is not true : [{'text': 'Seguir editando', 'height': 40, 'width': 309}, {'text': 'Descartar cambios', 'height': 40, 'width': 309}, {'text': 'Guardar borrador', 'height': 40, 'width': 309}]
+
+----------------------------------------------------------------------
+Ran 1 test in 17.285s
+
+FAILED (failures=1)
+[{"text": "Seguir editando", "height": 40, "width": 309}, {"text": "Descartar cambios", "height": 40, "width": 309}, {"text": "Guardar borrador", "height": 40, "width": 309}]

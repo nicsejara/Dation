@@ -1,0 +1,13 @@
+{
+  "model_a": "642ba0e2-3c11-44e5-bbb7-06f2c564c677",
+  "a_v1": "02398280-8a00-4f8f-aa0b-2e2baedab2f2",
+  "a_v1_hash": "e916104fad59353c06157946636c7a8df5410af48ff0408e4dc7aa9af09b6e5b",
+  "a_v2": "38e20f00-ae75-45de-8cbb-faa819615103",
+  "a_v2_hash": "409d30bbea42564712383c1bc6a223bdf00be68b662b2fc62104d5e693b161f7",
+  "model_b": "e0c42bca-a0a5-40b4-9e54-14918706e11e",
+  "b_v1": "6cad1bcc-ef50-4147-b24e-62140389bbd6",
+  "case": "eebf5285-a4b7-4dbc-8a10-e82f1a3f3f62",
+  "case_pinned_version": "02398280-8a00-4f8f-aa0b-2e2baedab2f2",
+  "case_pack_run_unchanged": true,
+  "v1_snapshot_unchanged": true
+}

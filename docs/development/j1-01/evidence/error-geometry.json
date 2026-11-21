@@ -1,0 +1,174 @@
+[
+  {
+    "width": 1440,
+    "scroll": 1440,
+    "client": 1440,
+    "buttons": [
+      {
+        "text": "Crear nuevo modelo",
+        "width": 159.703125,
+        "height": 44,
+        "left": 1224.296875,
+        "right": 1384
+      },
+      {
+        "text": "Buscar",
+        "width": 78.078125,
+        "height": 44,
+        "left": 1305.921875,
+        "right": 1384
+      },
+      {
+        "text": "Reintentar",
+        "width": 98.296875,
+        "height": 44,
+        "left": 315,
+        "right": 413.296875
+      },
+      {
+        "text": "\u2190",
+        "width": 44,
+        "height": 44,
+        "left": 313,
+        "right": 357
+      },
+      {
+        "text": "Continuar a Decision Case",
+        "width": 198.71875,
+        "height": 44,
+        "left": 1160.28125,
+        "right": 1359
+      }
+    ],
+    "cards": []
+  },
+  {
+    "width": 1280,
+    "scroll": 1280,
+    "client": 1280,
+    "buttons": [
+      {
+        "text": "Crear nuevo modelo",
+        "width": 159.703125,
+        "height": 44,
+        "left": 1064.296875,
+        "right": 1224
+      },
+      {
+        "text": "Buscar",
+        "width": 78.078125,
+        "height": 44,
+        "left": 1145.921875,
+        "right": 1224
+      },
+      {
+        "text": "Reintentar",
+        "width": 98.296875,
+        "height": 44,
+        "left": 315,
+        "right": 413.296875
+      },
+      {
+        "text": "\u2190",
+        "width": 44,
+        "height": 44,
+        "left": 313,
+        "right": 357
+      },
+      {
+        "text": "Continuar a Decision Case",
+        "width": 198.71875,
+        "height": 44,
+        "left": 1000.28125,
+        "right": 1199
+      }
+    ],
+    "cards": []
+  },
+  {
+    "width": 768,
+    "scroll": 768,
+    "client": 768,
+    "buttons": [
+      {
+        "text": "Crear nuevo modelo",
+        "width": 159.703125,
+        "height": 44,
+        "left": 566.296875,
+        "right": 726
+      },
+      {
+        "text": "Buscar",
+        "width": 78.078125,
+        "height": 44,
+        "left": 647.921875,
+        "right": 726
+      },
+      {
+        "text": "Reintentar",
+        "width": 98.296875,
+        "height": 44,
+        "left": 141,
+        "right": 239.296875
+      },
+      {
+        "text": "\u2190",
+        "width": 44,
+        "height": 44,
+        "left": 139,
+        "right": 183
+      },
+      {
+        "text": "Continuar a Decision Case",
+        "width": 198.71875,
+        "height": 44,
+        "left": 199,
+        "right": 397.71875
+      }
+    ],
+    "cards": []
+  },
+  {
+    "width": 375,
+    "scroll": 375,
+    "client": 375,
+    "buttons": [
+      {
+        "text": "Crear nuevo modelo",
+        "width": 251,
+        "height": 44,
+        "left": 92,
+        "right": 343
+      },
+      {
+        "text": "Buscar",
+        "width": 251,
+        "height": 44,
+        "left": 92,
+        "right": 343
+      },
+      {
+        "text": "Reintentar",
+        "width": 98.296875,
+        "height": 44,
+        "left": 111,
+        "right": 209.296875
+      },
+      {
+        "text": "\u2190",
+        "width": 44,
+        "height": 44,
+        "left": 109,
+        "right": 153
+      },
+      {
+        "text": "Continuar a Decision Case",
+        "width": 157,
+        "height": 53.09375,
+        "left": 169,
+        "right": 326
+      }
+    ],
+    "cards": []
+  }
+]

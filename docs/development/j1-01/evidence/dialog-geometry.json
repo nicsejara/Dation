@@ -1,0 +1,90 @@
+[
+  {
+    "width": 1440,
+    "scroll": 638,
+    "client": 638,
+    "buttons": [
+      {
+        "text": "Seguir editando",
+        "height": 44,
+        "width": 132.234375
+      },
+      {
+        "text": "Descartar cambios",
+        "height": 44,
+        "width": 150.34375
+      },
+      {
+        "text": "Guardar borrador",
+        "height": 44,
+        "width": 142.359375
+      }
+    ]
+  },
+  {
+    "width": 1280,
+    "scroll": 638,
+    "client": 638,
+    "buttons": [
+      {
+        "text": "Seguir editando",
+        "height": 44,
+        "width": 132.234375
+      },
+      {
+        "text": "Descartar cambios",
+        "height": 44,
+        "width": 150.34375
+      },
+      {
+        "text": "Guardar borrador",
+        "height": 44,
+        "width": 142.359375
+      }
+    ]
+  },
+  {
+    "width": 768,
+    "scroll": 638,
+    "client": 638,
+    "buttons": [
+      {
+        "text": "Seguir editando",
+        "height": 44,
+        "width": 132.234375
+      },
+      {
+        "text": "Descartar cambios",
+        "height": 44,
+        "width": 150.34375
+      },
+      {
+        "text": "Guardar borrador",
+        "height": 44,
+        "width": 142.359375
+      }
+    ]
+  },
+  {
+    "width": 375,
+    "scroll": 341,
+    "client": 341,
+    "buttons": [
+      {
+        "text": "Seguir editando",
+        "height": 44,
+        "width": 309
+      },
+      {
+        "text": "Descartar cambios",
+        "height": 44,
+        "width": 309
+      },
+      {
+        "text": "Guardar borrador",
+        "height": 44,
+        "width": 309
+      }
+    ]
+  }
+]

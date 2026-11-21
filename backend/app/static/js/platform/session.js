@@ -3,7 +3,12 @@
  'use strict';
  const nativeFetch=window.fetch.bind(window);let session=null,pending=null,owner=null;
  const channel=typeof BroadcastChannel==='function'?new BroadcastChannel('dation-session'):null;
- function clearPrivateState(){for(const store of [sessionStorage,localStorage]){for(const key of Object.keys(store)){if(key.startsWith('dation.'))store.removeItem(key);}}}
+ function clearPrivateState({modelOwner=null}={}){for(const store of [sessionStorage,localStorage]){for(const key of Object.keys(store)){if(!key.startsWith('dation.'))continue;
+  // A fresh tab may recover ONLY this authenticated subject's model copies.
+  // Logout / identity changes call without an owner and still erase everything.
+  if(store===localStorage&&modelOwner&&key.startsWith('dation.models.working.v1.'+modelOwner+'.'))continue;
+  store.removeItem(key);
+ }}}
  async function load(){
   const response=await nativeFetch('/auth/session',{method:'POST',credentials:'same-origin'});
   const body=await response.json();
@@ -11,7 +16,7 @@
   if(!body.membership){location.replace('/workspace-setup');throw new Error('Configurá tu workspace para continuar.');}
   const next=body.profile.id+':'+body.membership.workspace_id;
   if(owner&&owner!==next){clearPrivateState();location.replace('/app');throw new Error('La sesión cambió.');}
-  if(sessionStorage.getItem('_dation_identity')!==next){clearPrivateState();sessionStorage.setItem('_dation_identity',next);}
+  if(sessionStorage.getItem('_dation_identity')!==next){const freshTab=!sessionStorage.getItem('_dation_identity');clearPrivateState({modelOwner:freshTab?body.membership.workspace_id+'.'+body.profile.id:null});sessionStorage.setItem('_dation_identity',next);}
   owner=next;session=body;window.dispatchEvent(new CustomEvent('dation:identity'));return body;
  }
  async function refresh(){if(!pending)pending=load().finally(()=>{pending=null;});return pending;}

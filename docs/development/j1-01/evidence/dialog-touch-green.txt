@@ -1,0 +1,10 @@
+test_12_dirty_dialog_touch_targets_at_every_viewport (test_model_library_j101.ModelLibraryTests.test_12_dirty_dialog_touch_targets_at_every_viewport) ... Executing <Task finished name='Task-1' coro=<Saga10WizardTests.asyncSetUp() done, defined at /workspace/work/dation-j1-01/backend/tests/browser/test_saga10_wizard.py:24> result=None created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.121 seconds
+Executing <Task pending name='Task-6' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-j1-01/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.226 seconds
+ok
+test_03_dirty_back_cancel_discard_and_reload (test_model_library_j101.ModelLibraryTests.test_03_dirty_back_cancel_discard_and_reload) ... Executing <Task pending name='Task-17' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-j1-01/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.255 seconds
+ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 21.370s
+
+OK

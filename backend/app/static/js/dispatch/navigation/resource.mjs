@@ -25,6 +25,12 @@ export function readResource(url){
     resource.modelId=q.get('model_id');
     if(resource.modelId&&!UUID.test(resource.modelId)&&!(resource.view==='logistics-models'&&resource.modelId==='new'))throw new Error('El Model del enlace no es válido.');
   }
+  if(resource.view==='logistics-models'){
+    resource.modelView=q.get('model_view')||'library';
+    if(!['library','edit','review','history'].includes(resource.modelView))throw new Error('Vista del Model inválida.');
+    for(const [key,param]of [['modelVersionId','model_version_id'],['modelWorkId','model_work_id'],['modelReturnId','model_return_id']]){resource[key]=q.get(param);if(resource[key]&&!UUID.test(resource[key]))throw new Error('Identidad del Model inválida.');}
+    if(resource.modelVersionId&&(!resource.modelId||resource.modelId==='new')||resource.modelView==='review'&&(!resource.modelVersionId||!resource.modelId)||resource.modelView==='history'&&(!resource.modelId||resource.modelId==='new'))throw new Error('Indicá el Model y la versión exacta para revisar.');
+  }
   if(resource.view==='logistics-case-setup'){
     resource.coreStep=q.has('core_step')?Number(q.get('core_step')):null;
     if(resource.coreStep!==null&&![1,2,3].includes(resource.coreStep))throw new Error('Paso de Core inválido.');
@@ -37,11 +43,12 @@ export function readResource(url){
 }
 export function resourceUrl(url,resource){
   const next=new URL(url,'http://localhost');
-  for(const key of ['view','case_id','node_id','run_id','dda','settings_tab','model_id','core_step','preparation_id','parent_case_id','return_view','return_node','return_run','return_center',...HUB_KEYS,...CENTER_KEYS])next.searchParams.delete(key);
+  for(const key of ['view','case_id','node_id','run_id','dda','settings_tab','model_id','model_view','model_version_id','model_work_id','model_return_id','core_step','preparation_id','parent_case_id','return_view','return_node','return_run','return_center',...HUB_KEYS,...CENTER_KEYS])next.searchParams.delete(key);
   next.pathname=PLATFORM_PATHS[resource.view]||'/app';
   next.searchParams.set('view',resource.view);
   if(resource.caseId&&['overview','logistics-overview','logistics-data','logistics-map','logistics-config','decision-dashboard','traceability','library','logistics-case-setup','logistics-case-data'].includes(resource.view))next.searchParams.set('case_id',resource.caseId);
   if(resource.modelId&&['logistics-models','logistics-case-setup'].includes(resource.view))next.searchParams.set('model_id',resource.modelId);
+  if(resource.view==='logistics-models')for(const [key,param]of [['modelView','model_view'],['modelVersionId','model_version_id'],['modelWorkId','model_work_id'],['modelReturnId','model_return_id']])if(resource[key])next.searchParams.set(param,resource[key]);
   if(['logistics-config','decision-dashboard'].includes(resource.view)&&resource.nodeId)next.searchParams.set('node_id',resource.nodeId);
   if(resource.view==='decision-dashboard'&&resource.runId)next.searchParams.set('run_id',resource.runId);
   if(resource.view==='platform-data')writeHubResource(next,resource.hub);

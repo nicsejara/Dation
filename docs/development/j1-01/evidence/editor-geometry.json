@@ -1,0 +1,342 @@
+[
+  {
+    "width": 1440,
+    "scroll": 1440,
+    "client": 1440,
+    "buttons": [
+      {
+        "text": "Confirmar identidad del modelo",
+        "width": 272,
+        "height": 48,
+        "left": 1095,
+        "right": 1367
+      },
+      {
+        "text": "Confirmar operaci\u00f3n log\u00edstica",
+        "width": 272,
+        "height": 48,
+        "left": 1095,
+        "right": 1367
+      },
+      {
+        "text": "Guardar tipo de carga",
+        "width": 272,
+        "height": 48,
+        "left": 1076,
+        "right": 1348
+      },
+      {
+        "text": "Tipo 01 \u00b7 Vino Malbec60 cajas \u00b7 745 kg \u00b7 1,80 m\u00b3Requiere revisi\u00f3n",
+        "width": 506,
+        "height": 104,
+        "left": 324,
+        "right": 830
+      },
+      {
+        "text": "Tipo 02 \u00b7 Aceite de oliva80 cajas \u00b7 665 kg \u00b7 1,80 m\u00b3Requiere revisi\u00f3n",
+        "width": 506,
+        "height": 104,
+        "left": 842,
+        "right": 1348
+      },
+      {
+        "text": "Confirmar carga y capacidad",
+        "width": 272,
+        "height": 48,
+        "left": 1095,
+        "right": 1367
+      },
+      {
+        "text": "Confirmar recursos de transporte",
+        "width": 272,
+        "height": 48,
+        "left": 1095,
+        "right": 1367
+      },
+      {
+        "text": "Confirmar moneda y costos",
+        "width": 272,
+        "height": 48,
+        "left": 1095,
+        "right": 1367
+      },
+      {
+        "text": "\u2190",
+        "width": 44,
+        "height": 44,
+        "left": 313,
+        "right": 357
+      },
+      {
+        "text": "Guardar borrador",
+        "width": 142.359375,
+        "height": 44,
+        "left": 1071.5,
+        "right": 1213.859375
+      },
+      {
+        "text": "Publicar modelo",
+        "width": 135.140625,
+        "height": 44,
+        "left": 1223.859375,
+        "right": 1359
+      }
+    ],
+    "cards": []
+  },
+  {
+    "width": 1280,
+    "scroll": 1280,
+    "client": 1280,
+    "buttons": [
+      {
+        "text": "Confirmar identidad del modelo",
+        "width": 272,
+        "height": 48,
+        "left": 935,
+        "right": 1207
+      },
+      {
+        "text": "Confirmar operaci\u00f3n log\u00edstica",
+        "width": 272,
+        "height": 48,
+        "left": 935,
+        "right": 1207
+      },
+      {
+        "text": "Guardar tipo de carga",
+        "width": 272,
+        "height": 48,
+        "left": 916,
+        "right": 1188
+      },
+      {
+        "text": "Tipo 01 \u00b7 Vino Malbec60 cajas \u00b7 745 kg \u00b7 1,80 m\u00b3Guardado en este borrador\u2713",
+        "width": 426,
+        "height": 104,
+        "left": 324,
+        "right": 750
+      },
+      {
+        "text": "Tipo 02 \u00b7 Aceite de oliva80 cajas \u00b7 665 kg \u00b7 1,80 m\u00b3Guardado en este borrador\u2713",
+        "width": 426,
+        "height": 104,
+        "left": 762,
+        "right": 1188
+      },
+      {
+        "text": "Confirmar carga y capacidad",
+        "width": 272,
+        "height": 48,
+        "left": 935,
+        "right": 1207
+      },
+      {
+        "text": "Confirmar recursos de transporte",
+        "width": 272,
+        "height": 48,
+        "left": 935,
+        "right": 1207
+      },
+      {
+        "text": "Confirmar moneda y costos",
+        "width": 272,
+        "height": 48,
+        "left": 935,
+        "right": 1207
+      },
+      {
+        "text": "\u2190",
+        "width": 44,
+        "height": 44,
+        "left": 313,
+        "right": 357
+      },
+      {
+        "text": "Guardar borrador",
+        "width": 142.359375,
+        "height": 44,
+        "left": 911.5,
+        "right": 1053.859375
+      },
+      {
+        "text": "Publicar modelo",
+        "width": 135.140625,
+        "height": 44,
+        "left": 1063.859375,
+        "right": 1199
+      }
+    ],
+    "cards": []
+  },
+  {
+    "width": 768,
+    "scroll": 768,
+    "client": 768,
+    "buttons": [
+      {
+        "text": "Confirmar identidad del modelo",
+        "width": 272,
+        "height": 48,
+        "left": 437,
+        "right": 709
+      },
+      {
+        "text": "Confirmar operaci\u00f3n log\u00edstica",
+        "width": 272,
+        "height": 48,
+        "left": 437,
+        "right": 709
+      },
+      {
+        "text": "Guardar tipo de carga",
+        "width": 272,
+        "height": 48,
+        "left": 418,
+        "right": 690
+      },
+      {
+        "text": "Tipo 01 \u00b7 Vino Malbec60 cajas \u00b7 745 kg \u00b7 1,80 m\u00b3Guardado en este borrador\u2713",
+        "width": 264,
+        "height": 133.28125,
+        "left": 150,
+        "right": 414
+      },
+      {
+        "text": "Tipo 02 \u00b7 Aceite de oliva80 cajas \u00b7 665 kg \u00b7 1,80 m\u00b3Guardado en este borrador\u2713",
+        "width": 264,
+        "height": 133.28125,
+        "left": 426,
+        "right": 690
+      },
+      {
+        "text": "Confirmar carga y capacidad",
+        "width": 272,
+        "height": 48,
+        "left": 437,
+        "right": 709
+      },
+      {
+        "text": "Confirmar recursos de transporte",
+        "width": 272,
+        "height": 48,
+        "left": 437,
+        "right": 709
+      },
+      {
+        "text": "Confirmar moneda y costos",
+        "width": 272,
+        "height": 48,
+        "left": 437,
+        "right": 709
+      },
+      {
+        "text": "\u2190",
+        "width": 44,
+        "height": 44,
+        "left": 139,
+        "right": 183
+      },
+      {
+        "text": "Guardar borrador",
+        "width": 142.359375,
+        "height": 44,
+        "left": 199,
+        "right": 341.359375
+      },
+      {
+        "text": "Publicar modelo",
+        "width": 135.140625,
+        "height": 44,
+        "left": 351.359375,
+        "right": 486.5
+      }
+    ],
+    "cards": []
+  },
+  {
+    "width": 375,
+    "scroll": 375,
+    "client": 375,
+    "buttons": [
+      {
+        "text": "Confirmar identidad del modelo",
+        "width": 229,
+        "height": 48,
+        "left": 103,
+        "right": 332
+      },
+      {
+        "text": "Confirmar operaci\u00f3n log\u00edstica",
+        "width": 229,
+        "height": 48,
+        "left": 103,
+        "right": 332
+      },
+      {
+        "text": "Guardar tipo de carga",
+        "width": 207,
+        "height": 48,
+        "left": 114,
+        "right": 321
+      },
+      {
+        "text": "Tipo 01 \u00b7 Vino Malbec60 cajas \u00b7 745 kg \u00b7 1,80 m\u00b3Guardado en este borrador\u2713",
+        "width": 207,
+        "height": 133.28125,
+        "left": 114,
+        "right": 321
+      },
+      {
+        "text": "Tipo 02 \u00b7 Aceite de oliva80 cajas \u00b7 665 kg \u00b7 1,80 m\u00b3Guardado en este borrador\u2713",
+        "width": 207,
+        "height": 133.28125,
+        "left": 114,
+        "right": 321
+      },
+      {
+        "text": "Confirmar carga y capacidad",
+        "width": 229,
+        "height": 48,
+        "left": 103,
+        "right": 332
+      },
+      {
+        "text": "Confirmar recursos de transporte",
+        "width": 229,
+        "height": 48,
+        "left": 103,
+        "right": 332
+      },
+      {
+        "text": "Confirmar moneda y costos",
+        "width": 229,
+        "height": 48,
+        "left": 103,
+        "right": 332
+      },
+      {
+        "text": "\u2190",
+        "width": 44,
+        "height": 44,
+        "left": 109,
+        "right": 153
+      },
+      {
+        "text": "Guardar borrador",
+        "width": 142.359375,
+        "height": 44,
+        "left": 169,
+        "right": 311.359375
+      },
+      {
+        "text": "Publicar modelo",
+        "width": 135.140625,
+        "height": 44,
+        "left": 169,
+        "right": 304.140625
+      }
+    ],
+    "cards": []
+  }
+]

@@ -1,0 +1,28 @@
+test_busy_preview (__main__.BusyProbe.test_busy_preview) ... Executing <Task finished name='Task-1' coro=<Saga10WizardTests.asyncSetUp() done, defined at /workspace/work/dation-j1-01/backend/tests/browser/test_saga10_wizard.py:24> result=None created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.121 seconds
+FAIL
+Executing <Task pending name='Task-13' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-j1-01/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.294 seconds
+
+======================================================================
+FAIL: test_busy_preview (__main__.BusyProbe.test_busy_preview)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/usr/lib/python3.13/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/usr/lib/python3.13/asyncio/base_events.py", line 725, in run_until_complete
+    return future.result()
+           ~~~~~~~~~~~~~^^
+  File "<stdin>", line 19, in test_busy_preview
+AssertionError: Lists differ: ['Confirmar identidad del modelo', 'Confir[577 chars]tos'] != []
+
+First list contains 29 additional elements.
+First extra element 0:
+'Confirmar identidad del modelo'
+
+Diff is 716 characters long. Set self.maxDiff to None to see it.
+
+----------------------------------------------------------------------
+Ran 1 test in 18.095s
+
+FAILED (failures=1)
+{"enabled_controls_while_save_pending": ["Confirmar identidad del modelo", "Confirmar operaci\u00f3n log\u00edstica", "guided_unit_type", "guided_unit_type", "guided_unit_type", "guided_unit_type", "guided_unit_type", "unit_name", "unit_measure", "unit_length", "unit_width", "unit_height", "unit_volume", "unit_tare", "product_name", "product_package", "product_length", "product_width", "product_height", "product_mass", "product_quantity", "Tipo 01 \u00b7 Vino Malbec60 cajas \u00b7 745 kg \u00b7 1,80 m\u00b3Guardado en este borrador\u2713", "Confirmar carga y capacidad", "Confirmar recursos de transporte", "external_costs", "external_costs", "billing", "billing", "Confirmar moneda y costos"]}
