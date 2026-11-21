@@ -1,0 +1,66 @@
+test_01_atomic_initial_snapshot_and_replay_are_exact (tests.integration.test_decision_case_j102.DecisionCaseV2SQLTests.test_01_atomic_initial_snapshot_and_replay_are_exact) ... ok
+test_02_metadata_cas_history_and_mutation_recovery (tests.integration.test_decision_case_j102.DecisionCaseV2SQLTests.test_02_metadata_cas_history_and_mutation_recovery) ... ok
+test_03_model_is_pinned_and_frozen_math_requires_derivation (tests.integration.test_decision_case_j102.DecisionCaseV2SQLTests.test_03_model_is_pinned_and_frozen_math_requires_derivation) ... ok
+test_04_parent_revision_authorized_and_original_unchanged (tests.integration.test_decision_case_j102.DecisionCaseV2SQLTests.test_04_parent_revision_authorized_and_original_unchanged) ... ok
+test_05_tenants_viewers_and_private_privileges (tests.integration.test_decision_case_j102.DecisionCaseV2SQLTests.test_05_tenants_viewers_and_private_privileges) ... ok
+test_06_writers_off_history_still_readable_legacy_not_rewritten (tests.integration.test_decision_case_j102.DecisionCaseV2SQLTests.test_06_writers_off_history_still_readable_legacy_not_rewritten) ... ok
+test_07_batched_projection_scopes_rows_and_preserves_legacy (tests.integration.test_decision_case_j102.DecisionCaseV2SQLTests.test_07_batched_projection_scopes_rows_and_preserves_legacy) ... FAIL
+test_01_model_create_list_search_and_identity_replay (tests.integration.test_ultimate_case_models.UltimateCaseSQLTests.test_01_model_create_list_search_and_identity_replay) ... ok
+test_02_publish_is_append_only_and_replay_survives_draft_edit (tests.integration.test_ultimate_case_models.UltimateCaseSQLTests.test_02_publish_is_append_only_and_replay_survives_draft_edit) ... ok
+test_03_cases_reuse_one_version_and_new_version_does_not_rebind (tests.integration.test_ultimate_case_models.UltimateCaseSQLTests.test_03_cases_reuse_one_version_and_new_version_does_not_rebind) ... ok
+test_04_empty_case_pack_is_atomic_tenant_bound_and_reloads (tests.integration.test_ultimate_case_models.UltimateCaseSQLTests.test_04_empty_case_pack_is_atomic_tenant_bound_and_reloads) ... ok
+test_05_binding_is_immutable_even_before_admission (tests.integration.test_ultimate_case_models.UltimateCaseSQLTests.test_05_binding_is_immutable_even_before_admission) ... ok
+test_06_invalid_horizon_rolls_back_case_pack_and_owners (tests.integration.test_ultimate_case_models.UltimateCaseSQLTests.test_06_invalid_horizon_rolls_back_case_pack_and_owners) ... ok
+test_07_policy_and_modes_are_persisted_not_executed (tests.integration.test_ultimate_case_models.UltimateCaseSQLTests.test_07_policy_and_modes_are_persisted_not_executed) ... ok
+test_08_pre_admission_math_edit_changes_context_hash (tests.integration.test_ultimate_case_models.UltimateCaseSQLTests.test_08_pre_admission_math_edit_changes_context_hash) ... ok
+test_09_case_and_owner_cas_preserve_atomicity (tests.integration.test_ultimate_case_models.UltimateCaseSQLTests.test_09_case_and_owner_cas_preserve_atomicity) ... ok
+test_10_admin_owner_is_required_eligible_and_atomic (tests.integration.test_ultimate_case_models.UltimateCaseSQLTests.test_10_admin_owner_is_required_eligible_and_atomic) ... ok
+test_11_operator_can_create_pending_but_not_assign_or_publish (tests.integration.test_ultimate_case_models.UltimateCaseSQLTests.test_11_operator_can_create_pending_but_not_assign_or_publish) ... ok
+test_12_viewer_read_only_and_disabled_member_rejected (tests.integration.test_ultimate_case_models.UltimateCaseSQLTests.test_12_viewer_read_only_and_disabled_member_rejected) ... ok
+test_13_cross_workspace_cannot_read_or_bind (tests.integration.test_ultimate_case_models.UltimateCaseSQLTests.test_13_cross_workspace_cannot_read_or_bind) ... ok
+test_14_closed_flag_blocks_writes_keeps_existing_context_readable (tests.integration.test_ultimate_case_models.UltimateCaseSQLTests.test_14_closed_flag_blocks_writes_keeps_existing_context_readable) ... ok
+test_15_role_does_not_grant_permission_or_select_runtime (tests.integration.test_ultimate_case_models.UltimateCaseSQLTests.test_15_role_does_not_grant_permission_or_select_runtime) ... ok
+test_16_archived_model_prevents_new_binding_preserves_existing (tests.integration.test_ultimate_case_models.UltimateCaseSQLTests.test_16_archived_model_prevents_new_binding_preserves_existing) ... ok
+test_17_concurrent_publish_has_one_cas_winner (tests.integration.test_ultimate_case_models.UltimateCaseSQLTests.test_17_concurrent_publish_has_one_cas_winner) ... ok
+test_18_private_acl_and_direct_write_denials (tests.integration.test_ultimate_case_models.UltimateCaseSQLTests.test_18_private_acl_and_direct_write_denials) ... ok
+test_19_sql_rejects_invalid_policy_and_config_without_api (tests.integration.test_ultimate_case_models.UltimateCaseSQLTests.test_19_sql_rejects_invalid_policy_and_config_without_api) ... ok
+test_20_first_admission_freezes_sql_math_metadata_and_owner_remain_editable (tests.integration.test_ultimate_case_models.UltimateCaseSQLTests.test_20_first_admission_freezes_sql_math_metadata_and_owner_remain_editable) ... ok
+test_21_failed_admission_rolls_back_freeze (tests.integration.test_ultimate_case_models.UltimateCaseSQLTests.test_21_failed_admission_rolls_back_freeze) ... ok
+test_22_admission_and_context_update_serialize_on_workspace_lock (tests.integration.test_ultimate_case_models.UltimateCaseSQLTests.test_22_admission_and_context_update_serialize_on_workspace_lock) ... ok
+test_23_pack_failure_rolls_back_new_case_and_pack (tests.integration.test_ultimate_case_models.UltimateCaseSQLTests.test_23_pack_failure_rolls_back_new_case_and_pack) ... ok
+test_24_disabled_dda_denies_foundation_and_stale_model_cas (tests.integration.test_ultimate_case_models.UltimateCaseSQLTests.test_24_disabled_dda_denies_foundation_and_stale_model_cas) ... ok
+test_25_existing_archive_restore_keeps_binding_owners_and_pack (tests.integration.test_ultimate_case_models.UltimateCaseSQLTests.test_25_existing_archive_restore_keeps_binding_owners_and_pack) ... ok
+
+======================================================================
+FAIL: test_07_batched_projection_scopes_rows_and_preserves_legacy (tests.integration.test_decision_case_j102.DecisionCaseV2SQLTests.test_07_batched_projection_scopes_rows_and_preserves_legacy)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/work/dation-j1-02/backend/tests/integration/test_decision_case_j102.py", line 107, in test_07_batched_projection_scopes_rows_and_preserves_legacy
+    c,_=self.new_case();data=self.v2('projection',{'case_ids':[c['case']['id'],str(uuid4())]})
+                             ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/work/dation-j1-02/backend/tests/integration/test_decision_case_j102.py", line 38, in v2
+    def v2(self,operation,arguments,**options):return json.loads(self.sql(self.v2sql(operation,arguments,**options)))
+                                                                 ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/work/dation-j1-02/backend/tests/integration/test_ultimate_case_models.py", line 54, in sql
+    def sql(self,sql):return self.command(sql).stdout.strip()
+                             ~~~~~~~~~~~~^^^^^
+  File "/workspace/work/dation-j1-02/backend/tests/integration/ultimate_sql_support.py", line 91, in command
+    raise AssertionError(result.stderr)
+AssertionError: ERROR:  42702: column reference "c.workspace_id" is ambiguous
+LINE 3: ...blic.logistics_model_versions v ON v.workspace_id=c.workspac...
+                                                             ^
+DETAIL:  It could refer to either a PL/pgSQL variable or a table column.
+QUERY:  SELECT coalesce(jsonb_object_agg(c.id,jsonb_build_object('model_id',m.id,'model_name',m.name,'model_version_id',v.id,'model_version',v.version,
+    'planning_start',c.planning_start,'planning_end',c.planning_end,'horizon_type',c.horizon_type,'operating_mode',c.operating_mode,'case_policy',c.case_policy_jsonb,
+    'context_frozen_at',c.context_frozen_at,'case_definition',def.body)),'{}')               FROM public.decision_cases c LEFT JOIN public.logistics_model_versions v ON v.workspace_id=c.workspace_id AND v.id=c.logistics_model_version_id
+  LEFT JOIN public.logistics_models m ON m.workspace_id=v.workspace_id AND m.id=v.model_id
+  LEFT JOIN LATERAL(SELECT to_jsonb(r) body FROM dation_private.case_definition_revisions r WHERE r.workspace_id=c.workspace_id AND r.case_id=c.id ORDER BY revision DESC LIMIT 1) def ON true
+  WHERE c.workspace_id=target_workspace_id AND c.id IN(SELECT x::uuid FROM jsonb_array_elements_text(arguments->'case_ids') x)
+CONTEXT:  PL/pgSQL function public.platform_decision_case_v2(uuid,uuid,text,jsonb) line 14 at SQL statement
+LOCATION:  plpgsql_post_column_ref, pl_comp.c:1133
+
+
+----------------------------------------------------------------------
+Ran 32 tests in 34.540s
+
+FAILED (failures=1)

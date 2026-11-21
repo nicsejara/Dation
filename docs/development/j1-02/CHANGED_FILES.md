@@ -1,0 +1,46 @@
+# Archivos modificados
+
+- `backend/app/domain/logistics/case_acceptance.py`
+- `backend/app/domain/logistics/case_policy_v2.py`
+- `backend/app/domain/logistics/contracts.py`
+- `backend/app/engines/assignment/transport_contracts.py`
+- `backend/app/engines/assignment/transport_policies.py`
+- `backend/app/engines/assignment/transport_policy_result.py`
+- `backend/app/engines/assignment/transport_policy_validator.py`
+- `backend/app/models/decision_case_v2.py`
+- `backend/app/models/decision_journey.py`
+- `backend/app/platform/ultimate_routes.py`
+- `backend/app/results/canonical.py`
+- `backend/app/services/decision_case_v2_service.py`
+- `backend/app/services/decision_graph_service.py`
+- `backend/app/services/decision_journey_service.py`
+- `backend/app/services/logistics_model_service.py`
+- `backend/app/services/ultimate_run_service.py`
+- `backend/app/static/contracts/result-contracts-v1.json`
+- `backend/app/static/css/decision-case-v2.css`
+- `backend/app/static/js/dispatch/cases/case-v2-acceptance.mjs`
+- `backend/app/static/js/dispatch/cases/case-v2-editor.mjs`
+- `backend/app/static/js/dispatch/cases/case-v2-state.mjs`
+- `backend/app/static/js/dispatch/cases/case-v2-ui.mjs`
+- `backend/app/static/js/dispatch/cases/decision-case-v2.mjs`
+- `backend/app/static/js/dispatch/cases/ultimate-case-setup.mjs`
+- `backend/app/static/js/dispatch/graph-ux05/command-center.mjs`
+- `backend/app/static/js/dispatch/models/model-library-state.mjs`
+- `backend/app/static/js/dispatch/models/model-library.mjs`
+- `backend/app/static/js/dispatch/navigation/resource.mjs`
+- `backend/app/static/js/dispatch/upload/core-preparation.mjs`
+- `backend/app/static/js/dispatch/workspace.mjs`
+- `backend/app/static/js/platform/session.js`
+- `backend/tests/browser/fixtures/j102/catalog-model.json`
+- `backend/tests/browser/test_decision_case_j102.py`
+- `backend/tests/browser/test_decision_case_j102_visual.py`
+- `backend/tests/e2e/decision_case_j102_fixture.py`
+- `backend/tests/e2e/test_decision_case_j102.py`
+- `backend/tests/integration/test_decision_case_j102.py`
+- `backend/tests/test_decision_case_j102.py`
+- `backend/tests/test_decision_case_j102_gate.py`
+- `backend/tests/test_decision_case_j102_state.mjs`
+- `backend/tests/test_model_library_session.mjs`
+- `supabase/migrations/20261121141444_j102_decision_case_definitions.sql`
+
+Documentación: baseline, contrato, implementación, pruebas, matriz de aceptación, handoffs, activación/rollback y evidencia sintética en este directorio. No se modifican física R6, workflows, dependencias ni infraestructura.

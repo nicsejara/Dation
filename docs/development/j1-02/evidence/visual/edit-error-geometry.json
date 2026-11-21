@@ -1,0 +1,1842 @@
+[
+  {
+    "width": 1440,
+    "scroll": 1440,
+    "client": 1440,
+    "controls": [
+      {
+        "label": "01 \u00b7 Logistics Models",
+        "disabled": false,
+        "rect": {
+          "x": 288,
+          "y": 280.78125,
+          "width": 190,
+          "height": 44,
+          "top": 280.78125,
+          "right": 478,
+          "bottom": 324.78125,
+          "left": 288
+        }
+      },
+      {
+        "label": "02 \u00b7 Decision Case",
+        "disabled": false,
+        "rect": {
+          "x": 288,
+          "y": 334.78125,
+          "width": 190,
+          "height": 44,
+          "top": 334.78125,
+          "right": 478,
+          "bottom": 378.78125,
+          "left": 288
+        }
+      },
+      {
+        "label": "03 \u00b7 Data Preparation",
+        "disabled": false,
+        "rect": {
+          "x": 288,
+          "y": 388.78125,
+          "width": 190,
+          "height": 44,
+          "top": 388.78125,
+          "right": 478,
+          "bottom": 432.78125,
+          "left": 288
+        }
+      },
+      {
+        "label": "j102_name",
+        "disabled": false,
+        "rect": {
+          "x": 523,
+          "y": 420.28125,
+          "width": 570,
+          "height": 44,
+          "top": 420.28125,
+          "right": 1093,
+          "bottom": 464.28125,
+          "left": 523
+        }
+      },
+      {
+        "label": "j102_description",
+        "disabled": false,
+        "rect": {
+          "x": 523,
+          "y": 505.78125,
+          "width": 570,
+          "height": 120,
+          "top": 505.78125,
+          "right": 1093,
+          "bottom": 625.78125,
+          "left": 523
+        }
+      },
+      {
+        "label": "Confirmar Identidad",
+        "disabled": false,
+        "rect": {
+          "x": 935.484375,
+          "y": 671.78125,
+          "width": 157.515625,
+          "height": 44,
+          "top": 671.78125,
+          "right": 1093,
+          "bottom": 715.78125,
+          "left": 935.484375
+        }
+      },
+      {
+        "label": "j102_model_search",
+        "disabled": false,
+        "rect": {
+          "x": 523,
+          "y": 892.28125,
+          "width": 570,
+          "height": 44,
+          "top": 892.28125,
+          "right": 1093,
+          "bottom": 936.28125,
+          "left": 523
+        }
+      },
+      {
+        "label": "Buscar modelos",
+        "disabled": false,
+        "rect": {
+          "x": 523,
+          "y": 950.28125,
+          "width": 570,
+          "height": 44,
+          "top": 950.28125,
+          "right": 1093,
+          "bottom": 994.28125,
+          "left": 523
+        }
+      },
+      {
+        "label": "j102_model_id",
+        "disabled": false,
+        "rect": {
+          "x": 523,
+          "y": 1035.78125,
+          "width": 570,
+          "height": 44,
+          "top": 1035.78125,
+          "right": 1093,
+          "bottom": 1079.78125,
+          "left": 523
+        }
+      },
+      {
+        "label": "j102_version_id",
+        "disabled": false,
+        "rect": {
+          "x": 523,
+          "y": 1121.28125,
+          "width": 570,
+          "height": 44,
+          "top": 1121.28125,
+          "right": 1093,
+          "bottom": 1165.28125,
+          "left": 523
+        }
+      },
+      {
+        "label": "Modelos anteriores",
+        "disabled": true,
+        "rect": {
+          "x": 637.859375,
+          "y": 1179.28125,
+          "width": 153.203125,
+          "height": 44,
+          "top": 1179.28125,
+          "right": 791.0625,
+          "bottom": 1223.28125,
+          "left": 637.859375
+        }
+      },
+      {
+        "label": "M\u00e1s modelos",
+        "disabled": true,
+        "rect": {
+          "x": 861.78125,
+          "y": 1179.28125,
+          "width": 116.359375,
+          "height": 44,
+          "top": 1179.28125,
+          "right": 978.140625,
+          "bottom": 1223.28125,
+          "left": 861.78125
+        }
+      },
+      {
+        "label": "Abrir biblioteca de modelos",
+        "disabled": false,
+        "rect": {
+          "x": 523,
+          "y": 1418.859375,
+          "width": 570,
+          "height": 44,
+          "top": 1418.859375,
+          "right": 1093,
+          "bottom": 1462.859375,
+          "left": 523
+        }
+      },
+      {
+        "label": "Revisar versi\u00f3n seleccionada",
+        "disabled": false,
+        "rect": {
+          "x": 523,
+          "y": 1476.859375,
+          "width": 570,
+          "height": 44,
+          "top": 1476.859375,
+          "right": 1093,
+          "bottom": 1520.859375,
+          "left": 523
+        }
+      },
+      {
+        "label": "Confirmar Vinculaci\u00f3n del modelo",
+        "disabled": true,
+        "rect": {
+          "x": 848.3125,
+          "y": 1534.859375,
+          "width": 244.6875,
+          "height": 44,
+          "top": 1534.859375,
+          "right": 1093,
+          "bottom": 1578.859375,
+          "left": 848.3125
+        }
+      },
+      {
+        "label": "j102_operating_mode",
+        "disabled": false,
+        "rect": {
+          "x": 523,
+          "y": 1755.359375,
+          "width": 277,
+          "height": 44,
+          "top": 1755.359375,
+          "right": 800,
+          "bottom": 1799.359375,
+          "left": 523
+        }
+      },
+      {
+        "label": "j102_horizon_type",
+        "disabled": false,
+        "rect": {
+          "x": 816,
+          "y": 1755.359375,
+          "width": 277,
+          "height": 44,
+          "top": 1755.359375,
+          "right": 1093,
+          "bottom": 1799.359375,
+          "left": 816
+        }
+      },
+      {
+        "label": "j102_planning_start",
+        "disabled": false,
+        "rect": {
+          "x": 523,
+          "y": 1842.859375,
+          "width": 277,
+          "height": 44,
+          "top": 1842.859375,
+          "right": 800,
+          "bottom": 1886.859375,
+          "left": 523
+        }
+      },
+      {
+        "label": "j102_planning_end",
+        "disabled": false,
+        "rect": {
+          "x": 816,
+          "y": 1842.859375,
+          "width": 277,
+          "height": 44,
+          "top": 1842.859375,
+          "right": 1093,
+          "bottom": 1886.859375,
+          "left": 816
+        }
+      },
+      {
+        "label": "Proponer fecha de fin",
+        "disabled": false,
+        "rect": {
+          "x": 523,
+          "y": 1900.859375,
+          "width": 570,
+          "height": 44,
+          "top": 1900.859375,
+          "right": 1093,
+          "bottom": 1944.859375,
+          "left": 523
+        }
+      },
+      {
+        "label": "Confirmar Horizonte y modalidad",
+        "disabled": true,
+        "rect": {
+          "x": 853.859375,
+          "y": 1958.859375,
+          "width": 239.140625,
+          "height": 44,
+          "top": 1958.859375,
+          "right": 1093,
+          "bottom": 2002.859375,
+          "left": 853.859375
+        }
+      },
+      {
+        "label": "j102_primary_goal",
+        "disabled": false,
+        "rect": {
+          "x": 523,
+          "y": 2179.359375,
+          "width": 570,
+          "height": 44,
+          "top": 2179.359375,
+          "right": 1093,
+          "bottom": 2223.359375,
+          "left": 523
+        }
+      },
+      {
+        "label": "Confirmar Objetivo global",
+        "disabled": true,
+        "rect": {
+          "x": 899.375,
+          "y": 2269.359375,
+          "width": 193.625,
+          "height": 44,
+          "top": 2269.359375,
+          "right": 1093,
+          "bottom": 2313.359375,
+          "left": 899.375
+        }
+      },
+      {
+        "label": "j102_critical",
+        "disabled": false,
+        "rect": {
+          "x": 523,
+          "y": 2597.859375,
+          "width": 570,
+          "height": 44,
+          "top": 2597.859375,
+          "right": 1093,
+          "bottom": 2641.859375,
+          "left": 523
+        }
+      },
+      {
+        "label": "Confirmar Reglas y restricciones",
+        "disabled": true,
+        "rect": {
+          "x": 855.25,
+          "y": 2681.859375,
+          "width": 237.75,
+          "height": 44,
+          "top": 2681.859375,
+          "right": 1093,
+          "bottom": 2725.859375,
+          "left": 855.25
+        }
+      },
+      {
+        "label": "j102_success",
+        "disabled": false,
+        "rect": {
+          "x": 523,
+          "y": 2902.359375,
+          "width": 570,
+          "height": 44,
+          "top": 2902.359375,
+          "right": 1093,
+          "bottom": 2946.359375,
+          "left": 523
+        }
+      },
+      {
+        "label": "j102_owner",
+        "disabled": false,
+        "rect": {
+          "x": 523,
+          "y": 3013.859375,
+          "width": 570,
+          "height": 44,
+          "top": 3013.859375,
+          "right": 1093,
+          "bottom": 3057.859375,
+          "left": 523
+        }
+      },
+      {
+        "label": "Confirmar \u00c9xito y aprobaci\u00f3n",
+        "disabled": true,
+        "rect": {
+          "x": 876.953125,
+          "y": 3071.859375,
+          "width": 216.046875,
+          "height": 44,
+          "top": 3071.859375,
+          "right": 1093,
+          "bottom": 3115.859375,
+          "left": 876.953125
+        }
+      },
+      {
+        "label": "\u2190",
+        "disabled": false,
+        "rect": {
+          "x": 313,
+          "y": 3236.859375,
+          "width": 44,
+          "height": 44,
+          "top": 3236.859375,
+          "right": 357,
+          "bottom": 3280.859375,
+          "left": 313
+        }
+      },
+      {
+        "label": "Guardar borrador",
+        "disabled": false,
+        "rect": {
+          "x": 1061.34375,
+          "y": 3209.859375,
+          "width": 142.359375,
+          "height": 44,
+          "top": 3209.859375,
+          "right": 1203.703125,
+          "bottom": 3253.859375,
+          "left": 1061.34375
+        }
+      },
+      {
+        "label": "Cancelar cambios",
+        "disabled": false,
+        "rect": {
+          "x": 1213.703125,
+          "y": 3209.859375,
+          "width": 145.28125,
+          "height": 44,
+          "top": 3209.859375,
+          "right": 1358.984375,
+          "bottom": 3253.859375,
+          "left": 1213.703125
+        }
+      },
+      {
+        "label": "Confirmar definici\u00f3n",
+        "disabled": true,
+        "rect": {
+          "x": 1197.859375,
+          "y": 3263.859375,
+          "width": 161.125,
+          "height": 44,
+          "top": 3263.859375,
+          "right": 1358.984375,
+          "bottom": 3307.859375,
+          "left": 1197.859375
+        }
+      }
+    ],
+    "contrast": {
+      "minimum": 5.9271656528080285,
+      "count": 81,
+      "failures": []
+    }
+  },
+  {
+    "width": 1280,
+    "scroll": 1280,
+    "client": 1280,
+    "controls": [
+      {
+        "label": "01 \u00b7 Logistics Models",
+        "disabled": false,
+        "rect": {
+          "x": 288,
+          "y": 280.578125,
+          "width": 190,
+          "height": 44,
+          "top": 280.578125,
+          "right": 478,
+          "bottom": 324.578125,
+          "left": 288
+        }
+      },
+      {
+        "label": "02 \u00b7 Decision Case",
+        "disabled": false,
+        "rect": {
+          "x": 288,
+          "y": 334.578125,
+          "width": 190,
+          "height": 44,
+          "top": 334.578125,
+          "right": 478,
+          "bottom": 378.578125,
+          "left": 288
+        }
+      },
+      {
+        "label": "03 \u00b7 Data Preparation",
+        "disabled": false,
+        "rect": {
+          "x": 288,
+          "y": 388.578125,
+          "width": 190,
+          "height": 44,
+          "top": 388.578125,
+          "right": 478,
+          "bottom": 432.578125,
+          "left": 288
+        }
+      },
+      {
+        "label": "j102_name",
+        "disabled": false,
+        "rect": {
+          "x": 523,
+          "y": 420.078125,
+          "width": 410,
+          "height": 44,
+          "top": 420.078125,
+          "right": 933,
+          "bottom": 464.078125,
+          "left": 523
+        }
+      },
+      {
+        "label": "j102_description",
+        "disabled": false,
+        "rect": {
+          "x": 523,
+          "y": 505.578125,
+          "width": 410,
+          "height": 120,
+          "top": 505.578125,
+          "right": 933,
+          "bottom": 625.578125,
+          "left": 523
+        }
+      },
+      {
+        "label": "Confirmar Identidad",
+        "disabled": false,
+        "rect": {
+          "x": 775.484375,
+          "y": 689.578125,
+          "width": 157.515625,
+          "height": 44,
+          "top": 689.578125,
+          "right": 933,
+          "bottom": 733.578125,
+          "left": 775.484375
+        }
+      },
+      {
+        "label": "j102_model_search",
+        "disabled": false,
+        "rect": {
+          "x": 523,
+          "y": 928.078125,
+          "width": 410,
+          "height": 44,
+          "top": 928.078125,
+          "right": 933,
+          "bottom": 972.078125,
+          "left": 523
+        }
+      },
+      {
+        "label": "Buscar modelos",
+        "disabled": false,
+        "rect": {
+          "x": 523,
+          "y": 986.078125,
+          "width": 410,
+          "height": 44,
+          "top": 986.078125,
+          "right": 933,
+          "bottom": 1030.078125,
+          "left": 523
+        }
+      },
+      {
+        "label": "j102_model_id",
+        "disabled": false,
+        "rect": {
+          "x": 523,
+          "y": 1071.578125,
+          "width": 410,
+          "height": 44,
+          "top": 1071.578125,
+          "right": 933,
+          "bottom": 1115.578125,
+          "left": 523
+        }
+      },
+      {
+        "label": "j102_version_id",
+        "disabled": false,
+        "rect": {
+          "x": 523,
+          "y": 1157.078125,
+          "width": 410,
+          "height": 44,
+          "top": 1157.078125,
+          "right": 933,
+          "bottom": 1201.078125,
+          "left": 523
+        }
+      },
+      {
+        "label": "Modelos anteriores",
+        "disabled": true,
+        "rect": {
+          "x": 557.859375,
+          "y": 1215.078125,
+          "width": 153.203125,
+          "height": 44,
+          "top": 1215.078125,
+          "right": 711.0625,
+          "bottom": 1259.078125,
+          "left": 557.859375
+        }
+      },
+      {
+        "label": "M\u00e1s modelos",
+        "disabled": true,
+        "rect": {
+          "x": 781.78125,
+          "y": 1215.078125,
+          "width": 116.359375,
+          "height": 44,
+          "top": 1215.078125,
+          "right": 898.140625,
+          "bottom": 1259.078125,
+          "left": 781.78125
+        }
+      },
+      {
+        "label": "Abrir biblioteca de modelos",
+        "disabled": false,
+        "rect": {
+          "x": 523,
+          "y": 1472.65625,
+          "width": 410,
+          "height": 44,
+          "top": 1472.65625,
+          "right": 933,
+          "bottom": 1516.65625,
+          "left": 523
+        }
+      },
+      {
+        "label": "Revisar versi\u00f3n seleccionada",
+        "disabled": false,
+        "rect": {
+          "x": 523,
+          "y": 1530.65625,
+          "width": 410,
+          "height": 44,
+          "top": 1530.65625,
+          "right": 933,
+          "bottom": 1574.65625,
+          "left": 523
+        }
+      },
+      {
+        "label": "Confirmar Vinculaci\u00f3n del modelo",
+        "disabled": true,
+        "rect": {
+          "x": 688.3125,
+          "y": 1588.65625,
+          "width": 244.6875,
+          "height": 44,
+          "top": 1588.65625,
+          "right": 933,
+          "bottom": 1632.65625,
+          "left": 688.3125
+        }
+      },
+      {
+        "label": "j102_operating_mode",
+        "disabled": false,
+        "rect": {
+          "x": 523,
+          "y": 1827.15625,
+          "width": 197,
+          "height": 44,
+          "top": 1827.15625,
+          "right": 720,
+          "bottom": 1871.15625,
+          "left": 523
+        }
+      },
+      {
+        "label": "j102_horizon_type",
+        "disabled": false,
+        "rect": {
+          "x": 736,
+          "y": 1827.15625,
+          "width": 197,
+          "height": 44,
+          "top": 1827.15625,
+          "right": 933,
+          "bottom": 1871.15625,
+          "left": 736
+        }
+      },
+      {
+        "label": "j102_planning_start",
+        "disabled": false,
+        "rect": {
+          "x": 523,
+          "y": 1914.65625,
+          "width": 197,
+          "height": 44,
+          "top": 1914.65625,
+          "right": 720,
+          "bottom": 1958.65625,
+          "left": 523
+        }
+      },
+      {
+        "label": "j102_planning_end",
+        "disabled": false,
+        "rect": {
+          "x": 736,
+          "y": 1914.65625,
+          "width": 197,
+          "height": 44,
+          "top": 1914.65625,
+          "right": 933,
+          "bottom": 1958.65625,
+          "left": 736
+        }
+      },
+      {
+        "label": "Proponer fecha de fin",
+        "disabled": false,
+        "rect": {
+          "x": 523,
+          "y": 1972.65625,
+          "width": 410,
+          "height": 44,
+          "top": 1972.65625,
+          "right": 933,
+          "bottom": 2016.65625,
+          "left": 523
+        }
+      },
+      {
+        "label": "Confirmar Horizonte y modalidad",
+        "disabled": true,
+        "rect": {
+          "x": 693.859375,
+          "y": 2030.65625,
+          "width": 239.140625,
+          "height": 44,
+          "top": 2030.65625,
+          "right": 933,
+          "bottom": 2074.65625,
+          "left": 693.859375
+        }
+      },
+      {
+        "label": "j102_primary_goal",
+        "disabled": false,
+        "rect": {
+          "x": 523,
+          "y": 2269.15625,
+          "width": 410,
+          "height": 44,
+          "top": 2269.15625,
+          "right": 933,
+          "bottom": 2313.15625,
+          "left": 523
+        }
+      },
+      {
+        "label": "Confirmar Objetivo global",
+        "disabled": true,
+        "rect": {
+          "x": 739.375,
+          "y": 2377.15625,
+          "width": 193.625,
+          "height": 44,
+          "top": 2377.15625,
+          "right": 933,
+          "bottom": 2421.15625,
+          "left": 739.375
+        }
+      },
+      {
+        "label": "j102_critical",
+        "disabled": false,
+        "rect": {
+          "x": 523,
+          "y": 2723.65625,
+          "width": 410,
+          "height": 44,
+          "top": 2723.65625,
+          "right": 933,
+          "bottom": 2767.65625,
+          "left": 523
+        }
+      },
+      {
+        "label": "Confirmar Reglas y restricciones",
+        "disabled": true,
+        "rect": {
+          "x": 695.25,
+          "y": 2807.65625,
+          "width": 237.75,
+          "height": 44,
+          "top": 2807.65625,
+          "right": 933,
+          "bottom": 2851.65625,
+          "left": 695.25
+        }
+      },
+      {
+        "label": "j102_success",
+        "disabled": false,
+        "rect": {
+          "x": 523,
+          "y": 3028.15625,
+          "width": 410,
+          "height": 44,
+          "top": 3028.15625,
+          "right": 933,
+          "bottom": 3072.15625,
+          "left": 523
+        }
+      },
+      {
+        "label": "j102_owner",
+        "disabled": false,
+        "rect": {
+          "x": 523,
+          "y": 3157.65625,
+          "width": 410,
+          "height": 44,
+          "top": 3157.65625,
+          "right": 933,
+          "bottom": 3201.65625,
+          "left": 523
+        }
+      },
+      {
+        "label": "Confirmar \u00c9xito y aprobaci\u00f3n",
+        "disabled": true,
+        "rect": {
+          "x": 716.953125,
+          "y": 3215.65625,
+          "width": 216.046875,
+          "height": 44,
+          "top": 3215.65625,
+          "right": 933,
+          "bottom": 3259.65625,
+          "left": 716.953125
+        }
+      },
+      {
+        "label": "\u2190",
+        "disabled": false,
+        "rect": {
+          "x": 313,
+          "y": 3380.65625,
+          "width": 44,
+          "height": 44,
+          "top": 3380.65625,
+          "right": 357,
+          "bottom": 3424.65625,
+          "left": 313
+        }
+      },
+      {
+        "label": "Guardar borrador",
+        "disabled": false,
+        "rect": {
+          "x": 901.34375,
+          "y": 3353.65625,
+          "width": 142.359375,
+          "height": 44,
+          "top": 3353.65625,
+          "right": 1043.703125,
+          "bottom": 3397.65625,
+          "left": 901.34375
+        }
+      },
+      {
+        "label": "Cancelar cambios",
+        "disabled": false,
+        "rect": {
+          "x": 1053.703125,
+          "y": 3353.65625,
+          "width": 145.28125,
+          "height": 44,
+          "top": 3353.65625,
+          "right": 1198.984375,
+          "bottom": 3397.65625,
+          "left": 1053.703125
+        }
+      },
+      {
+        "label": "Confirmar definici\u00f3n",
+        "disabled": true,
+        "rect": {
+          "x": 1037.859375,
+          "y": 3407.65625,
+          "width": 161.125,
+          "height": 44,
+          "top": 3407.65625,
+          "right": 1198.984375,
+          "bottom": 3451.65625,
+          "left": 1037.859375
+        }
+      }
+    ],
+    "contrast": {
+      "minimum": 5.9271656528080285,
+      "count": 81,
+      "failures": []
+    }
+  },
+  {
+    "width": 768,
+    "scroll": 768,
+    "client": 768,
+    "controls": [
+      {
+        "label": "01 \u00b7 Logistics Models",
+        "disabled": false,
+        "rect": {
+          "x": 114,
+          "y": 270.78125,
+          "width": 197.328125,
+          "height": 44,
+          "top": 270.78125,
+          "right": 311.328125,
+          "bottom": 314.78125,
+          "left": 114
+        }
+      },
+      {
+        "label": "02 \u00b7 Decision Case",
+        "disabled": false,
+        "rect": {
+          "x": 321.328125,
+          "y": 270.78125,
+          "width": 197.328125,
+          "height": 44,
+          "top": 270.78125,
+          "right": 518.65625,
+          "bottom": 314.78125,
+          "left": 321.328125
+        }
+      },
+      {
+        "label": "03 \u00b7 Data Preparation",
+        "disabled": false,
+        "rect": {
+          "x": 528.65625,
+          "y": 270.78125,
+          "width": 197.328125,
+          "height": 44,
+          "top": 270.78125,
+          "right": 725.984375,
+          "bottom": 314.78125,
+          "left": 528.65625
+        }
+      },
+      {
+        "label": "j102_name",
+        "disabled": false,
+        "rect": {
+          "x": 135,
+          "y": 472.28125,
+          "width": 570,
+          "height": 44,
+          "top": 472.28125,
+          "right": 705,
+          "bottom": 516.28125,
+          "left": 135
+        }
+      },
+      {
+        "label": "j102_description",
+        "disabled": false,
+        "rect": {
+          "x": 135,
+          "y": 557.78125,
+          "width": 570,
+          "height": 120,
+          "top": 557.78125,
+          "right": 705,
+          "bottom": 677.78125,
+          "left": 135
+        }
+      },
+      {
+        "label": "Confirmar Identidad",
+        "disabled": false,
+        "rect": {
+          "x": 547.484375,
+          "y": 723.78125,
+          "width": 157.515625,
+          "height": 44,
+          "top": 723.78125,
+          "right": 705,
+          "bottom": 767.78125,
+          "left": 547.484375
+        }
+      },
+      {
+        "label": "j102_model_search",
+        "disabled": false,
+        "rect": {
+          "x": 135,
+          "y": 944.28125,
+          "width": 570,
+          "height": 44,
+          "top": 944.28125,
+          "right": 705,
+          "bottom": 988.28125,
+          "left": 135
+        }
+      },
+      {
+        "label": "Buscar modelos",
+        "disabled": false,
+        "rect": {
+          "x": 135,
+          "y": 1002.28125,
+          "width": 570,
+          "height": 44,
+          "top": 1002.28125,
+          "right": 705,
+          "bottom": 1046.28125,
+          "left": 135
+        }
+      },
+      {
+        "label": "j102_model_id",
+        "disabled": false,
+        "rect": {
+          "x": 135,
+          "y": 1087.78125,
+          "width": 570,
+          "height": 44,
+          "top": 1087.78125,
+          "right": 705,
+          "bottom": 1131.78125,
+          "left": 135
+        }
+      },
+      {
+        "label": "j102_version_id",
+        "disabled": false,
+        "rect": {
+          "x": 135,
+          "y": 1173.28125,
+          "width": 570,
+          "height": 44,
+          "top": 1173.28125,
+          "right": 705,
+          "bottom": 1217.28125,
+          "left": 135
+        }
+      },
+      {
+        "label": "Modelos anteriores",
+        "disabled": true,
+        "rect": {
+          "x": 249.859375,
+          "y": 1231.28125,
+          "width": 153.203125,
+          "height": 44,
+          "top": 1231.28125,
+          "right": 403.0625,
+          "bottom": 1275.28125,
+          "left": 249.859375
+        }
+      },
+      {
+        "label": "M\u00e1s modelos",
+        "disabled": true,
+        "rect": {
+          "x": 473.78125,
+          "y": 1231.28125,
+          "width": 116.359375,
+          "height": 44,
+          "top": 1231.28125,
+          "right": 590.140625,
+          "bottom": 1275.28125,
+          "left": 473.78125
+        }
+      },
+      {
+        "label": "Abrir biblioteca de modelos",
+        "disabled": false,
+        "rect": {
+          "x": 135,
+          "y": 1470.859375,
+          "width": 570,
+          "height": 44,
+          "top": 1470.859375,
+          "right": 705,
+          "bottom": 1514.859375,
+          "left": 135
+        }
+      },
+      {
+        "label": "Revisar versi\u00f3n seleccionada",
+        "disabled": false,
+        "rect": {
+          "x": 135,
+          "y": 1528.859375,
+          "width": 570,
+          "height": 44,
+          "top": 1528.859375,
+          "right": 705,
+          "bottom": 1572.859375,
+          "left": 135
+        }
+      },
+      {
+        "label": "Confirmar Vinculaci\u00f3n del modelo",
+        "disabled": true,
+        "rect": {
+          "x": 460.3125,
+          "y": 1586.859375,
+          "width": 244.6875,
+          "height": 44,
+          "top": 1586.859375,
+          "right": 705,
+          "bottom": 1630.859375,
+          "left": 460.3125
+        }
+      },
+      {
+        "label": "j102_operating_mode",
+        "disabled": false,
+        "rect": {
+          "x": 135,
+          "y": 1807.359375,
+          "width": 277,
+          "height": 44,
+          "top": 1807.359375,
+          "right": 412,
+          "bottom": 1851.359375,
+          "left": 135
+        }
+      },
+      {
+        "label": "j102_horizon_type",
+        "disabled": false,
+        "rect": {
+          "x": 428,
+          "y": 1807.359375,
+          "width": 277,
+          "height": 44,
+          "top": 1807.359375,
+          "right": 705,
+          "bottom": 1851.359375,
+          "left": 428
+        }
+      },
+      {
+        "label": "j102_planning_start",
+        "disabled": false,
+        "rect": {
+          "x": 135,
+          "y": 1894.859375,
+          "width": 277,
+          "height": 44,
+          "top": 1894.859375,
+          "right": 412,
+          "bottom": 1938.859375,
+          "left": 135
+        }
+      },
+      {
+        "label": "j102_planning_end",
+        "disabled": false,
+        "rect": {
+          "x": 428,
+          "y": 1894.859375,
+          "width": 277,
+          "height": 44,
+          "top": 1894.859375,
+          "right": 705,
+          "bottom": 1938.859375,
+          "left": 428
+        }
+      },
+      {
+        "label": "Proponer fecha de fin",
+        "disabled": false,
+        "rect": {
+          "x": 135,
+          "y": 1952.859375,
+          "width": 570,
+          "height": 44,
+          "top": 1952.859375,
+          "right": 705,
+          "bottom": 1996.859375,
+          "left": 135
+        }
+      },
+      {
+        "label": "Confirmar Horizonte y modalidad",
+        "disabled": true,
+        "rect": {
+          "x": 465.859375,
+          "y": 2010.859375,
+          "width": 239.140625,
+          "height": 44,
+          "top": 2010.859375,
+          "right": 705,
+          "bottom": 2054.859375,
+          "left": 465.859375
+        }
+      },
+      {
+        "label": "j102_primary_goal",
+        "disabled": false,
+        "rect": {
+          "x": 135,
+          "y": 2231.359375,
+          "width": 570,
+          "height": 44,
+          "top": 2231.359375,
+          "right": 705,
+          "bottom": 2275.359375,
+          "left": 135
+        }
+      },
+      {
+        "label": "Confirmar Objetivo global",
+        "disabled": true,
+        "rect": {
+          "x": 511.375,
+          "y": 2321.359375,
+          "width": 193.625,
+          "height": 44,
+          "top": 2321.359375,
+          "right": 705,
+          "bottom": 2365.359375,
+          "left": 511.375
+        }
+      },
+      {
+        "label": "j102_critical",
+        "disabled": false,
+        "rect": {
+          "x": 135,
+          "y": 2649.859375,
+          "width": 570,
+          "height": 44,
+          "top": 2649.859375,
+          "right": 705,
+          "bottom": 2693.859375,
+          "left": 135
+        }
+      },
+      {
+        "label": "Confirmar Reglas y restricciones",
+        "disabled": true,
+        "rect": {
+          "x": 467.25,
+          "y": 2733.859375,
+          "width": 237.75,
+          "height": 44,
+          "top": 2733.859375,
+          "right": 705,
+          "bottom": 2777.859375,
+          "left": 467.25
+        }
+      },
+      {
+        "label": "j102_success",
+        "disabled": false,
+        "rect": {
+          "x": 135,
+          "y": 2954.359375,
+          "width": 570,
+          "height": 44,
+          "top": 2954.359375,
+          "right": 705,
+          "bottom": 2998.359375,
+          "left": 135
+        }
+      },
+      {
+        "label": "j102_owner",
+        "disabled": false,
+        "rect": {
+          "x": 135,
+          "y": 3065.859375,
+          "width": 570,
+          "height": 44,
+          "top": 3065.859375,
+          "right": 705,
+          "bottom": 3109.859375,
+          "left": 135
+        }
+      },
+      {
+        "label": "Confirmar \u00c9xito y aprobaci\u00f3n",
+        "disabled": true,
+        "rect": {
+          "x": 488.953125,
+          "y": 3123.859375,
+          "width": 216.046875,
+          "height": 44,
+          "top": 3123.859375,
+          "right": 705,
+          "bottom": 3167.859375,
+          "left": 488.953125
+        }
+      },
+      {
+        "label": "\u2190",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 3591.421875,
+          "width": 44,
+          "height": 44,
+          "top": 3591.421875,
+          "right": 183,
+          "bottom": 3635.421875,
+          "left": 139
+        }
+      },
+      {
+        "label": "Guardar borrador",
+        "disabled": false,
+        "rect": {
+          "x": 199,
+          "y": 3685.421875,
+          "width": 142.359375,
+          "height": 44,
+          "top": 3685.421875,
+          "right": 341.359375,
+          "bottom": 3729.421875,
+          "left": 199
+        }
+      },
+      {
+        "label": "Cancelar cambios",
+        "disabled": false,
+        "rect": {
+          "x": 351.359375,
+          "y": 3685.421875,
+          "width": 145.28125,
+          "height": 44,
+          "top": 3685.421875,
+          "right": 496.640625,
+          "bottom": 3729.421875,
+          "left": 351.359375
+        }
+      },
+      {
+        "label": "Confirmar definici\u00f3n",
+        "disabled": true,
+        "rect": {
+          "x": 506.640625,
+          "y": 3685.421875,
+          "width": 161.125,
+          "height": 44,
+          "top": 3685.421875,
+          "right": 667.765625,
+          "bottom": 3729.421875,
+          "left": 506.640625
+        }
+      }
+    ],
+    "contrast": {
+      "minimum": 5.9271656528080285,
+      "count": 81,
+      "failures": []
+    }
+  },
+  {
+    "width": 375,
+    "scroll": 375,
+    "client": 375,
+    "controls": [
+      {
+        "label": "01 \u00b7 Logistics Models",
+        "disabled": false,
+        "rect": {
+          "x": 92,
+          "y": 343.96875,
+          "width": 251,
+          "height": 44,
+          "top": 343.96875,
+          "right": 343,
+          "bottom": 387.96875,
+          "left": 92
+        }
+      },
+      {
+        "label": "02 \u00b7 Decision Case",
+        "disabled": false,
+        "rect": {
+          "x": 92,
+          "y": 397.96875,
+          "width": 251,
+          "height": 44,
+          "top": 397.96875,
+          "right": 343,
+          "bottom": 441.96875,
+          "left": 92
+        }
+      },
+      {
+        "label": "03 \u00b7 Data Preparation",
+        "disabled": false,
+        "rect": {
+          "x": 92,
+          "y": 451.96875,
+          "width": 251,
+          "height": 44,
+          "top": 451.96875,
+          "right": 343,
+          "bottom": 495.96875,
+          "left": 92
+        }
+      },
+      {
+        "label": "j102_name",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 671.46875,
+          "width": 217,
+          "height": 44,
+          "top": 671.46875,
+          "right": 326,
+          "bottom": 715.46875,
+          "left": 109
+        }
+      },
+      {
+        "label": "j102_description",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 756.96875,
+          "width": 217,
+          "height": 120,
+          "top": 756.96875,
+          "right": 326,
+          "bottom": 876.96875,
+          "left": 109
+        }
+      },
+      {
+        "label": "Confirmar Identidad",
+        "disabled": false,
+        "rect": {
+          "x": 168.484375,
+          "y": 958.96875,
+          "width": 157.515625,
+          "height": 44,
+          "top": 958.96875,
+          "right": 326,
+          "bottom": 1002.96875,
+          "left": 168.484375
+        }
+      },
+      {
+        "label": "j102_model_search",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 1244.53125,
+          "width": 217,
+          "height": 44,
+          "top": 1244.53125,
+          "right": 326,
+          "bottom": 1288.53125,
+          "left": 109
+        }
+      },
+      {
+        "label": "Buscar modelos",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 1302.53125,
+          "width": 217,
+          "height": 44,
+          "top": 1302.53125,
+          "right": 326,
+          "bottom": 1346.53125,
+          "left": 109
+        }
+      },
+      {
+        "label": "j102_model_id",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 1388.03125,
+          "width": 217,
+          "height": 44,
+          "top": 1388.03125,
+          "right": 326,
+          "bottom": 1432.03125,
+          "left": 109
+        }
+      },
+      {
+        "label": "j102_version_id",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 1473.53125,
+          "width": 217,
+          "height": 44,
+          "top": 1473.53125,
+          "right": 326,
+          "bottom": 1517.53125,
+          "left": 109
+        }
+      },
+      {
+        "label": "Modelos anteriores",
+        "disabled": true,
+        "rect": {
+          "x": 111.53125,
+          "y": 1531.53125,
+          "width": 153.203125,
+          "height": 44,
+          "top": 1531.53125,
+          "right": 264.734375,
+          "bottom": 1575.53125,
+          "left": 111.53125
+        }
+      },
+      {
+        "label": "M\u00e1s modelos",
+        "disabled": true,
+        "rect": {
+          "x": 159.3125,
+          "y": 1587.53125,
+          "width": 116.359375,
+          "height": 44,
+          "top": 1587.53125,
+          "right": 275.671875,
+          "bottom": 1631.53125,
+          "left": 159.3125
+        }
+      },
+      {
+        "label": "Abrir biblioteca de modelos",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 1903.5,
+          "width": 217,
+          "height": 44,
+          "top": 1903.5,
+          "right": 326,
+          "bottom": 1947.5,
+          "left": 109
+        }
+      },
+      {
+        "label": "Revisar versi\u00f3n seleccionada",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 1961.5,
+          "width": 217,
+          "height": 44,
+          "top": 1961.5,
+          "right": 326,
+          "bottom": 2005.5,
+          "left": 109
+        }
+      },
+      {
+        "label": "Confirmar Vinculaci\u00f3n del modelo",
+        "disabled": true,
+        "rect": {
+          "x": 109,
+          "y": 2019.5,
+          "width": 217,
+          "height": 53.09375,
+          "top": 2019.5,
+          "right": 326,
+          "bottom": 2072.59375,
+          "left": 109
+        }
+      },
+      {
+        "label": "j102_operating_mode",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 2291.21875,
+          "width": 217,
+          "height": 44,
+          "top": 2291.21875,
+          "right": 326,
+          "bottom": 2335.21875,
+          "left": 109
+        }
+      },
+      {
+        "label": "j102_horizon_type",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 2378.71875,
+          "width": 217,
+          "height": 44,
+          "top": 2378.71875,
+          "right": 326,
+          "bottom": 2422.71875,
+          "left": 109
+        }
+      },
+      {
+        "label": "j102_planning_start",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 2466.21875,
+          "width": 217,
+          "height": 44,
+          "top": 2466.21875,
+          "right": 326,
+          "bottom": 2510.21875,
+          "left": 109
+        }
+      },
+      {
+        "label": "j102_planning_end",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 2553.71875,
+          "width": 217,
+          "height": 44,
+          "top": 2553.71875,
+          "right": 326,
+          "bottom": 2597.71875,
+          "left": 109
+        }
+      },
+      {
+        "label": "Proponer fecha de fin",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 2611.71875,
+          "width": 217,
+          "height": 44,
+          "top": 2611.71875,
+          "right": 326,
+          "bottom": 2655.71875,
+          "left": 109
+        }
+      },
+      {
+        "label": "Confirmar Horizonte y modalidad",
+        "disabled": true,
+        "rect": {
+          "x": 109,
+          "y": 2669.71875,
+          "width": 217,
+          "height": 53.09375,
+          "top": 2669.71875,
+          "right": 326,
+          "bottom": 2722.8125,
+          "left": 109
+        }
+      },
+      {
+        "label": "j102_primary_goal",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 2941.4375,
+          "width": 217,
+          "height": 44,
+          "top": 2941.4375,
+          "right": 326,
+          "bottom": 2985.4375,
+          "left": 109
+        }
+      },
+      {
+        "label": "Confirmar Objetivo global",
+        "disabled": true,
+        "rect": {
+          "x": 132.375,
+          "y": 3067.4375,
+          "width": 193.625,
+          "height": 44,
+          "top": 3067.4375,
+          "right": 326,
+          "bottom": 3111.4375,
+          "left": 132.375
+        }
+      },
+      {
+        "label": "j102_critical",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 3493.5625,
+          "width": 217,
+          "height": 44,
+          "top": 3493.5625,
+          "right": 326,
+          "bottom": 3537.5625,
+          "left": 109
+        }
+      },
+      {
+        "label": "Confirmar Reglas y restricciones",
+        "disabled": true,
+        "rect": {
+          "x": 109,
+          "y": 3595.5625,
+          "width": 217,
+          "height": 53.09375,
+          "top": 3595.5625,
+          "right": 326,
+          "bottom": 3648.65625,
+          "left": 109
+        }
+      },
+      {
+        "label": "j102_success",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 3849.28125,
+          "width": 217,
+          "height": 44,
+          "top": 3849.28125,
+          "right": 326,
+          "bottom": 3893.28125,
+          "left": 109
+        }
+      },
+      {
+        "label": "j102_owner",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 3996.78125,
+          "width": 217,
+          "height": 44,
+          "top": 3996.78125,
+          "right": 326,
+          "bottom": 4040.78125,
+          "left": 109
+        }
+      },
+      {
+        "label": "Confirmar \u00c9xito y aprobaci\u00f3n",
+        "disabled": true,
+        "rect": {
+          "x": 109.953125,
+          "y": 4054.78125,
+          "width": 216.046875,
+          "height": 44,
+          "top": 4054.78125,
+          "right": 326,
+          "bottom": 4098.78125,
+          "left": 109.953125
+        }
+      },
+      {
+        "label": "\u2190",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 4512.34375,
+          "width": 44,
+          "height": 44,
+          "top": 4512.34375,
+          "right": 153,
+          "bottom": 4556.34375,
+          "left": 109
+        }
+      },
+      {
+        "label": "Guardar borrador",
+        "disabled": false,
+        "rect": {
+          "x": 165,
+          "y": 4634.34375,
+          "width": 142.359375,
+          "height": 44,
+          "top": 4634.34375,
+          "right": 307.359375,
+          "bottom": 4678.34375,
+          "left": 165
+        }
+      },
+      {
+        "label": "Cancelar cambios",
+        "disabled": false,
+        "rect": {
+          "x": 165,
+          "y": 4688.34375,
+          "width": 145.28125,
+          "height": 44,
+          "top": 4688.34375,
+          "right": 310.28125,
+          "bottom": 4732.34375,
+          "left": 165
+        }
+      },
+      {
+        "label": "Confirmar definici\u00f3n",
+        "disabled": true,
+        "rect": {
+          "x": 165,
+          "y": 4742.34375,
+          "width": 161,
+          "height": 53.09375,
+          "top": 4742.34375,
+          "right": 326,
+          "bottom": 4795.4375,
+          "left": 165
+        }
+      }
+    ],
+    "contrast": {
+      "minimum": 5.9271656528080285,
+      "count": 81,
+      "failures": []
+    }
+  }
+]

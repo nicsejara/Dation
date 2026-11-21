@@ -1,0 +1,8 @@
+test_01_real_d1_result_kpi_and_manual_approval_are_separate (test_decision_case_j102.DecisionCaseV2ExecutionE2E.test_01_real_d1_result_kpi_and_manual_approval_are_separate) ... ok
+test_02_metadata_revision_does_not_rebind_approved_d1_or_d2 (test_decision_case_j102.DecisionCaseV2ExecutionE2E.test_02_metadata_revision_does_not_rebind_approved_d1_or_d2) ... ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 19.716s
+
+OK
+DATION_E2E_RESULT={"passed": true, "tests": 2, "failures": [], "errors": [], "skipped": [], "passed_ids": ["test_decision_case_j102.DecisionCaseV2ExecutionE2E.test_01_real_d1_result_kpi_and_manual_approval_are_separate", "test_decision_case_j102.DecisionCaseV2ExecutionE2E.test_02_metadata_revision_does_not_rebind_approved_d1_or_d2"], "scope": "FOCUSED_RECHECK", "selected_modules": ["test_decision_case_j102"], "failure_details": []}

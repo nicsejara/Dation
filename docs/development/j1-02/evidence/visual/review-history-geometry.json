@@ -1,0 +1,666 @@
+[
+  {
+    "width": 1440,
+    "scroll": 1440,
+    "client": 1440,
+    "controls": [
+      {
+        "label": "01 \u00b7 Logistics Models",
+        "disabled": false,
+        "rect": {
+          "x": 288,
+          "y": 280.78125,
+          "width": 190,
+          "height": 44,
+          "top": 280.78125,
+          "right": 478,
+          "bottom": 324.78125,
+          "left": 288
+        }
+      },
+      {
+        "label": "02 \u00b7 Decision Case",
+        "disabled": false,
+        "rect": {
+          "x": 288,
+          "y": 334.78125,
+          "width": 190,
+          "height": 44,
+          "top": 334.78125,
+          "right": 478,
+          "bottom": 378.78125,
+          "left": 288
+        }
+      },
+      {
+        "label": "03 \u00b7 Data Preparation",
+        "disabled": true,
+        "rect": {
+          "x": 288,
+          "y": 388.78125,
+          "width": 190,
+          "height": 44,
+          "top": 388.78125,
+          "right": 478,
+          "bottom": 432.78125,
+          "left": 288
+        }
+      },
+      {
+        "label": "Cambiar",
+        "disabled": false,
+        "rect": {
+          "x": 831.96875,
+          "y": 840.15625,
+          "width": 86.03125,
+          "height": 44,
+          "top": 840.15625,
+          "right": 918,
+          "bottom": 884.15625,
+          "left": 831.96875
+        }
+      },
+      {
+        "label": "Cambiar",
+        "disabled": false,
+        "rect": {
+          "x": 1280.96875,
+          "y": 840.15625,
+          "width": 86.03125,
+          "height": 44,
+          "top": 840.15625,
+          "right": 1367,
+          "bottom": 884.15625,
+          "left": 1280.96875
+        }
+      },
+      {
+        "label": "\u2190",
+        "disabled": false,
+        "rect": {
+          "x": 313,
+          "y": 1204.328125,
+          "width": 44,
+          "height": 44,
+          "top": 1204.328125,
+          "right": 357,
+          "bottom": 1248.328125,
+          "left": 313
+        }
+      },
+      {
+        "label": "Revisar definici\u00f3n vigente",
+        "disabled": false,
+        "rect": {
+          "x": 981.140625,
+          "y": 1150.328125,
+          "width": 195.109375,
+          "height": 44,
+          "top": 1150.328125,
+          "right": 1176.25,
+          "bottom": 1194.328125,
+          "left": 981.140625
+        }
+      },
+      {
+        "label": "Revisar Model Version",
+        "disabled": false,
+        "rect": {
+          "x": 1186.25,
+          "y": 1150.328125,
+          "width": 172.734375,
+          "height": 44,
+          "top": 1150.328125,
+          "right": 1358.984375,
+          "bottom": 1194.328125,
+          "left": 1186.25
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 981.875,
+          "y": 1204.328125,
+          "width": 184.265625,
+          "height": 44,
+          "top": 1204.328125,
+          "right": 1166.140625,
+          "bottom": 1248.328125,
+          "left": 981.875
+        }
+      },
+      {
+        "label": "Historial de ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 1176.140625,
+          "y": 1204.328125,
+          "width": 182.84375,
+          "height": 44,
+          "top": 1204.328125,
+          "right": 1358.984375,
+          "bottom": 1248.328125,
+          "left": 1176.140625
+        }
+      },
+      {
+        "label": "Crear Case derivado",
+        "disabled": false,
+        "rect": {
+          "x": 1198.53125,
+          "y": 1258.328125,
+          "width": 160.453125,
+          "height": 44,
+          "top": 1258.328125,
+          "right": 1358.984375,
+          "bottom": 1302.328125,
+          "left": 1198.53125
+        }
+      }
+    ],
+    "contrast": {
+      "minimum": 5.429139914708745,
+      "count": 47,
+      "failures": []
+    }
+  },
+  {
+    "width": 1280,
+    "scroll": 1280,
+    "client": 1280,
+    "controls": [
+      {
+        "label": "01 \u00b7 Logistics Models",
+        "disabled": false,
+        "rect": {
+          "x": 288,
+          "y": 280.578125,
+          "width": 190,
+          "height": 44,
+          "top": 280.578125,
+          "right": 478,
+          "bottom": 324.578125,
+          "left": 288
+        }
+      },
+      {
+        "label": "02 \u00b7 Decision Case",
+        "disabled": false,
+        "rect": {
+          "x": 288,
+          "y": 334.578125,
+          "width": 190,
+          "height": 44,
+          "top": 334.578125,
+          "right": 478,
+          "bottom": 378.578125,
+          "left": 288
+        }
+      },
+      {
+        "label": "03 \u00b7 Data Preparation",
+        "disabled": true,
+        "rect": {
+          "x": 288,
+          "y": 388.578125,
+          "width": 190,
+          "height": 44,
+          "top": 388.578125,
+          "right": 478,
+          "bottom": 432.578125,
+          "left": 288
+        }
+      },
+      {
+        "label": "Cambiar",
+        "disabled": false,
+        "rect": {
+          "x": 751.96875,
+          "y": 857.953125,
+          "width": 86.03125,
+          "height": 44,
+          "top": 857.953125,
+          "right": 838,
+          "bottom": 901.953125,
+          "left": 751.96875
+        }
+      },
+      {
+        "label": "Cambiar",
+        "disabled": false,
+        "rect": {
+          "x": 1120.96875,
+          "y": 857.953125,
+          "width": 86.03125,
+          "height": 44,
+          "top": 857.953125,
+          "right": 1207,
+          "bottom": 901.953125,
+          "left": 1120.96875
+        }
+      },
+      {
+        "label": "\u2190",
+        "disabled": false,
+        "rect": {
+          "x": 313,
+          "y": 1222.125,
+          "width": 44,
+          "height": 44,
+          "top": 1222.125,
+          "right": 357,
+          "bottom": 1266.125,
+          "left": 313
+        }
+      },
+      {
+        "label": "Revisar definici\u00f3n vigente",
+        "disabled": false,
+        "rect": {
+          "x": 821.140625,
+          "y": 1168.125,
+          "width": 195.109375,
+          "height": 44,
+          "top": 1168.125,
+          "right": 1016.25,
+          "bottom": 1212.125,
+          "left": 821.140625
+        }
+      },
+      {
+        "label": "Revisar Model Version",
+        "disabled": false,
+        "rect": {
+          "x": 1026.25,
+          "y": 1168.125,
+          "width": 172.734375,
+          "height": 44,
+          "top": 1168.125,
+          "right": 1198.984375,
+          "bottom": 1212.125,
+          "left": 1026.25
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 821.875,
+          "y": 1222.125,
+          "width": 184.265625,
+          "height": 44,
+          "top": 1222.125,
+          "right": 1006.140625,
+          "bottom": 1266.125,
+          "left": 821.875
+        }
+      },
+      {
+        "label": "Historial de ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 1016.140625,
+          "y": 1222.125,
+          "width": 182.84375,
+          "height": 44,
+          "top": 1222.125,
+          "right": 1198.984375,
+          "bottom": 1266.125,
+          "left": 1016.140625
+        }
+      },
+      {
+        "label": "Crear Case derivado",
+        "disabled": false,
+        "rect": {
+          "x": 1038.53125,
+          "y": 1276.125,
+          "width": 160.453125,
+          "height": 44,
+          "top": 1276.125,
+          "right": 1198.984375,
+          "bottom": 1320.125,
+          "left": 1038.53125
+        }
+      }
+    ],
+    "contrast": {
+      "minimum": 5.429139914708745,
+      "count": 47,
+      "failures": []
+    }
+  },
+  {
+    "width": 768,
+    "scroll": 768,
+    "client": 768,
+    "controls": [
+      {
+        "label": "01 \u00b7 Logistics Models",
+        "disabled": false,
+        "rect": {
+          "x": 114,
+          "y": 270.78125,
+          "width": 197.328125,
+          "height": 44,
+          "top": 270.78125,
+          "right": 311.328125,
+          "bottom": 314.78125,
+          "left": 114
+        }
+      },
+      {
+        "label": "02 \u00b7 Decision Case",
+        "disabled": false,
+        "rect": {
+          "x": 321.328125,
+          "y": 270.78125,
+          "width": 197.328125,
+          "height": 44,
+          "top": 270.78125,
+          "right": 518.65625,
+          "bottom": 314.78125,
+          "left": 321.328125
+        }
+      },
+      {
+        "label": "03 \u00b7 Data Preparation",
+        "disabled": true,
+        "rect": {
+          "x": 528.65625,
+          "y": 270.78125,
+          "width": 197.328125,
+          "height": 44,
+          "top": 270.78125,
+          "right": 725.984375,
+          "bottom": 314.78125,
+          "left": 528.65625
+        }
+      },
+      {
+        "label": "Cambiar",
+        "disabled": false,
+        "rect": {
+          "x": 308.96875,
+          "y": 958.15625,
+          "width": 86.03125,
+          "height": 44,
+          "top": 958.15625,
+          "right": 395,
+          "bottom": 1002.15625,
+          "left": 308.96875
+        }
+      },
+      {
+        "label": "Cambiar",
+        "disabled": false,
+        "rect": {
+          "x": 622.96875,
+          "y": 958.15625,
+          "width": 86.03125,
+          "height": 44,
+          "top": 958.15625,
+          "right": 709,
+          "bottom": 1002.15625,
+          "left": 622.96875
+        }
+      },
+      {
+        "label": "\u2190",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 1268.328125,
+          "width": 44,
+          "height": 44,
+          "top": 1268.328125,
+          "right": 183,
+          "bottom": 1312.328125,
+          "left": 139
+        }
+      },
+      {
+        "label": "Revisar definici\u00f3n vigente",
+        "disabled": false,
+        "rect": {
+          "x": 199,
+          "y": 1362.328125,
+          "width": 195.109375,
+          "height": 44,
+          "top": 1362.328125,
+          "right": 394.109375,
+          "bottom": 1406.328125,
+          "left": 199
+        }
+      },
+      {
+        "label": "Revisar Model Version",
+        "disabled": false,
+        "rect": {
+          "x": 404.109375,
+          "y": 1362.328125,
+          "width": 172.734375,
+          "height": 44,
+          "top": 1362.328125,
+          "right": 576.84375,
+          "bottom": 1406.328125,
+          "left": 404.109375
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 199,
+          "y": 1416.328125,
+          "width": 184.265625,
+          "height": 44,
+          "top": 1416.328125,
+          "right": 383.265625,
+          "bottom": 1460.328125,
+          "left": 199
+        }
+      },
+      {
+        "label": "Historial de ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 393.265625,
+          "y": 1416.328125,
+          "width": 182.84375,
+          "height": 44,
+          "top": 1416.328125,
+          "right": 576.109375,
+          "bottom": 1460.328125,
+          "left": 393.265625
+        }
+      },
+      {
+        "label": "Crear Case derivado",
+        "disabled": false,
+        "rect": {
+          "x": 199,
+          "y": 1470.328125,
+          "width": 160.453125,
+          "height": 44,
+          "top": 1470.328125,
+          "right": 359.453125,
+          "bottom": 1514.328125,
+          "left": 199
+        }
+      }
+    ],
+    "contrast": {
+      "minimum": 5.429139914708745,
+      "count": 47,
+      "failures": []
+    }
+  },
+  {
+    "width": 375,
+    "scroll": 375,
+    "client": 375,
+    "controls": [
+      {
+        "label": "01 \u00b7 Logistics Models",
+        "disabled": false,
+        "rect": {
+          "x": 92,
+          "y": 343.96875,
+          "width": 251,
+          "height": 44,
+          "top": 343.96875,
+          "right": 343,
+          "bottom": 387.96875,
+          "left": 92
+        }
+      },
+      {
+        "label": "02 \u00b7 Decision Case",
+        "disabled": false,
+        "rect": {
+          "x": 92,
+          "y": 397.96875,
+          "width": 251,
+          "height": 44,
+          "top": 397.96875,
+          "right": 343,
+          "bottom": 441.96875,
+          "left": 92
+        }
+      },
+      {
+        "label": "03 \u00b7 Data Preparation",
+        "disabled": true,
+        "rect": {
+          "x": 92,
+          "y": 451.96875,
+          "width": 251,
+          "height": 44,
+          "top": 451.96875,
+          "right": 343,
+          "bottom": 495.96875,
+          "left": 92
+        }
+      },
+      {
+        "label": "Cambiar",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 1701.71875,
+          "width": 217,
+          "height": 44,
+          "top": 1701.71875,
+          "right": 326,
+          "bottom": 1745.71875,
+          "left": 109
+        }
+      },
+      {
+        "label": "Cambiar",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 1906.5,
+          "width": 217,
+          "height": 44,
+          "top": 1906.5,
+          "right": 326,
+          "bottom": 1950.5,
+          "left": 109
+        }
+      },
+      {
+        "label": "\u2190",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 2237.28125,
+          "width": 44,
+          "height": 44,
+          "top": 2237.28125,
+          "right": 153,
+          "bottom": 2281.28125,
+          "left": 109
+        }
+      },
+      {
+        "label": "Revisar definici\u00f3n vigente",
+        "disabled": false,
+        "rect": {
+          "x": 165,
+          "y": 2359.28125,
+          "width": 161,
+          "height": 53.09375,
+          "top": 2359.28125,
+          "right": 326,
+          "bottom": 2412.375,
+          "left": 165
+        }
+      },
+      {
+        "label": "Revisar Model Version",
+        "disabled": false,
+        "rect": {
+          "x": 165,
+          "y": 2422.375,
+          "width": 161,
+          "height": 53.09375,
+          "top": 2422.375,
+          "right": 326,
+          "bottom": 2475.46875,
+          "left": 165
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 165,
+          "y": 2485.46875,
+          "width": 161,
+          "height": 53.09375,
+          "top": 2485.46875,
+          "right": 326,
+          "bottom": 2538.5625,
+          "left": 165
+        }
+      },
+      {
+        "label": "Historial de ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 165,
+          "y": 2548.5625,
+          "width": 161,
+          "height": 53.09375,
+          "top": 2548.5625,
+          "right": 326,
+          "bottom": 2601.65625,
+          "left": 165
+        }
+      },
+      {
+        "label": "Crear Case derivado",
+        "disabled": false,
+        "rect": {
+          "x": 165,
+          "y": 2611.65625,
+          "width": 160.453125,
+          "height": 44,
+          "top": 2611.65625,
+          "right": 325.453125,
+          "bottom": 2655.65625,
+          "left": 165
+        }
+      }
+    ],
+    "contrast": {
+      "minimum": 5.429139914708745,
+      "count": 47,
+      "failures": []
+    }
+  }
+]

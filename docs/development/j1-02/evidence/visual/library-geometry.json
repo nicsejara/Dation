@@ -1,0 +1,4810 @@
+[
+  {
+    "width": 1440,
+    "scroll": 1440,
+    "client": 1440,
+    "controls": [
+      {
+        "label": "Crear Decision Case",
+        "disabled": false,
+        "rect": {
+          "x": 288,
+          "y": 274.171875,
+          "width": 989.625,
+          "height": 44,
+          "top": 274.171875,
+          "right": 1277.625,
+          "bottom": 318.171875,
+          "left": 288
+        }
+      },
+      {
+        "label": "01 \u00b7 Logistics Models",
+        "disabled": false,
+        "rect": {
+          "x": 288,
+          "y": 367.171875,
+          "width": 190,
+          "height": 44,
+          "top": 367.171875,
+          "right": 478,
+          "bottom": 411.171875,
+          "left": 288
+        }
+      },
+      {
+        "label": "02 \u00b7 Decision Case",
+        "disabled": false,
+        "rect": {
+          "x": 288,
+          "y": 421.171875,
+          "width": 190,
+          "height": 44,
+          "top": 421.171875,
+          "right": 478,
+          "bottom": 465.171875,
+          "left": 288
+        }
+      },
+      {
+        "label": "03 \u00b7 Data Preparation",
+        "disabled": true,
+        "rect": {
+          "x": 288,
+          "y": 475.171875,
+          "width": 190,
+          "height": 44,
+          "top": 475.171875,
+          "right": 478,
+          "bottom": 519.171875,
+          "left": 288
+        }
+      },
+      {
+        "label": "j102_case_search",
+        "disabled": false,
+        "rect": {
+          "x": 502,
+          "y": 394.671875,
+          "width": 530,
+          "height": 44,
+          "top": 394.671875,
+          "right": 1032,
+          "bottom": 438.671875,
+          "left": 502
+        }
+      },
+      {
+        "label": "j102_case_filter",
+        "disabled": false,
+        "rect": {
+          "x": 1048,
+          "y": 394.671875,
+          "width": 200,
+          "height": 44,
+          "top": 394.671875,
+          "right": 1248,
+          "bottom": 438.671875,
+          "left": 1048
+        }
+      },
+      {
+        "label": "Buscar Cases",
+        "disabled": false,
+        "rect": {
+          "x": 1264,
+          "y": 394.671875,
+          "width": 120,
+          "height": 44,
+          "top": 394.671875,
+          "right": 1384,
+          "bottom": 438.671875,
+          "left": 1264
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 690.453125,
+          "width": 115.671875,
+          "height": 44,
+          "top": 690.453125,
+          "right": 642.671875,
+          "bottom": 734.453125,
+          "left": 527
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 746.453125,
+          "width": 184.265625,
+          "height": 44,
+          "top": 746.453125,
+          "right": 711.265625,
+          "bottom": 790.453125,
+          "left": 527
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 802.453125,
+          "width": 132.28125,
+          "height": 44,
+          "top": 802.453125,
+          "right": 659.28125,
+          "bottom": 846.453125,
+          "left": 527
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 977,
+          "y": 690.453125,
+          "width": 115.671875,
+          "height": 44,
+          "top": 690.453125,
+          "right": 1092.671875,
+          "bottom": 734.453125,
+          "left": 977
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 977,
+          "y": 746.453125,
+          "width": 184.265625,
+          "height": 44,
+          "top": 746.453125,
+          "right": 1161.265625,
+          "bottom": 790.453125,
+          "left": 977
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 977,
+          "y": 802.453125,
+          "width": 132.28125,
+          "height": 44,
+          "top": 802.453125,
+          "right": 1109.28125,
+          "bottom": 846.453125,
+          "left": 977
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 1121.234375,
+          "width": 115.671875,
+          "height": 44,
+          "top": 1121.234375,
+          "right": 642.671875,
+          "bottom": 1165.234375,
+          "left": 527
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 1177.234375,
+          "width": 184.265625,
+          "height": 44,
+          "top": 1177.234375,
+          "right": 711.265625,
+          "bottom": 1221.234375,
+          "left": 527
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 1233.234375,
+          "width": 132.28125,
+          "height": 44,
+          "top": 1233.234375,
+          "right": 659.28125,
+          "bottom": 1277.234375,
+          "left": 527
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 977,
+          "y": 1121.234375,
+          "width": 115.671875,
+          "height": 44,
+          "top": 1121.234375,
+          "right": 1092.671875,
+          "bottom": 1165.234375,
+          "left": 977
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 977,
+          "y": 1177.234375,
+          "width": 184.265625,
+          "height": 44,
+          "top": 1177.234375,
+          "right": 1161.265625,
+          "bottom": 1221.234375,
+          "left": 977
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 977,
+          "y": 1233.234375,
+          "width": 132.28125,
+          "height": 44,
+          "top": 1233.234375,
+          "right": 1109.28125,
+          "bottom": 1277.234375,
+          "left": 977
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 1552.015625,
+          "width": 115.671875,
+          "height": 44,
+          "top": 1552.015625,
+          "right": 642.671875,
+          "bottom": 1596.015625,
+          "left": 527
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 1608.015625,
+          "width": 184.265625,
+          "height": 44,
+          "top": 1608.015625,
+          "right": 711.265625,
+          "bottom": 1652.015625,
+          "left": 527
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 1664.015625,
+          "width": 132.28125,
+          "height": 44,
+          "top": 1664.015625,
+          "right": 659.28125,
+          "bottom": 1708.015625,
+          "left": 527
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 977,
+          "y": 1552.015625,
+          "width": 115.671875,
+          "height": 44,
+          "top": 1552.015625,
+          "right": 1092.671875,
+          "bottom": 1596.015625,
+          "left": 977
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 977,
+          "y": 1608.015625,
+          "width": 184.265625,
+          "height": 44,
+          "top": 1608.015625,
+          "right": 1161.265625,
+          "bottom": 1652.015625,
+          "left": 977
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 977,
+          "y": 1664.015625,
+          "width": 132.28125,
+          "height": 44,
+          "top": 1664.015625,
+          "right": 1109.28125,
+          "bottom": 1708.015625,
+          "left": 977
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 1982.796875,
+          "width": 115.671875,
+          "height": 44,
+          "top": 1982.796875,
+          "right": 642.671875,
+          "bottom": 2026.796875,
+          "left": 527
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 2038.796875,
+          "width": 184.265625,
+          "height": 44,
+          "top": 2038.796875,
+          "right": 711.265625,
+          "bottom": 2082.796875,
+          "left": 527
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 2094.796875,
+          "width": 132.28125,
+          "height": 44,
+          "top": 2094.796875,
+          "right": 659.28125,
+          "bottom": 2138.796875,
+          "left": 527
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 977,
+          "y": 1982.796875,
+          "width": 115.671875,
+          "height": 44,
+          "top": 1982.796875,
+          "right": 1092.671875,
+          "bottom": 2026.796875,
+          "left": 977
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 977,
+          "y": 2038.796875,
+          "width": 184.265625,
+          "height": 44,
+          "top": 2038.796875,
+          "right": 1161.265625,
+          "bottom": 2082.796875,
+          "left": 977
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 977,
+          "y": 2094.796875,
+          "width": 132.28125,
+          "height": 44,
+          "top": 2094.796875,
+          "right": 1109.28125,
+          "bottom": 2138.796875,
+          "left": 977
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 2413.578125,
+          "width": 115.671875,
+          "height": 44,
+          "top": 2413.578125,
+          "right": 642.671875,
+          "bottom": 2457.578125,
+          "left": 527
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 2469.578125,
+          "width": 184.265625,
+          "height": 44,
+          "top": 2469.578125,
+          "right": 711.265625,
+          "bottom": 2513.578125,
+          "left": 527
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 2525.578125,
+          "width": 132.28125,
+          "height": 44,
+          "top": 2525.578125,
+          "right": 659.28125,
+          "bottom": 2569.578125,
+          "left": 527
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 977,
+          "y": 2413.578125,
+          "width": 115.671875,
+          "height": 44,
+          "top": 2413.578125,
+          "right": 1092.671875,
+          "bottom": 2457.578125,
+          "left": 977
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 977,
+          "y": 2469.578125,
+          "width": 184.265625,
+          "height": 44,
+          "top": 2469.578125,
+          "right": 1161.265625,
+          "bottom": 2513.578125,
+          "left": 977
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 977,
+          "y": 2525.578125,
+          "width": 132.28125,
+          "height": 44,
+          "top": 2525.578125,
+          "right": 1109.28125,
+          "bottom": 2569.578125,
+          "left": 977
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 2844.359375,
+          "width": 115.671875,
+          "height": 44,
+          "top": 2844.359375,
+          "right": 642.671875,
+          "bottom": 2888.359375,
+          "left": 527
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 2900.359375,
+          "width": 184.265625,
+          "height": 44,
+          "top": 2900.359375,
+          "right": 711.265625,
+          "bottom": 2944.359375,
+          "left": 527
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 2956.359375,
+          "width": 132.28125,
+          "height": 44,
+          "top": 2956.359375,
+          "right": 659.28125,
+          "bottom": 3000.359375,
+          "left": 527
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 977,
+          "y": 2844.359375,
+          "width": 115.671875,
+          "height": 44,
+          "top": 2844.359375,
+          "right": 1092.671875,
+          "bottom": 2888.359375,
+          "left": 977
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 977,
+          "y": 2900.359375,
+          "width": 184.265625,
+          "height": 44,
+          "top": 2900.359375,
+          "right": 1161.265625,
+          "bottom": 2944.359375,
+          "left": 977
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 977,
+          "y": 2956.359375,
+          "width": 132.28125,
+          "height": 44,
+          "top": 2956.359375,
+          "right": 1109.28125,
+          "bottom": 3000.359375,
+          "left": 977
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 3275.140625,
+          "width": 115.671875,
+          "height": 44,
+          "top": 3275.140625,
+          "right": 642.671875,
+          "bottom": 3319.140625,
+          "left": 527
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 3331.140625,
+          "width": 184.265625,
+          "height": 44,
+          "top": 3331.140625,
+          "right": 711.265625,
+          "bottom": 3375.140625,
+          "left": 527
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 3387.140625,
+          "width": 132.28125,
+          "height": 44,
+          "top": 3387.140625,
+          "right": 659.28125,
+          "bottom": 3431.140625,
+          "left": 527
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 977,
+          "y": 3275.140625,
+          "width": 115.671875,
+          "height": 44,
+          "top": 3275.140625,
+          "right": 1092.671875,
+          "bottom": 3319.140625,
+          "left": 977
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 977,
+          "y": 3331.140625,
+          "width": 184.265625,
+          "height": 44,
+          "top": 3331.140625,
+          "right": 1161.265625,
+          "bottom": 3375.140625,
+          "left": 977
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 977,
+          "y": 3387.140625,
+          "width": 132.28125,
+          "height": 44,
+          "top": 3387.140625,
+          "right": 1109.28125,
+          "bottom": 3431.140625,
+          "left": 977
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 3705.921875,
+          "width": 115.671875,
+          "height": 44,
+          "top": 3705.921875,
+          "right": 642.671875,
+          "bottom": 3749.921875,
+          "left": 527
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 3761.921875,
+          "width": 184.265625,
+          "height": 44,
+          "top": 3761.921875,
+          "right": 711.265625,
+          "bottom": 3805.921875,
+          "left": 527
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 3817.921875,
+          "width": 132.28125,
+          "height": 44,
+          "top": 3817.921875,
+          "right": 659.28125,
+          "bottom": 3861.921875,
+          "left": 527
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 977,
+          "y": 3705.921875,
+          "width": 115.671875,
+          "height": 44,
+          "top": 3705.921875,
+          "right": 1092.671875,
+          "bottom": 3749.921875,
+          "left": 977
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 977,
+          "y": 3761.921875,
+          "width": 184.265625,
+          "height": 44,
+          "top": 3761.921875,
+          "right": 1161.265625,
+          "bottom": 3805.921875,
+          "left": 977
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 977,
+          "y": 3817.921875,
+          "width": 132.28125,
+          "height": 44,
+          "top": 3817.921875,
+          "right": 1109.28125,
+          "bottom": 3861.921875,
+          "left": 977
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 4136.703125,
+          "width": 115.671875,
+          "height": 44,
+          "top": 4136.703125,
+          "right": 642.671875,
+          "bottom": 4180.703125,
+          "left": 527
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 4192.703125,
+          "width": 184.265625,
+          "height": 44,
+          "top": 4192.703125,
+          "right": 711.265625,
+          "bottom": 4236.703125,
+          "left": 527
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 4248.703125,
+          "width": 132.28125,
+          "height": 44,
+          "top": 4248.703125,
+          "right": 659.28125,
+          "bottom": 4292.703125,
+          "left": 527
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 977,
+          "y": 4136.703125,
+          "width": 115.671875,
+          "height": 44,
+          "top": 4136.703125,
+          "right": 1092.671875,
+          "bottom": 4180.703125,
+          "left": 977
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 977,
+          "y": 4192.703125,
+          "width": 184.265625,
+          "height": 44,
+          "top": 4192.703125,
+          "right": 1161.265625,
+          "bottom": 4236.703125,
+          "left": 977
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 977,
+          "y": 4248.703125,
+          "width": 132.28125,
+          "height": 44,
+          "top": 4248.703125,
+          "right": 1109.28125,
+          "bottom": 4292.703125,
+          "left": 977
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 4567.484375,
+          "width": 115.671875,
+          "height": 44,
+          "top": 4567.484375,
+          "right": 642.671875,
+          "bottom": 4611.484375,
+          "left": 527
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 4623.484375,
+          "width": 184.265625,
+          "height": 44,
+          "top": 4623.484375,
+          "right": 711.265625,
+          "bottom": 4667.484375,
+          "left": 527
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 4679.484375,
+          "width": 132.28125,
+          "height": 44,
+          "top": 4679.484375,
+          "right": 659.28125,
+          "bottom": 4723.484375,
+          "left": 527
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 977,
+          "y": 4567.484375,
+          "width": 115.671875,
+          "height": 44,
+          "top": 4567.484375,
+          "right": 1092.671875,
+          "bottom": 4611.484375,
+          "left": 977
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 977,
+          "y": 4623.484375,
+          "width": 184.265625,
+          "height": 44,
+          "top": 4623.484375,
+          "right": 1161.265625,
+          "bottom": 4667.484375,
+          "left": 977
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 977,
+          "y": 4679.484375,
+          "width": 132.28125,
+          "height": 44,
+          "top": 4679.484375,
+          "right": 1109.28125,
+          "bottom": 4723.484375,
+          "left": 977
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 4998.265625,
+          "width": 115.671875,
+          "height": 44,
+          "top": 4998.265625,
+          "right": 642.671875,
+          "bottom": 5042.265625,
+          "left": 527
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 5054.265625,
+          "width": 184.265625,
+          "height": 44,
+          "top": 5054.265625,
+          "right": 711.265625,
+          "bottom": 5098.265625,
+          "left": 527
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 5110.265625,
+          "width": 132.28125,
+          "height": 44,
+          "top": 5110.265625,
+          "right": 659.28125,
+          "bottom": 5154.265625,
+          "left": 527
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 977,
+          "y": 4998.265625,
+          "width": 115.671875,
+          "height": 44,
+          "top": 4998.265625,
+          "right": 1092.671875,
+          "bottom": 5042.265625,
+          "left": 977
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 977,
+          "y": 5054.265625,
+          "width": 184.265625,
+          "height": 44,
+          "top": 5054.265625,
+          "right": 1161.265625,
+          "bottom": 5098.265625,
+          "left": 977
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 977,
+          "y": 5110.265625,
+          "width": 132.28125,
+          "height": 44,
+          "top": 5110.265625,
+          "right": 1109.28125,
+          "bottom": 5154.265625,
+          "left": 977
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 5429.046875,
+          "width": 115.671875,
+          "height": 44,
+          "top": 5429.046875,
+          "right": 642.671875,
+          "bottom": 5473.046875,
+          "left": 527
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 5485.046875,
+          "width": 184.265625,
+          "height": 44,
+          "top": 5485.046875,
+          "right": 711.265625,
+          "bottom": 5529.046875,
+          "left": 527
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 5541.046875,
+          "width": 132.28125,
+          "height": 44,
+          "top": 5541.046875,
+          "right": 659.28125,
+          "bottom": 5585.046875,
+          "left": 527
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 977,
+          "y": 5429.046875,
+          "width": 115.671875,
+          "height": 44,
+          "top": 5429.046875,
+          "right": 1092.671875,
+          "bottom": 5473.046875,
+          "left": 977
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 977,
+          "y": 5485.046875,
+          "width": 184.265625,
+          "height": 44,
+          "top": 5485.046875,
+          "right": 1161.265625,
+          "bottom": 5529.046875,
+          "left": 977
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 977,
+          "y": 5541.046875,
+          "width": 132.28125,
+          "height": 44,
+          "top": 5541.046875,
+          "right": 1109.28125,
+          "bottom": 5585.046875,
+          "left": 977
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 5859.828125,
+          "width": 115.671875,
+          "height": 44,
+          "top": 5859.828125,
+          "right": 642.671875,
+          "bottom": 5903.828125,
+          "left": 527
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 5915.828125,
+          "width": 184.265625,
+          "height": 44,
+          "top": 5915.828125,
+          "right": 711.265625,
+          "bottom": 5959.828125,
+          "left": 527
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 5971.828125,
+          "width": 132.28125,
+          "height": 44,
+          "top": 5971.828125,
+          "right": 659.28125,
+          "bottom": 6015.828125,
+          "left": 527
+        }
+      },
+      {
+        "label": "Cases anteriores",
+        "disabled": true,
+        "rect": {
+          "x": 785.640625,
+          "y": 6060.828125,
+          "width": 138.78125,
+          "height": 44,
+          "top": 6060.828125,
+          "right": 924.421875,
+          "bottom": 6104.828125,
+          "left": 785.640625
+        }
+      },
+      {
+        "label": "M\u00e1s Cases",
+        "disabled": false,
+        "rect": {
+          "x": 999.125,
+          "y": 6060.828125,
+          "width": 101.21875,
+          "height": 44,
+          "top": 6060.828125,
+          "right": 1100.34375,
+          "bottom": 6104.828125,
+          "left": 999.125
+        }
+      },
+      {
+        "label": "\u2190",
+        "disabled": false,
+        "rect": {
+          "x": 313,
+          "y": 6177.828125,
+          "width": 44,
+          "height": 44,
+          "top": 6177.828125,
+          "right": 357,
+          "bottom": 6221.828125,
+          "left": 313
+        }
+      }
+    ],
+    "contrast": {
+      "minimum": 6.161887829123643,
+      "count": 242,
+      "failures": []
+    }
+  },
+  {
+    "width": 1280,
+    "scroll": 1280,
+    "client": 1280,
+    "controls": [
+      {
+        "label": "Crear Decision Case",
+        "disabled": false,
+        "rect": {
+          "x": 288,
+          "y": 273.96875,
+          "width": 829.625,
+          "height": 44,
+          "top": 273.96875,
+          "right": 1117.625,
+          "bottom": 317.96875,
+          "left": 288
+        }
+      },
+      {
+        "label": "01 \u00b7 Logistics Models",
+        "disabled": false,
+        "rect": {
+          "x": 288,
+          "y": 366.96875,
+          "width": 190,
+          "height": 44,
+          "top": 366.96875,
+          "right": 478,
+          "bottom": 410.96875,
+          "left": 288
+        }
+      },
+      {
+        "label": "02 \u00b7 Decision Case",
+        "disabled": false,
+        "rect": {
+          "x": 288,
+          "y": 420.96875,
+          "width": 190,
+          "height": 44,
+          "top": 420.96875,
+          "right": 478,
+          "bottom": 464.96875,
+          "left": 288
+        }
+      },
+      {
+        "label": "03 \u00b7 Data Preparation",
+        "disabled": true,
+        "rect": {
+          "x": 288,
+          "y": 474.96875,
+          "width": 190,
+          "height": 44,
+          "top": 474.96875,
+          "right": 478,
+          "bottom": 518.96875,
+          "left": 288
+        }
+      },
+      {
+        "label": "j102_case_search",
+        "disabled": false,
+        "rect": {
+          "x": 502,
+          "y": 394.46875,
+          "width": 370,
+          "height": 44,
+          "top": 394.46875,
+          "right": 872,
+          "bottom": 438.46875,
+          "left": 502
+        }
+      },
+      {
+        "label": "j102_case_filter",
+        "disabled": false,
+        "rect": {
+          "x": 888,
+          "y": 394.46875,
+          "width": 200,
+          "height": 44,
+          "top": 394.46875,
+          "right": 1088,
+          "bottom": 438.46875,
+          "left": 888
+        }
+      },
+      {
+        "label": "Buscar Cases",
+        "disabled": false,
+        "rect": {
+          "x": 1104,
+          "y": 394.46875,
+          "width": 120,
+          "height": 44,
+          "top": 394.46875,
+          "right": 1224,
+          "bottom": 438.46875,
+          "left": 1104
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 690.25,
+          "width": 115.671875,
+          "height": 44,
+          "top": 690.25,
+          "right": 642.671875,
+          "bottom": 734.25,
+          "left": 527
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 746.25,
+          "width": 184.265625,
+          "height": 44,
+          "top": 746.25,
+          "right": 711.265625,
+          "bottom": 790.25,
+          "left": 527
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 802.25,
+          "width": 132.28125,
+          "height": 44,
+          "top": 802.25,
+          "right": 659.28125,
+          "bottom": 846.25,
+          "left": 527
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 897,
+          "y": 690.25,
+          "width": 115.671875,
+          "height": 44,
+          "top": 690.25,
+          "right": 1012.671875,
+          "bottom": 734.25,
+          "left": 897
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 897,
+          "y": 746.25,
+          "width": 184.265625,
+          "height": 44,
+          "top": 746.25,
+          "right": 1081.265625,
+          "bottom": 790.25,
+          "left": 897
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 897,
+          "y": 802.25,
+          "width": 132.28125,
+          "height": 44,
+          "top": 802.25,
+          "right": 1029.28125,
+          "bottom": 846.25,
+          "left": 897
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 1121.03125,
+          "width": 115.671875,
+          "height": 44,
+          "top": 1121.03125,
+          "right": 642.671875,
+          "bottom": 1165.03125,
+          "left": 527
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 1177.03125,
+          "width": 184.265625,
+          "height": 44,
+          "top": 1177.03125,
+          "right": 711.265625,
+          "bottom": 1221.03125,
+          "left": 527
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 1233.03125,
+          "width": 132.28125,
+          "height": 44,
+          "top": 1233.03125,
+          "right": 659.28125,
+          "bottom": 1277.03125,
+          "left": 527
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 897,
+          "y": 1121.03125,
+          "width": 115.671875,
+          "height": 44,
+          "top": 1121.03125,
+          "right": 1012.671875,
+          "bottom": 1165.03125,
+          "left": 897
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 897,
+          "y": 1177.03125,
+          "width": 184.265625,
+          "height": 44,
+          "top": 1177.03125,
+          "right": 1081.265625,
+          "bottom": 1221.03125,
+          "left": 897
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 897,
+          "y": 1233.03125,
+          "width": 132.28125,
+          "height": 44,
+          "top": 1233.03125,
+          "right": 1029.28125,
+          "bottom": 1277.03125,
+          "left": 897
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 1551.8125,
+          "width": 115.671875,
+          "height": 44,
+          "top": 1551.8125,
+          "right": 642.671875,
+          "bottom": 1595.8125,
+          "left": 527
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 1607.8125,
+          "width": 184.265625,
+          "height": 44,
+          "top": 1607.8125,
+          "right": 711.265625,
+          "bottom": 1651.8125,
+          "left": 527
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 1663.8125,
+          "width": 132.28125,
+          "height": 44,
+          "top": 1663.8125,
+          "right": 659.28125,
+          "bottom": 1707.8125,
+          "left": 527
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 897,
+          "y": 1551.8125,
+          "width": 115.671875,
+          "height": 44,
+          "top": 1551.8125,
+          "right": 1012.671875,
+          "bottom": 1595.8125,
+          "left": 897
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 897,
+          "y": 1607.8125,
+          "width": 184.265625,
+          "height": 44,
+          "top": 1607.8125,
+          "right": 1081.265625,
+          "bottom": 1651.8125,
+          "left": 897
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 897,
+          "y": 1663.8125,
+          "width": 132.28125,
+          "height": 44,
+          "top": 1663.8125,
+          "right": 1029.28125,
+          "bottom": 1707.8125,
+          "left": 897
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 1982.59375,
+          "width": 115.671875,
+          "height": 44,
+          "top": 1982.59375,
+          "right": 642.671875,
+          "bottom": 2026.59375,
+          "left": 527
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 2038.59375,
+          "width": 184.265625,
+          "height": 44,
+          "top": 2038.59375,
+          "right": 711.265625,
+          "bottom": 2082.59375,
+          "left": 527
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 2094.59375,
+          "width": 132.28125,
+          "height": 44,
+          "top": 2094.59375,
+          "right": 659.28125,
+          "bottom": 2138.59375,
+          "left": 527
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 897,
+          "y": 1982.59375,
+          "width": 115.671875,
+          "height": 44,
+          "top": 1982.59375,
+          "right": 1012.671875,
+          "bottom": 2026.59375,
+          "left": 897
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 897,
+          "y": 2038.59375,
+          "width": 184.265625,
+          "height": 44,
+          "top": 2038.59375,
+          "right": 1081.265625,
+          "bottom": 2082.59375,
+          "left": 897
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 897,
+          "y": 2094.59375,
+          "width": 132.28125,
+          "height": 44,
+          "top": 2094.59375,
+          "right": 1029.28125,
+          "bottom": 2138.59375,
+          "left": 897
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 2413.375,
+          "width": 115.671875,
+          "height": 44,
+          "top": 2413.375,
+          "right": 642.671875,
+          "bottom": 2457.375,
+          "left": 527
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 2469.375,
+          "width": 184.265625,
+          "height": 44,
+          "top": 2469.375,
+          "right": 711.265625,
+          "bottom": 2513.375,
+          "left": 527
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 2525.375,
+          "width": 132.28125,
+          "height": 44,
+          "top": 2525.375,
+          "right": 659.28125,
+          "bottom": 2569.375,
+          "left": 527
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 897,
+          "y": 2413.375,
+          "width": 115.671875,
+          "height": 44,
+          "top": 2413.375,
+          "right": 1012.671875,
+          "bottom": 2457.375,
+          "left": 897
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 897,
+          "y": 2469.375,
+          "width": 184.265625,
+          "height": 44,
+          "top": 2469.375,
+          "right": 1081.265625,
+          "bottom": 2513.375,
+          "left": 897
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 897,
+          "y": 2525.375,
+          "width": 132.28125,
+          "height": 44,
+          "top": 2525.375,
+          "right": 1029.28125,
+          "bottom": 2569.375,
+          "left": 897
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 2844.15625,
+          "width": 115.671875,
+          "height": 44,
+          "top": 2844.15625,
+          "right": 642.671875,
+          "bottom": 2888.15625,
+          "left": 527
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 2900.15625,
+          "width": 184.265625,
+          "height": 44,
+          "top": 2900.15625,
+          "right": 711.265625,
+          "bottom": 2944.15625,
+          "left": 527
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 2956.15625,
+          "width": 132.28125,
+          "height": 44,
+          "top": 2956.15625,
+          "right": 659.28125,
+          "bottom": 3000.15625,
+          "left": 527
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 897,
+          "y": 2844.15625,
+          "width": 115.671875,
+          "height": 44,
+          "top": 2844.15625,
+          "right": 1012.671875,
+          "bottom": 2888.15625,
+          "left": 897
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 897,
+          "y": 2900.15625,
+          "width": 184.265625,
+          "height": 44,
+          "top": 2900.15625,
+          "right": 1081.265625,
+          "bottom": 2944.15625,
+          "left": 897
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 897,
+          "y": 2956.15625,
+          "width": 132.28125,
+          "height": 44,
+          "top": 2956.15625,
+          "right": 1029.28125,
+          "bottom": 3000.15625,
+          "left": 897
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 3274.9375,
+          "width": 115.671875,
+          "height": 44,
+          "top": 3274.9375,
+          "right": 642.671875,
+          "bottom": 3318.9375,
+          "left": 527
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 3330.9375,
+          "width": 184.265625,
+          "height": 44,
+          "top": 3330.9375,
+          "right": 711.265625,
+          "bottom": 3374.9375,
+          "left": 527
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 3386.9375,
+          "width": 132.28125,
+          "height": 44,
+          "top": 3386.9375,
+          "right": 659.28125,
+          "bottom": 3430.9375,
+          "left": 527
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 897,
+          "y": 3274.9375,
+          "width": 115.671875,
+          "height": 44,
+          "top": 3274.9375,
+          "right": 1012.671875,
+          "bottom": 3318.9375,
+          "left": 897
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 897,
+          "y": 3330.9375,
+          "width": 184.265625,
+          "height": 44,
+          "top": 3330.9375,
+          "right": 1081.265625,
+          "bottom": 3374.9375,
+          "left": 897
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 897,
+          "y": 3386.9375,
+          "width": 132.28125,
+          "height": 44,
+          "top": 3386.9375,
+          "right": 1029.28125,
+          "bottom": 3430.9375,
+          "left": 897
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 3705.71875,
+          "width": 115.671875,
+          "height": 44,
+          "top": 3705.71875,
+          "right": 642.671875,
+          "bottom": 3749.71875,
+          "left": 527
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 3761.71875,
+          "width": 184.265625,
+          "height": 44,
+          "top": 3761.71875,
+          "right": 711.265625,
+          "bottom": 3805.71875,
+          "left": 527
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 3817.71875,
+          "width": 132.28125,
+          "height": 44,
+          "top": 3817.71875,
+          "right": 659.28125,
+          "bottom": 3861.71875,
+          "left": 527
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 897,
+          "y": 3705.71875,
+          "width": 115.671875,
+          "height": 44,
+          "top": 3705.71875,
+          "right": 1012.671875,
+          "bottom": 3749.71875,
+          "left": 897
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 897,
+          "y": 3761.71875,
+          "width": 184.265625,
+          "height": 44,
+          "top": 3761.71875,
+          "right": 1081.265625,
+          "bottom": 3805.71875,
+          "left": 897
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 897,
+          "y": 3817.71875,
+          "width": 132.28125,
+          "height": 44,
+          "top": 3817.71875,
+          "right": 1029.28125,
+          "bottom": 3861.71875,
+          "left": 897
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 4136.5,
+          "width": 115.671875,
+          "height": 44,
+          "top": 4136.5,
+          "right": 642.671875,
+          "bottom": 4180.5,
+          "left": 527
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 4192.5,
+          "width": 184.265625,
+          "height": 44,
+          "top": 4192.5,
+          "right": 711.265625,
+          "bottom": 4236.5,
+          "left": 527
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 4248.5,
+          "width": 132.28125,
+          "height": 44,
+          "top": 4248.5,
+          "right": 659.28125,
+          "bottom": 4292.5,
+          "left": 527
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 897,
+          "y": 4136.5,
+          "width": 115.671875,
+          "height": 44,
+          "top": 4136.5,
+          "right": 1012.671875,
+          "bottom": 4180.5,
+          "left": 897
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 897,
+          "y": 4192.5,
+          "width": 184.265625,
+          "height": 44,
+          "top": 4192.5,
+          "right": 1081.265625,
+          "bottom": 4236.5,
+          "left": 897
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 897,
+          "y": 4248.5,
+          "width": 132.28125,
+          "height": 44,
+          "top": 4248.5,
+          "right": 1029.28125,
+          "bottom": 4292.5,
+          "left": 897
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 4567.28125,
+          "width": 115.671875,
+          "height": 44,
+          "top": 4567.28125,
+          "right": 642.671875,
+          "bottom": 4611.28125,
+          "left": 527
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 4623.28125,
+          "width": 184.265625,
+          "height": 44,
+          "top": 4623.28125,
+          "right": 711.265625,
+          "bottom": 4667.28125,
+          "left": 527
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 4679.28125,
+          "width": 132.28125,
+          "height": 44,
+          "top": 4679.28125,
+          "right": 659.28125,
+          "bottom": 4723.28125,
+          "left": 527
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 897,
+          "y": 4567.28125,
+          "width": 115.671875,
+          "height": 44,
+          "top": 4567.28125,
+          "right": 1012.671875,
+          "bottom": 4611.28125,
+          "left": 897
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 897,
+          "y": 4623.28125,
+          "width": 184.265625,
+          "height": 44,
+          "top": 4623.28125,
+          "right": 1081.265625,
+          "bottom": 4667.28125,
+          "left": 897
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 897,
+          "y": 4679.28125,
+          "width": 132.28125,
+          "height": 44,
+          "top": 4679.28125,
+          "right": 1029.28125,
+          "bottom": 4723.28125,
+          "left": 897
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 4998.0625,
+          "width": 115.671875,
+          "height": 44,
+          "top": 4998.0625,
+          "right": 642.671875,
+          "bottom": 5042.0625,
+          "left": 527
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 5054.0625,
+          "width": 184.265625,
+          "height": 44,
+          "top": 5054.0625,
+          "right": 711.265625,
+          "bottom": 5098.0625,
+          "left": 527
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 5110.0625,
+          "width": 132.28125,
+          "height": 44,
+          "top": 5110.0625,
+          "right": 659.28125,
+          "bottom": 5154.0625,
+          "left": 527
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 897,
+          "y": 4998.0625,
+          "width": 115.671875,
+          "height": 44,
+          "top": 4998.0625,
+          "right": 1012.671875,
+          "bottom": 5042.0625,
+          "left": 897
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 897,
+          "y": 5054.0625,
+          "width": 184.265625,
+          "height": 44,
+          "top": 5054.0625,
+          "right": 1081.265625,
+          "bottom": 5098.0625,
+          "left": 897
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 897,
+          "y": 5110.0625,
+          "width": 132.28125,
+          "height": 44,
+          "top": 5110.0625,
+          "right": 1029.28125,
+          "bottom": 5154.0625,
+          "left": 897
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 5428.84375,
+          "width": 115.671875,
+          "height": 44,
+          "top": 5428.84375,
+          "right": 642.671875,
+          "bottom": 5472.84375,
+          "left": 527
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 5484.84375,
+          "width": 184.265625,
+          "height": 44,
+          "top": 5484.84375,
+          "right": 711.265625,
+          "bottom": 5528.84375,
+          "left": 527
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 5540.84375,
+          "width": 132.28125,
+          "height": 44,
+          "top": 5540.84375,
+          "right": 659.28125,
+          "bottom": 5584.84375,
+          "left": 527
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 897,
+          "y": 5428.84375,
+          "width": 115.671875,
+          "height": 44,
+          "top": 5428.84375,
+          "right": 1012.671875,
+          "bottom": 5472.84375,
+          "left": 897
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 897,
+          "y": 5484.84375,
+          "width": 184.265625,
+          "height": 44,
+          "top": 5484.84375,
+          "right": 1081.265625,
+          "bottom": 5528.84375,
+          "left": 897
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 897,
+          "y": 5540.84375,
+          "width": 132.28125,
+          "height": 44,
+          "top": 5540.84375,
+          "right": 1029.28125,
+          "bottom": 5584.84375,
+          "left": 897
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 5859.625,
+          "width": 115.671875,
+          "height": 44,
+          "top": 5859.625,
+          "right": 642.671875,
+          "bottom": 5903.625,
+          "left": 527
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 5915.625,
+          "width": 184.265625,
+          "height": 44,
+          "top": 5915.625,
+          "right": 711.265625,
+          "bottom": 5959.625,
+          "left": 527
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 527,
+          "y": 5971.625,
+          "width": 132.28125,
+          "height": 44,
+          "top": 5971.625,
+          "right": 659.28125,
+          "bottom": 6015.625,
+          "left": 527
+        }
+      },
+      {
+        "label": "Cases anteriores",
+        "disabled": true,
+        "rect": {
+          "x": 705.640625,
+          "y": 6060.625,
+          "width": 138.78125,
+          "height": 44,
+          "top": 6060.625,
+          "right": 844.421875,
+          "bottom": 6104.625,
+          "left": 705.640625
+        }
+      },
+      {
+        "label": "M\u00e1s Cases",
+        "disabled": false,
+        "rect": {
+          "x": 919.125,
+          "y": 6060.625,
+          "width": 101.21875,
+          "height": 44,
+          "top": 6060.625,
+          "right": 1020.34375,
+          "bottom": 6104.625,
+          "left": 919.125
+        }
+      },
+      {
+        "label": "\u2190",
+        "disabled": false,
+        "rect": {
+          "x": 313,
+          "y": 6177.625,
+          "width": 44,
+          "height": 44,
+          "top": 6177.625,
+          "right": 357,
+          "bottom": 6221.625,
+          "left": 313
+        }
+      }
+    ],
+    "contrast": {
+      "minimum": 6.161887829123643,
+      "count": 242,
+      "failures": []
+    }
+  },
+  {
+    "width": 768,
+    "scroll": 768,
+    "client": 768,
+    "controls": [
+      {
+        "label": "Crear Decision Case",
+        "disabled": false,
+        "rect": {
+          "x": 114,
+          "y": 264.171875,
+          "width": 505.625,
+          "height": 44,
+          "top": 264.171875,
+          "right": 619.625,
+          "bottom": 308.171875,
+          "left": 114
+        }
+      },
+      {
+        "label": "01 \u00b7 Logistics Models",
+        "disabled": false,
+        "rect": {
+          "x": 114,
+          "y": 357.171875,
+          "width": 197.328125,
+          "height": 44,
+          "top": 357.171875,
+          "right": 311.328125,
+          "bottom": 401.171875,
+          "left": 114
+        }
+      },
+      {
+        "label": "02 \u00b7 Decision Case",
+        "disabled": false,
+        "rect": {
+          "x": 321.328125,
+          "y": 357.171875,
+          "width": 197.328125,
+          "height": 44,
+          "top": 357.171875,
+          "right": 518.65625,
+          "bottom": 401.171875,
+          "left": 321.328125
+        }
+      },
+      {
+        "label": "03 \u00b7 Data Preparation",
+        "disabled": true,
+        "rect": {
+          "x": 528.65625,
+          "y": 357.171875,
+          "width": 197.328125,
+          "height": 44,
+          "top": 357.171875,
+          "right": 725.984375,
+          "bottom": 401.171875,
+          "left": 528.65625
+        }
+      },
+      {
+        "label": "j102_case_search",
+        "disabled": false,
+        "rect": {
+          "x": 114,
+          "y": 446.671875,
+          "width": 612,
+          "height": 44,
+          "top": 446.671875,
+          "right": 726,
+          "bottom": 490.671875,
+          "left": 114
+        }
+      },
+      {
+        "label": "j102_case_filter",
+        "disabled": false,
+        "rect": {
+          "x": 114,
+          "y": 534.171875,
+          "width": 612,
+          "height": 44,
+          "top": 534.171875,
+          "right": 726,
+          "bottom": 578.171875,
+          "left": 114
+        }
+      },
+      {
+        "label": "Buscar Cases",
+        "disabled": false,
+        "rect": {
+          "x": 114,
+          "y": 594.171875,
+          "width": 612,
+          "height": 44,
+          "top": 594.171875,
+          "right": 726,
+          "bottom": 638.171875,
+          "left": 114
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 871.953125,
+          "width": 115.671875,
+          "height": 44,
+          "top": 871.953125,
+          "right": 254.671875,
+          "bottom": 915.953125,
+          "left": 139
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 927.953125,
+          "width": 184.265625,
+          "height": 44,
+          "top": 927.953125,
+          "right": 323.265625,
+          "bottom": 971.953125,
+          "left": 139
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 983.953125,
+          "width": 132.28125,
+          "height": 44,
+          "top": 983.953125,
+          "right": 271.28125,
+          "bottom": 1027.953125,
+          "left": 139
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 1284.734375,
+          "width": 115.671875,
+          "height": 44,
+          "top": 1284.734375,
+          "right": 254.671875,
+          "bottom": 1328.734375,
+          "left": 139
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 1340.734375,
+          "width": 184.265625,
+          "height": 44,
+          "top": 1340.734375,
+          "right": 323.265625,
+          "bottom": 1384.734375,
+          "left": 139
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 1396.734375,
+          "width": 132.28125,
+          "height": 44,
+          "top": 1396.734375,
+          "right": 271.28125,
+          "bottom": 1440.734375,
+          "left": 139
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 1697.515625,
+          "width": 115.671875,
+          "height": 44,
+          "top": 1697.515625,
+          "right": 254.671875,
+          "bottom": 1741.515625,
+          "left": 139
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 1753.515625,
+          "width": 184.265625,
+          "height": 44,
+          "top": 1753.515625,
+          "right": 323.265625,
+          "bottom": 1797.515625,
+          "left": 139
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 1809.515625,
+          "width": 132.28125,
+          "height": 44,
+          "top": 1809.515625,
+          "right": 271.28125,
+          "bottom": 1853.515625,
+          "left": 139
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 2110.296875,
+          "width": 115.671875,
+          "height": 44,
+          "top": 2110.296875,
+          "right": 254.671875,
+          "bottom": 2154.296875,
+          "left": 139
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 2166.296875,
+          "width": 184.265625,
+          "height": 44,
+          "top": 2166.296875,
+          "right": 323.265625,
+          "bottom": 2210.296875,
+          "left": 139
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 2222.296875,
+          "width": 132.28125,
+          "height": 44,
+          "top": 2222.296875,
+          "right": 271.28125,
+          "bottom": 2266.296875,
+          "left": 139
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 2523.078125,
+          "width": 115.671875,
+          "height": 44,
+          "top": 2523.078125,
+          "right": 254.671875,
+          "bottom": 2567.078125,
+          "left": 139
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 2579.078125,
+          "width": 184.265625,
+          "height": 44,
+          "top": 2579.078125,
+          "right": 323.265625,
+          "bottom": 2623.078125,
+          "left": 139
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 2635.078125,
+          "width": 132.28125,
+          "height": 44,
+          "top": 2635.078125,
+          "right": 271.28125,
+          "bottom": 2679.078125,
+          "left": 139
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 2935.859375,
+          "width": 115.671875,
+          "height": 44,
+          "top": 2935.859375,
+          "right": 254.671875,
+          "bottom": 2979.859375,
+          "left": 139
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 2991.859375,
+          "width": 184.265625,
+          "height": 44,
+          "top": 2991.859375,
+          "right": 323.265625,
+          "bottom": 3035.859375,
+          "left": 139
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 3047.859375,
+          "width": 132.28125,
+          "height": 44,
+          "top": 3047.859375,
+          "right": 271.28125,
+          "bottom": 3091.859375,
+          "left": 139
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 3348.640625,
+          "width": 115.671875,
+          "height": 44,
+          "top": 3348.640625,
+          "right": 254.671875,
+          "bottom": 3392.640625,
+          "left": 139
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 3404.640625,
+          "width": 184.265625,
+          "height": 44,
+          "top": 3404.640625,
+          "right": 323.265625,
+          "bottom": 3448.640625,
+          "left": 139
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 3460.640625,
+          "width": 132.28125,
+          "height": 44,
+          "top": 3460.640625,
+          "right": 271.28125,
+          "bottom": 3504.640625,
+          "left": 139
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 3761.421875,
+          "width": 115.671875,
+          "height": 44,
+          "top": 3761.421875,
+          "right": 254.671875,
+          "bottom": 3805.421875,
+          "left": 139
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 3817.421875,
+          "width": 184.265625,
+          "height": 44,
+          "top": 3817.421875,
+          "right": 323.265625,
+          "bottom": 3861.421875,
+          "left": 139
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 3873.421875,
+          "width": 132.28125,
+          "height": 44,
+          "top": 3873.421875,
+          "right": 271.28125,
+          "bottom": 3917.421875,
+          "left": 139
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 4174.203125,
+          "width": 115.671875,
+          "height": 44,
+          "top": 4174.203125,
+          "right": 254.671875,
+          "bottom": 4218.203125,
+          "left": 139
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 4230.203125,
+          "width": 184.265625,
+          "height": 44,
+          "top": 4230.203125,
+          "right": 323.265625,
+          "bottom": 4274.203125,
+          "left": 139
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 4286.203125,
+          "width": 132.28125,
+          "height": 44,
+          "top": 4286.203125,
+          "right": 271.28125,
+          "bottom": 4330.203125,
+          "left": 139
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 4586.984375,
+          "width": 115.671875,
+          "height": 44,
+          "top": 4586.984375,
+          "right": 254.671875,
+          "bottom": 4630.984375,
+          "left": 139
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 4642.984375,
+          "width": 184.265625,
+          "height": 44,
+          "top": 4642.984375,
+          "right": 323.265625,
+          "bottom": 4686.984375,
+          "left": 139
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 4698.984375,
+          "width": 132.28125,
+          "height": 44,
+          "top": 4698.984375,
+          "right": 271.28125,
+          "bottom": 4742.984375,
+          "left": 139
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 4999.765625,
+          "width": 115.671875,
+          "height": 44,
+          "top": 4999.765625,
+          "right": 254.671875,
+          "bottom": 5043.765625,
+          "left": 139
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 5055.765625,
+          "width": 184.265625,
+          "height": 44,
+          "top": 5055.765625,
+          "right": 323.265625,
+          "bottom": 5099.765625,
+          "left": 139
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 5111.765625,
+          "width": 132.28125,
+          "height": 44,
+          "top": 5111.765625,
+          "right": 271.28125,
+          "bottom": 5155.765625,
+          "left": 139
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 5412.546875,
+          "width": 115.671875,
+          "height": 44,
+          "top": 5412.546875,
+          "right": 254.671875,
+          "bottom": 5456.546875,
+          "left": 139
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 5468.546875,
+          "width": 184.265625,
+          "height": 44,
+          "top": 5468.546875,
+          "right": 323.265625,
+          "bottom": 5512.546875,
+          "left": 139
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 5524.546875,
+          "width": 132.28125,
+          "height": 44,
+          "top": 5524.546875,
+          "right": 271.28125,
+          "bottom": 5568.546875,
+          "left": 139
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 5825.328125,
+          "width": 115.671875,
+          "height": 44,
+          "top": 5825.328125,
+          "right": 254.671875,
+          "bottom": 5869.328125,
+          "left": 139
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 5881.328125,
+          "width": 184.265625,
+          "height": 44,
+          "top": 5881.328125,
+          "right": 323.265625,
+          "bottom": 5925.328125,
+          "left": 139
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 5937.328125,
+          "width": 132.28125,
+          "height": 44,
+          "top": 5937.328125,
+          "right": 271.28125,
+          "bottom": 5981.328125,
+          "left": 139
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 6238.109375,
+          "width": 115.671875,
+          "height": 44,
+          "top": 6238.109375,
+          "right": 254.671875,
+          "bottom": 6282.109375,
+          "left": 139
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 6294.109375,
+          "width": 184.265625,
+          "height": 44,
+          "top": 6294.109375,
+          "right": 323.265625,
+          "bottom": 6338.109375,
+          "left": 139
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 6350.109375,
+          "width": 132.28125,
+          "height": 44,
+          "top": 6350.109375,
+          "right": 271.28125,
+          "bottom": 6394.109375,
+          "left": 139
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 6650.890625,
+          "width": 115.671875,
+          "height": 44,
+          "top": 6650.890625,
+          "right": 254.671875,
+          "bottom": 6694.890625,
+          "left": 139
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 6706.890625,
+          "width": 184.265625,
+          "height": 44,
+          "top": 6706.890625,
+          "right": 323.265625,
+          "bottom": 6750.890625,
+          "left": 139
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 6762.890625,
+          "width": 132.28125,
+          "height": 44,
+          "top": 6762.890625,
+          "right": 271.28125,
+          "bottom": 6806.890625,
+          "left": 139
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 7063.671875,
+          "width": 115.671875,
+          "height": 44,
+          "top": 7063.671875,
+          "right": 254.671875,
+          "bottom": 7107.671875,
+          "left": 139
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 7119.671875,
+          "width": 184.265625,
+          "height": 44,
+          "top": 7119.671875,
+          "right": 323.265625,
+          "bottom": 7163.671875,
+          "left": 139
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 7175.671875,
+          "width": 132.28125,
+          "height": 44,
+          "top": 7175.671875,
+          "right": 271.28125,
+          "bottom": 7219.671875,
+          "left": 139
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 7476.453125,
+          "width": 115.671875,
+          "height": 44,
+          "top": 7476.453125,
+          "right": 254.671875,
+          "bottom": 7520.453125,
+          "left": 139
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 7532.453125,
+          "width": 184.265625,
+          "height": 44,
+          "top": 7532.453125,
+          "right": 323.265625,
+          "bottom": 7576.453125,
+          "left": 139
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 7588.453125,
+          "width": 132.28125,
+          "height": 44,
+          "top": 7588.453125,
+          "right": 271.28125,
+          "bottom": 7632.453125,
+          "left": 139
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 7889.234375,
+          "width": 115.671875,
+          "height": 44,
+          "top": 7889.234375,
+          "right": 254.671875,
+          "bottom": 7933.234375,
+          "left": 139
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 7945.234375,
+          "width": 184.265625,
+          "height": 44,
+          "top": 7945.234375,
+          "right": 323.265625,
+          "bottom": 7989.234375,
+          "left": 139
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 8001.234375,
+          "width": 132.28125,
+          "height": 44,
+          "top": 8001.234375,
+          "right": 271.28125,
+          "bottom": 8045.234375,
+          "left": 139
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 8302.015625,
+          "width": 115.671875,
+          "height": 44,
+          "top": 8302.015625,
+          "right": 254.671875,
+          "bottom": 8346.015625,
+          "left": 139
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 8358.015625,
+          "width": 184.265625,
+          "height": 44,
+          "top": 8358.015625,
+          "right": 323.265625,
+          "bottom": 8402.015625,
+          "left": 139
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 8414.015625,
+          "width": 132.28125,
+          "height": 44,
+          "top": 8414.015625,
+          "right": 271.28125,
+          "bottom": 8458.015625,
+          "left": 139
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 8714.796875,
+          "width": 115.671875,
+          "height": 44,
+          "top": 8714.796875,
+          "right": 254.671875,
+          "bottom": 8758.796875,
+          "left": 139
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 8770.796875,
+          "width": 184.265625,
+          "height": 44,
+          "top": 8770.796875,
+          "right": 323.265625,
+          "bottom": 8814.796875,
+          "left": 139
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 8826.796875,
+          "width": 132.28125,
+          "height": 44,
+          "top": 8826.796875,
+          "right": 271.28125,
+          "bottom": 8870.796875,
+          "left": 139
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 9127.578125,
+          "width": 115.671875,
+          "height": 44,
+          "top": 9127.578125,
+          "right": 254.671875,
+          "bottom": 9171.578125,
+          "left": 139
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 9183.578125,
+          "width": 184.265625,
+          "height": 44,
+          "top": 9183.578125,
+          "right": 323.265625,
+          "bottom": 9227.578125,
+          "left": 139
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 9239.578125,
+          "width": 132.28125,
+          "height": 44,
+          "top": 9239.578125,
+          "right": 271.28125,
+          "bottom": 9283.578125,
+          "left": 139
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 9540.359375,
+          "width": 115.671875,
+          "height": 44,
+          "top": 9540.359375,
+          "right": 254.671875,
+          "bottom": 9584.359375,
+          "left": 139
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 9596.359375,
+          "width": 184.265625,
+          "height": 44,
+          "top": 9596.359375,
+          "right": 323.265625,
+          "bottom": 9640.359375,
+          "left": 139
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 9652.359375,
+          "width": 132.28125,
+          "height": 44,
+          "top": 9652.359375,
+          "right": 271.28125,
+          "bottom": 9696.359375,
+          "left": 139
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 9953.140625,
+          "width": 115.671875,
+          "height": 44,
+          "top": 9953.140625,
+          "right": 254.671875,
+          "bottom": 9997.140625,
+          "left": 139
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 10009.140625,
+          "width": 184.265625,
+          "height": 44,
+          "top": 10009.140625,
+          "right": 323.265625,
+          "bottom": 10053.140625,
+          "left": 139
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 10065.140625,
+          "width": 132.28125,
+          "height": 44,
+          "top": 10065.140625,
+          "right": 271.28125,
+          "bottom": 10109.140625,
+          "left": 139
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 10365.921875,
+          "width": 115.671875,
+          "height": 44,
+          "top": 10365.921875,
+          "right": 254.671875,
+          "bottom": 10409.921875,
+          "left": 139
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 10421.921875,
+          "width": 184.265625,
+          "height": 44,
+          "top": 10421.921875,
+          "right": 323.265625,
+          "bottom": 10465.921875,
+          "left": 139
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 10477.921875,
+          "width": 132.28125,
+          "height": 44,
+          "top": 10477.921875,
+          "right": 271.28125,
+          "bottom": 10521.921875,
+          "left": 139
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 10778.703125,
+          "width": 115.671875,
+          "height": 44,
+          "top": 10778.703125,
+          "right": 254.671875,
+          "bottom": 10822.703125,
+          "left": 139
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 10834.703125,
+          "width": 184.265625,
+          "height": 44,
+          "top": 10834.703125,
+          "right": 323.265625,
+          "bottom": 10878.703125,
+          "left": 139
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 10890.703125,
+          "width": 132.28125,
+          "height": 44,
+          "top": 10890.703125,
+          "right": 271.28125,
+          "bottom": 10934.703125,
+          "left": 139
+        }
+      },
+      {
+        "label": "Cases anteriores",
+        "disabled": true,
+        "rect": {
+          "x": 262.640625,
+          "y": 10979.703125,
+          "width": 138.78125,
+          "height": 44,
+          "top": 10979.703125,
+          "right": 401.421875,
+          "bottom": 11023.703125,
+          "left": 262.640625
+        }
+      },
+      {
+        "label": "M\u00e1s Cases",
+        "disabled": false,
+        "rect": {
+          "x": 476.125,
+          "y": 10979.703125,
+          "width": 101.21875,
+          "height": 44,
+          "top": 10979.703125,
+          "right": 577.34375,
+          "bottom": 11023.703125,
+          "left": 476.125
+        }
+      },
+      {
+        "label": "\u2190",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 11096.703125,
+          "width": 44,
+          "height": 44,
+          "top": 11096.703125,
+          "right": 183,
+          "bottom": 11140.703125,
+          "left": 139
+        }
+      }
+    ],
+    "contrast": {
+      "minimum": 6.161887829123643,
+      "count": 242,
+      "failures": []
+    }
+  },
+  {
+    "width": 375,
+    "scroll": 375,
+    "client": 375,
+    "controls": [
+      {
+        "label": "Crear Decision Case",
+        "disabled": false,
+        "rect": {
+          "x": 92,
+          "y": 359.75,
+          "width": 251,
+          "height": 44,
+          "top": 359.75,
+          "right": 343,
+          "bottom": 403.75,
+          "left": 92
+        }
+      },
+      {
+        "label": "01 \u00b7 Logistics Models",
+        "disabled": false,
+        "rect": {
+          "x": 92,
+          "y": 452.75,
+          "width": 251,
+          "height": 44,
+          "top": 452.75,
+          "right": 343,
+          "bottom": 496.75,
+          "left": 92
+        }
+      },
+      {
+        "label": "02 \u00b7 Decision Case",
+        "disabled": false,
+        "rect": {
+          "x": 92,
+          "y": 506.75,
+          "width": 251,
+          "height": 44,
+          "top": 506.75,
+          "right": 343,
+          "bottom": 550.75,
+          "left": 92
+        }
+      },
+      {
+        "label": "03 \u00b7 Data Preparation",
+        "disabled": true,
+        "rect": {
+          "x": 92,
+          "y": 560.75,
+          "width": 251,
+          "height": 44,
+          "top": 560.75,
+          "right": 343,
+          "bottom": 604.75,
+          "left": 92
+        }
+      },
+      {
+        "label": "j102_case_search",
+        "disabled": false,
+        "rect": {
+          "x": 92,
+          "y": 650.25,
+          "width": 251,
+          "height": 44,
+          "top": 650.25,
+          "right": 343,
+          "bottom": 694.25,
+          "left": 92
+        }
+      },
+      {
+        "label": "j102_case_filter",
+        "disabled": false,
+        "rect": {
+          "x": 92,
+          "y": 737.75,
+          "width": 251,
+          "height": 44,
+          "top": 737.75,
+          "right": 343,
+          "bottom": 781.75,
+          "left": 92
+        }
+      },
+      {
+        "label": "Buscar Cases",
+        "disabled": false,
+        "rect": {
+          "x": 92,
+          "y": 797.75,
+          "width": 251,
+          "height": 44,
+          "top": 797.75,
+          "right": 343,
+          "bottom": 841.75,
+          "left": 92
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 1125.921875,
+          "width": 115.671875,
+          "height": 44,
+          "top": 1125.921875,
+          "right": 224.671875,
+          "bottom": 1169.921875,
+          "left": 109
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 1181.921875,
+          "width": 184.265625,
+          "height": 44,
+          "top": 1181.921875,
+          "right": 293.265625,
+          "bottom": 1225.921875,
+          "left": 109
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 1237.921875,
+          "width": 132.28125,
+          "height": 44,
+          "top": 1237.921875,
+          "right": 241.28125,
+          "bottom": 1281.921875,
+          "left": 109
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 1581.09375,
+          "width": 115.671875,
+          "height": 44,
+          "top": 1581.09375,
+          "right": 224.671875,
+          "bottom": 1625.09375,
+          "left": 109
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 1637.09375,
+          "width": 184.265625,
+          "height": 44,
+          "top": 1637.09375,
+          "right": 293.265625,
+          "bottom": 1681.09375,
+          "left": 109
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 1693.09375,
+          "width": 132.28125,
+          "height": 44,
+          "top": 1693.09375,
+          "right": 241.28125,
+          "bottom": 1737.09375,
+          "left": 109
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 2036.265625,
+          "width": 115.671875,
+          "height": 44,
+          "top": 2036.265625,
+          "right": 224.671875,
+          "bottom": 2080.265625,
+          "left": 109
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 2092.265625,
+          "width": 184.265625,
+          "height": 44,
+          "top": 2092.265625,
+          "right": 293.265625,
+          "bottom": 2136.265625,
+          "left": 109
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 2148.265625,
+          "width": 132.28125,
+          "height": 44,
+          "top": 2148.265625,
+          "right": 241.28125,
+          "bottom": 2192.265625,
+          "left": 109
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 2491.4375,
+          "width": 115.671875,
+          "height": 44,
+          "top": 2491.4375,
+          "right": 224.671875,
+          "bottom": 2535.4375,
+          "left": 109
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 2547.4375,
+          "width": 184.265625,
+          "height": 44,
+          "top": 2547.4375,
+          "right": 293.265625,
+          "bottom": 2591.4375,
+          "left": 109
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 2603.4375,
+          "width": 132.28125,
+          "height": 44,
+          "top": 2603.4375,
+          "right": 241.28125,
+          "bottom": 2647.4375,
+          "left": 109
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 2946.609375,
+          "width": 115.671875,
+          "height": 44,
+          "top": 2946.609375,
+          "right": 224.671875,
+          "bottom": 2990.609375,
+          "left": 109
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 3002.609375,
+          "width": 184.265625,
+          "height": 44,
+          "top": 3002.609375,
+          "right": 293.265625,
+          "bottom": 3046.609375,
+          "left": 109
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 3058.609375,
+          "width": 132.28125,
+          "height": 44,
+          "top": 3058.609375,
+          "right": 241.28125,
+          "bottom": 3102.609375,
+          "left": 109
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 3401.78125,
+          "width": 115.671875,
+          "height": 44,
+          "top": 3401.78125,
+          "right": 224.671875,
+          "bottom": 3445.78125,
+          "left": 109
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 3457.78125,
+          "width": 184.265625,
+          "height": 44,
+          "top": 3457.78125,
+          "right": 293.265625,
+          "bottom": 3501.78125,
+          "left": 109
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 3513.78125,
+          "width": 132.28125,
+          "height": 44,
+          "top": 3513.78125,
+          "right": 241.28125,
+          "bottom": 3557.78125,
+          "left": 109
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 3856.953125,
+          "width": 115.671875,
+          "height": 44,
+          "top": 3856.953125,
+          "right": 224.671875,
+          "bottom": 3900.953125,
+          "left": 109
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 3912.953125,
+          "width": 184.265625,
+          "height": 44,
+          "top": 3912.953125,
+          "right": 293.265625,
+          "bottom": 3956.953125,
+          "left": 109
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 3968.953125,
+          "width": 132.28125,
+          "height": 44,
+          "top": 3968.953125,
+          "right": 241.28125,
+          "bottom": 4012.953125,
+          "left": 109
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 4312.125,
+          "width": 115.671875,
+          "height": 44,
+          "top": 4312.125,
+          "right": 224.671875,
+          "bottom": 4356.125,
+          "left": 109
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 4368.125,
+          "width": 184.265625,
+          "height": 44,
+          "top": 4368.125,
+          "right": 293.265625,
+          "bottom": 4412.125,
+          "left": 109
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 4424.125,
+          "width": 132.28125,
+          "height": 44,
+          "top": 4424.125,
+          "right": 241.28125,
+          "bottom": 4468.125,
+          "left": 109
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 4767.296875,
+          "width": 115.671875,
+          "height": 44,
+          "top": 4767.296875,
+          "right": 224.671875,
+          "bottom": 4811.296875,
+          "left": 109
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 4823.296875,
+          "width": 184.265625,
+          "height": 44,
+          "top": 4823.296875,
+          "right": 293.265625,
+          "bottom": 4867.296875,
+          "left": 109
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 4879.296875,
+          "width": 132.28125,
+          "height": 44,
+          "top": 4879.296875,
+          "right": 241.28125,
+          "bottom": 4923.296875,
+          "left": 109
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 5222.46875,
+          "width": 115.671875,
+          "height": 44,
+          "top": 5222.46875,
+          "right": 224.671875,
+          "bottom": 5266.46875,
+          "left": 109
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 5278.46875,
+          "width": 184.265625,
+          "height": 44,
+          "top": 5278.46875,
+          "right": 293.265625,
+          "bottom": 5322.46875,
+          "left": 109
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 5334.46875,
+          "width": 132.28125,
+          "height": 44,
+          "top": 5334.46875,
+          "right": 241.28125,
+          "bottom": 5378.46875,
+          "left": 109
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 5677.640625,
+          "width": 115.671875,
+          "height": 44,
+          "top": 5677.640625,
+          "right": 224.671875,
+          "bottom": 5721.640625,
+          "left": 109
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 5733.640625,
+          "width": 184.265625,
+          "height": 44,
+          "top": 5733.640625,
+          "right": 293.265625,
+          "bottom": 5777.640625,
+          "left": 109
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 5789.640625,
+          "width": 132.28125,
+          "height": 44,
+          "top": 5789.640625,
+          "right": 241.28125,
+          "bottom": 5833.640625,
+          "left": 109
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 6132.8125,
+          "width": 115.671875,
+          "height": 44,
+          "top": 6132.8125,
+          "right": 224.671875,
+          "bottom": 6176.8125,
+          "left": 109
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 6188.8125,
+          "width": 184.265625,
+          "height": 44,
+          "top": 6188.8125,
+          "right": 293.265625,
+          "bottom": 6232.8125,
+          "left": 109
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 6244.8125,
+          "width": 132.28125,
+          "height": 44,
+          "top": 6244.8125,
+          "right": 241.28125,
+          "bottom": 6288.8125,
+          "left": 109
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 6587.984375,
+          "width": 115.671875,
+          "height": 44,
+          "top": 6587.984375,
+          "right": 224.671875,
+          "bottom": 6631.984375,
+          "left": 109
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 6643.984375,
+          "width": 184.265625,
+          "height": 44,
+          "top": 6643.984375,
+          "right": 293.265625,
+          "bottom": 6687.984375,
+          "left": 109
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 6699.984375,
+          "width": 132.28125,
+          "height": 44,
+          "top": 6699.984375,
+          "right": 241.28125,
+          "bottom": 6743.984375,
+          "left": 109
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 7043.15625,
+          "width": 115.671875,
+          "height": 44,
+          "top": 7043.15625,
+          "right": 224.671875,
+          "bottom": 7087.15625,
+          "left": 109
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 7099.15625,
+          "width": 184.265625,
+          "height": 44,
+          "top": 7099.15625,
+          "right": 293.265625,
+          "bottom": 7143.15625,
+          "left": 109
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 7155.15625,
+          "width": 132.28125,
+          "height": 44,
+          "top": 7155.15625,
+          "right": 241.28125,
+          "bottom": 7199.15625,
+          "left": 109
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 7498.328125,
+          "width": 115.671875,
+          "height": 44,
+          "top": 7498.328125,
+          "right": 224.671875,
+          "bottom": 7542.328125,
+          "left": 109
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 7554.328125,
+          "width": 184.265625,
+          "height": 44,
+          "top": 7554.328125,
+          "right": 293.265625,
+          "bottom": 7598.328125,
+          "left": 109
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 7610.328125,
+          "width": 132.28125,
+          "height": 44,
+          "top": 7610.328125,
+          "right": 241.28125,
+          "bottom": 7654.328125,
+          "left": 109
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 7953.5,
+          "width": 115.671875,
+          "height": 44,
+          "top": 7953.5,
+          "right": 224.671875,
+          "bottom": 7997.5,
+          "left": 109
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 8009.5,
+          "width": 184.265625,
+          "height": 44,
+          "top": 8009.5,
+          "right": 293.265625,
+          "bottom": 8053.5,
+          "left": 109
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 8065.5,
+          "width": 132.28125,
+          "height": 44,
+          "top": 8065.5,
+          "right": 241.28125,
+          "bottom": 8109.5,
+          "left": 109
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 8408.671875,
+          "width": 115.671875,
+          "height": 44,
+          "top": 8408.671875,
+          "right": 224.671875,
+          "bottom": 8452.671875,
+          "left": 109
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 8464.671875,
+          "width": 184.265625,
+          "height": 44,
+          "top": 8464.671875,
+          "right": 293.265625,
+          "bottom": 8508.671875,
+          "left": 109
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 8520.671875,
+          "width": 132.28125,
+          "height": 44,
+          "top": 8520.671875,
+          "right": 241.28125,
+          "bottom": 8564.671875,
+          "left": 109
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 8863.84375,
+          "width": 115.671875,
+          "height": 44,
+          "top": 8863.84375,
+          "right": 224.671875,
+          "bottom": 8907.84375,
+          "left": 109
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 8919.84375,
+          "width": 184.265625,
+          "height": 44,
+          "top": 8919.84375,
+          "right": 293.265625,
+          "bottom": 8963.84375,
+          "left": 109
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 8975.84375,
+          "width": 132.28125,
+          "height": 44,
+          "top": 8975.84375,
+          "right": 241.28125,
+          "bottom": 9019.84375,
+          "left": 109
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 9319.015625,
+          "width": 115.671875,
+          "height": 44,
+          "top": 9319.015625,
+          "right": 224.671875,
+          "bottom": 9363.015625,
+          "left": 109
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 9375.015625,
+          "width": 184.265625,
+          "height": 44,
+          "top": 9375.015625,
+          "right": 293.265625,
+          "bottom": 9419.015625,
+          "left": 109
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 9431.015625,
+          "width": 132.28125,
+          "height": 44,
+          "top": 9431.015625,
+          "right": 241.28125,
+          "bottom": 9475.015625,
+          "left": 109
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 9774.1875,
+          "width": 115.671875,
+          "height": 44,
+          "top": 9774.1875,
+          "right": 224.671875,
+          "bottom": 9818.1875,
+          "left": 109
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 9830.1875,
+          "width": 184.265625,
+          "height": 44,
+          "top": 9830.1875,
+          "right": 293.265625,
+          "bottom": 9874.1875,
+          "left": 109
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 9886.1875,
+          "width": 132.28125,
+          "height": 44,
+          "top": 9886.1875,
+          "right": 241.28125,
+          "bottom": 9930.1875,
+          "left": 109
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 10229.359375,
+          "width": 115.671875,
+          "height": 44,
+          "top": 10229.359375,
+          "right": 224.671875,
+          "bottom": 10273.359375,
+          "left": 109
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 10285.359375,
+          "width": 184.265625,
+          "height": 44,
+          "top": 10285.359375,
+          "right": 293.265625,
+          "bottom": 10329.359375,
+          "left": 109
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 10341.359375,
+          "width": 132.28125,
+          "height": 44,
+          "top": 10341.359375,
+          "right": 241.28125,
+          "bottom": 10385.359375,
+          "left": 109
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 10684.53125,
+          "width": 115.671875,
+          "height": 44,
+          "top": 10684.53125,
+          "right": 224.671875,
+          "bottom": 10728.53125,
+          "left": 109
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 10740.53125,
+          "width": 184.265625,
+          "height": 44,
+          "top": 10740.53125,
+          "right": 293.265625,
+          "bottom": 10784.53125,
+          "left": 109
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 10796.53125,
+          "width": 132.28125,
+          "height": 44,
+          "top": 10796.53125,
+          "right": 241.28125,
+          "bottom": 10840.53125,
+          "left": 109
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 11139.703125,
+          "width": 115.671875,
+          "height": 44,
+          "top": 11139.703125,
+          "right": 224.671875,
+          "bottom": 11183.703125,
+          "left": 109
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 11195.703125,
+          "width": 184.265625,
+          "height": 44,
+          "top": 11195.703125,
+          "right": 293.265625,
+          "bottom": 11239.703125,
+          "left": 109
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 11251.703125,
+          "width": 132.28125,
+          "height": 44,
+          "top": 11251.703125,
+          "right": 241.28125,
+          "bottom": 11295.703125,
+          "left": 109
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 11594.875,
+          "width": 115.671875,
+          "height": 44,
+          "top": 11594.875,
+          "right": 224.671875,
+          "bottom": 11638.875,
+          "left": 109
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 11650.875,
+          "width": 184.265625,
+          "height": 44,
+          "top": 11650.875,
+          "right": 293.265625,
+          "bottom": 11694.875,
+          "left": 109
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 11706.875,
+          "width": 132.28125,
+          "height": 44,
+          "top": 11706.875,
+          "right": 241.28125,
+          "bottom": 11750.875,
+          "left": 109
+        }
+      },
+      {
+        "label": "Revisar Case",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 12050.046875,
+          "width": 115.671875,
+          "height": 44,
+          "top": 12050.046875,
+          "right": 224.671875,
+          "bottom": 12094.046875,
+          "left": 109
+        }
+      },
+      {
+        "label": "Historial de definiciones",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 12106.046875,
+          "width": 184.265625,
+          "height": 44,
+          "top": 12106.046875,
+          "right": 293.265625,
+          "bottom": 12150.046875,
+          "left": 109
+        }
+      },
+      {
+        "label": "Ver ejecuciones",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 12162.046875,
+          "width": 132.28125,
+          "height": 44,
+          "top": 12162.046875,
+          "right": 241.28125,
+          "bottom": 12206.046875,
+          "left": 109
+        }
+      },
+      {
+        "label": "Cases anteriores",
+        "disabled": true,
+        "rect": {
+          "x": 116.75,
+          "y": 12243.046875,
+          "width": 138.78125,
+          "height": 44,
+          "top": 12243.046875,
+          "right": 255.53125,
+          "bottom": 12287.046875,
+          "left": 116.75
+        }
+      },
+      {
+        "label": "M\u00e1s Cases",
+        "disabled": false,
+        "rect": {
+          "x": 166.890625,
+          "y": 12299.046875,
+          "width": 101.21875,
+          "height": 44,
+          "top": 12299.046875,
+          "right": 268.109375,
+          "bottom": 12343.046875,
+          "left": 166.890625
+        }
+      },
+      {
+        "label": "\u2190",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 12408.046875,
+          "width": 44,
+          "height": 44,
+          "top": 12408.046875,
+          "right": 153,
+          "bottom": 12452.046875,
+          "left": 109
+        }
+      }
+    ],
+    "contrast": {
+      "minimum": 6.161887829123643,
+      "count": 242,
+      "failures": []
+    }
+  }
+]

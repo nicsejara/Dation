@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, Query
 from app.auth import require_upload_access
 from app.platform.entitlements import require_dda
 from app.models.ultimate_foundation import ModelCreate,ModelUpdate,ModelPublish,ModelContractPreview,UltimateCaseCreate,UltimateCaseUpdate
+from app.models.decision_case_v2 import UltimateCaseCreateV2, DecisionCaseDefinitionV2, CaseDefinitionUpdateV2
 from app.services import logistics_model_service as service
 
 router=APIRouter()
@@ -41,6 +42,11 @@ async def preview_template(entity:str,payload:ModelContractPreview,ctx=Depends(r
 async def model(model_id:UUID,ctx=Depends(require_upload_access)):
     return await service.get_model(logistics(ctx),model_id)
 
+@router.get('/logistics-models/{model_id}/versions/{version_id}/contracts')
+async def published_contracts(model_id:UUID,version_id:UUID,ctx=Depends(require_upload_access)):
+    provisional,contracts=await service.preview_contracts(logistics(ctx),ModelContractPreview(model_id=model_id,version_id=version_id))
+    return {'provisional':provisional,'contracts':{entity:contract.model_dump(mode='json') for entity,contract in contracts.items()}}
+
 @router.put('/logistics-models/{model_id}')
 async def update_model(model_id:UUID,payload:ModelUpdate,ctx=Depends(require_upload_access)):
     return await service.update_model(logistics(ctx),model_id,payload)
@@ -50,8 +56,38 @@ async def publish_model(model_id:UUID,payload:ModelPublish,ctx=Depends(require_u
     return await service.publish_model(logistics(ctx),model_id,payload)
 
 @router.post('/logistics-cases')
-async def create_case(payload:UltimateCaseCreate,ctx=Depends(require_upload_access)):
+async def create_case(payload:UltimateCaseCreateV2|UltimateCaseCreate,ctx=Depends(require_upload_access)):
     return await service.create_case(logistics(ctx),payload)
+
+@router.post('/decision-case-definitions/validate')
+async def validate_definition(payload:DecisionCaseDefinitionV2,ctx=Depends(require_upload_access)):
+    from app.services import decision_case_v2_service as definitions
+    return await definitions.validate(logistics(ctx),payload)
+
+@router.get('/logistics-cases/{case_id}/definitions')
+async def definitions(case_id:UUID,limit:int=Query(25,ge=1,le=50),offset:int=Query(0,ge=0,le=1000000),ctx=Depends(require_upload_access)):
+    from app.services import decision_case_v2_service as definitions
+    return await definitions.call(logistics(ctx),'history',case_id=str(case_id),limit=limit,offset=offset)
+
+@router.get('/logistics-cases/{case_id}/definitions/{revision_id}')
+async def definition(case_id:UUID,revision_id:UUID,ctx=Depends(require_upload_access)):
+    from app.services import decision_case_v2_service as definitions
+    return definitions.checked_revision(await definitions.call(logistics(ctx),'revision',case_id=str(case_id),revision_id=str(revision_id)))
+
+@router.get('/logistics-cases/{case_id}/definitions/from-run/{run_id}')
+async def definition_from_run(case_id:UUID,run_id:UUID,ctx=Depends(require_upload_access)):
+    from app.services import decision_case_v2_service as definitions
+    return await definitions.from_run(logistics(ctx),case_id,run_id)
+
+@router.put('/logistics-cases/{case_id}/definition')
+async def update_definition(case_id:UUID,payload:CaseDefinitionUpdateV2,ctx=Depends(require_upload_access)):
+    from app.services import decision_case_v2_service as definitions
+    return await definitions.update(logistics(ctx),case_id,payload)
+
+@router.get('/logistics-cases/{case_id}/acceptance')
+async def acceptance(case_id:UUID,run_id:UUID|None=None,ctx=Depends(require_upload_access)):
+    from app.services import decision_case_v2_service as definitions
+    return await definitions.acceptance(logistics(ctx),case_id,run_id)
 
 @router.get('/logistics-cases/{case_id}/context')
 async def context(case_id:UUID,ctx=Depends(require_upload_access)):

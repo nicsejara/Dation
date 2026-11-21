@@ -1,0 +1,442 @@
+[
+  {
+    "width": 1440,
+    "scroll": 1440,
+    "client": 1440,
+    "controls": [
+      {
+        "label": "01 \u00b7 Logistics Models",
+        "disabled": false,
+        "rect": {
+          "x": 288,
+          "y": 280.78125,
+          "width": 190,
+          "height": 44,
+          "top": 280.78125,
+          "right": 478,
+          "bottom": 324.78125,
+          "left": 288
+        }
+      },
+      {
+        "label": "02 \u00b7 Decision Case",
+        "disabled": false,
+        "rect": {
+          "x": 288,
+          "y": 334.78125,
+          "width": 190,
+          "height": 44,
+          "top": 334.78125,
+          "right": 478,
+          "bottom": 378.78125,
+          "left": 288
+        }
+      },
+      {
+        "label": "03 \u00b7 Data Preparation",
+        "disabled": false,
+        "rect": {
+          "x": 288,
+          "y": 388.78125,
+          "width": 190,
+          "height": 44,
+          "top": 388.78125,
+          "right": 478,
+          "bottom": 432.78125,
+          "left": 288
+        }
+      },
+      {
+        "label": "\u2190",
+        "disabled": false,
+        "rect": {
+          "x": 313,
+          "y": 859.765625,
+          "width": 44,
+          "height": 44,
+          "top": 859.765625,
+          "right": 357,
+          "bottom": 903.765625,
+          "left": 313
+        }
+      },
+      {
+        "label": "Editar configuraci\u00f3n",
+        "disabled": false,
+        "rect": {
+          "x": 1015.84375,
+          "y": 832.765625,
+          "width": 160.40625,
+          "height": 44,
+          "top": 832.765625,
+          "right": 1176.25,
+          "bottom": 876.765625,
+          "left": 1015.84375
+        }
+      },
+      {
+        "label": "Revisar Model Version",
+        "disabled": false,
+        "rect": {
+          "x": 1186.25,
+          "y": 832.765625,
+          "width": 172.734375,
+          "height": 44,
+          "top": 832.765625,
+          "right": 1358.984375,
+          "bottom": 876.765625,
+          "left": 1186.25
+        }
+      },
+      {
+        "label": "Continuar a preparaci\u00f3n de datos",
+        "disabled": false,
+        "rect": {
+          "x": 1117.65625,
+          "y": 886.765625,
+          "width": 241.328125,
+          "height": 44,
+          "top": 886.765625,
+          "right": 1358.984375,
+          "bottom": 930.765625,
+          "left": 1117.65625
+        }
+      }
+    ],
+    "contrast": {
+      "minimum": 6.161887829123643,
+      "count": 33,
+      "failures": []
+    }
+  },
+  {
+    "width": 1280,
+    "scroll": 1280,
+    "client": 1280,
+    "controls": [
+      {
+        "label": "01 \u00b7 Logistics Models",
+        "disabled": false,
+        "rect": {
+          "x": 288,
+          "y": 280.578125,
+          "width": 190,
+          "height": 44,
+          "top": 280.578125,
+          "right": 478,
+          "bottom": 324.578125,
+          "left": 288
+        }
+      },
+      {
+        "label": "02 \u00b7 Decision Case",
+        "disabled": false,
+        "rect": {
+          "x": 288,
+          "y": 334.578125,
+          "width": 190,
+          "height": 44,
+          "top": 334.578125,
+          "right": 478,
+          "bottom": 378.578125,
+          "left": 288
+        }
+      },
+      {
+        "label": "03 \u00b7 Data Preparation",
+        "disabled": false,
+        "rect": {
+          "x": 288,
+          "y": 388.578125,
+          "width": 190,
+          "height": 44,
+          "top": 388.578125,
+          "right": 478,
+          "bottom": 432.578125,
+          "left": 288
+        }
+      },
+      {
+        "label": "\u2190",
+        "disabled": false,
+        "rect": {
+          "x": 313,
+          "y": 859.5625,
+          "width": 44,
+          "height": 44,
+          "top": 859.5625,
+          "right": 357,
+          "bottom": 903.5625,
+          "left": 313
+        }
+      },
+      {
+        "label": "Editar configuraci\u00f3n",
+        "disabled": false,
+        "rect": {
+          "x": 855.84375,
+          "y": 832.5625,
+          "width": 160.40625,
+          "height": 44,
+          "top": 832.5625,
+          "right": 1016.25,
+          "bottom": 876.5625,
+          "left": 855.84375
+        }
+      },
+      {
+        "label": "Revisar Model Version",
+        "disabled": false,
+        "rect": {
+          "x": 1026.25,
+          "y": 832.5625,
+          "width": 172.734375,
+          "height": 44,
+          "top": 832.5625,
+          "right": 1198.984375,
+          "bottom": 876.5625,
+          "left": 1026.25
+        }
+      },
+      {
+        "label": "Continuar a preparaci\u00f3n de datos",
+        "disabled": false,
+        "rect": {
+          "x": 957.65625,
+          "y": 886.5625,
+          "width": 241.328125,
+          "height": 44,
+          "top": 886.5625,
+          "right": 1198.984375,
+          "bottom": 930.5625,
+          "left": 957.65625
+        }
+      }
+    ],
+    "contrast": {
+      "minimum": 6.161887829123643,
+      "count": 33,
+      "failures": []
+    }
+  },
+  {
+    "width": 768,
+    "scroll": 768,
+    "client": 768,
+    "controls": [
+      {
+        "label": "01 \u00b7 Logistics Models",
+        "disabled": false,
+        "rect": {
+          "x": 114,
+          "y": 270.78125,
+          "width": 197.328125,
+          "height": 44,
+          "top": 270.78125,
+          "right": 311.328125,
+          "bottom": 314.78125,
+          "left": 114
+        }
+      },
+      {
+        "label": "02 \u00b7 Decision Case",
+        "disabled": false,
+        "rect": {
+          "x": 321.328125,
+          "y": 270.78125,
+          "width": 197.328125,
+          "height": 44,
+          "top": 270.78125,
+          "right": 518.65625,
+          "bottom": 314.78125,
+          "left": 321.328125
+        }
+      },
+      {
+        "label": "03 \u00b7 Data Preparation",
+        "disabled": false,
+        "rect": {
+          "x": 528.65625,
+          "y": 270.78125,
+          "width": 197.328125,
+          "height": 44,
+          "top": 270.78125,
+          "right": 725.984375,
+          "bottom": 314.78125,
+          "left": 528.65625
+        }
+      },
+      {
+        "label": "\u2190",
+        "disabled": false,
+        "rect": {
+          "x": 139,
+          "y": 884.765625,
+          "width": 44,
+          "height": 44,
+          "top": 884.765625,
+          "right": 183,
+          "bottom": 928.765625,
+          "left": 139
+        }
+      },
+      {
+        "label": "Editar configuraci\u00f3n",
+        "disabled": false,
+        "rect": {
+          "x": 199,
+          "y": 978.765625,
+          "width": 160.40625,
+          "height": 44,
+          "top": 978.765625,
+          "right": 359.40625,
+          "bottom": 1022.765625,
+          "left": 199
+        }
+      },
+      {
+        "label": "Revisar Model Version",
+        "disabled": false,
+        "rect": {
+          "x": 369.40625,
+          "y": 978.765625,
+          "width": 172.734375,
+          "height": 44,
+          "top": 978.765625,
+          "right": 542.140625,
+          "bottom": 1022.765625,
+          "left": 369.40625
+        }
+      },
+      {
+        "label": "Continuar a preparaci\u00f3n de datos",
+        "disabled": false,
+        "rect": {
+          "x": 199,
+          "y": 1032.765625,
+          "width": 241.328125,
+          "height": 44,
+          "top": 1032.765625,
+          "right": 440.328125,
+          "bottom": 1076.765625,
+          "left": 199
+        }
+      }
+    ],
+    "contrast": {
+      "minimum": 6.161887829123643,
+      "count": 33,
+      "failures": []
+    }
+  },
+  {
+    "width": 375,
+    "scroll": 375,
+    "client": 375,
+    "controls": [
+      {
+        "label": "01 \u00b7 Logistics Models",
+        "disabled": false,
+        "rect": {
+          "x": 92,
+          "y": 343.96875,
+          "width": 251,
+          "height": 44,
+          "top": 343.96875,
+          "right": 343,
+          "bottom": 387.96875,
+          "left": 92
+        }
+      },
+      {
+        "label": "02 \u00b7 Decision Case",
+        "disabled": false,
+        "rect": {
+          "x": 92,
+          "y": 397.96875,
+          "width": 251,
+          "height": 44,
+          "top": 397.96875,
+          "right": 343,
+          "bottom": 441.96875,
+          "left": 92
+        }
+      },
+      {
+        "label": "03 \u00b7 Data Preparation",
+        "disabled": false,
+        "rect": {
+          "x": 92,
+          "y": 451.96875,
+          "width": 251,
+          "height": 44,
+          "top": 451.96875,
+          "right": 343,
+          "bottom": 495.96875,
+          "left": 92
+        }
+      },
+      {
+        "label": "\u2190",
+        "disabled": false,
+        "rect": {
+          "x": 109,
+          "y": 1514.9375,
+          "width": 44,
+          "height": 44,
+          "top": 1514.9375,
+          "right": 153,
+          "bottom": 1558.9375,
+          "left": 109
+        }
+      },
+      {
+        "label": "Editar configuraci\u00f3n",
+        "disabled": false,
+        "rect": {
+          "x": 165,
+          "y": 1636.9375,
+          "width": 160.40625,
+          "height": 44,
+          "top": 1636.9375,
+          "right": 325.40625,
+          "bottom": 1680.9375,
+          "left": 165
+        }
+      },
+      {
+        "label": "Revisar Model Version",
+        "disabled": false,
+        "rect": {
+          "x": 165,
+          "y": 1690.9375,
+          "width": 161,
+          "height": 53.09375,
+          "top": 1690.9375,
+          "right": 326,
+          "bottom": 1744.03125,
+          "left": 165
+        }
+      },
+      {
+        "label": "Continuar a preparaci\u00f3n de datos",
+        "disabled": false,
+        "rect": {
+          "x": 165,
+          "y": 1754.03125,
+          "width": 161,
+          "height": 70.640625,
+          "top": 1754.03125,
+          "right": 326,
+          "bottom": 1824.671875,
+          "left": 165
+        }
+      }
+    ],
+    "contrast": {
+      "minimum": 6.161887829123643,
+      "count": 33,
+      "failures": []
+    }
+  }
+]

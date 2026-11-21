@@ -38,6 +38,19 @@ def pinned_context(raw,node_policy=None):
         graph_version=row['graph_definition_version'],contract_hash=raw['model_version']['contract_hash'],planning_start=row['planning_start'],planning_end=row['planning_end'],
         case_policy=row['case_policy_jsonb'],node_policy=policy,currency_policy=model['currency_policy'],primary_dimension=model['primary_dimension'],active_dimensions=model['active_dimensions'],
         read_set=tuple(SemanticInput(slot=e['slot_key'],canonical_sha256=e['canonical_sha256'],contract_hash=e['contract_hash'],normalizer_version=e['normalizer_version']) for e in refs))
+    if raw.get('case_definition'):
+        from app.domain.logistics.case_policy_v2 import CaseExecutionBindingV2
+        revision=raw['case_definition'];definition=revision['snapshot']
+        context=context.model_copy(update={'decision_definition':CaseExecutionBindingV2(definition_revision_id=revision['id'],definition_hash=revision['definition_hash'],
+            business_rules=definition['business_rules'],acceptance_policy=definition['acceptance_policy'])})
+        upstream=raw.get('source_input',{}).get('context',{}).get('decision_definition')
+        if raw.get('source_run') and upstream:
+            # Metadata revisions after D1 cannot relabel the definition consumed
+            # by that approved run. Mathematical fields are already frozen.
+            source=CaseExecutionBindingV2.model_validate(upstream)
+            if (source.business_rules,source.acceptance_policy)!=(context.decision_definition.business_rules,context.decision_definition.acceptance_policy):
+                raise HTTPException(409,'La política de D1 aprobado difiere del Case fijado.')
+            context=context.model_copy(update={'decision_definition':source})
     return model,context,refs
 
 

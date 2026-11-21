@@ -1,0 +1,123 @@
+{
+  "version": 2,
+  "operating_role": "SHIPPER",
+  "transport_pattern": "DIRECT",
+  "allowed_sources": [
+    "OWN",
+    "EXTERNAL"
+  ],
+  "active_dimensions": [
+    "pallets",
+    "weight_kg",
+    "volume_m3",
+    "units"
+  ],
+  "primary_dimension": "weight_kg",
+  "split_permitted": true,
+  "homogeneous_loads_declared": true,
+  "currency_policy": {
+    "currency": "ARS",
+    "minor_units": 2,
+    "rounding": "ROUND_HALF_UP"
+  },
+  "own_cost_model": "OWN_OPERATING_CYCLE",
+  "external_cost_models": [
+    "PER_TRIP",
+    "PER_KM"
+  ],
+  "per_km_billing_bases": [
+    "ONE_WAY",
+    "ROUND_TRIP"
+  ],
+  "consolidation_permitted": true,
+  "resource_categories": [],
+  "cargo": {
+    "input_mode": "catalog",
+    "profile": "PALLETIZED",
+    "split_policy": "DISCRETE",
+    "compatibility_policy": "UNIFORM_DECLARED",
+    "products": [
+      {
+        "product_id": "JUICE",
+        "name": "Jugo",
+        "unit_label": "caja",
+        "units_per_package": 12,
+        "gross_mass": {
+          "value": "12",
+          "unit": "kg"
+        }
+      },
+      {
+        "product_id": "WATER",
+        "name": "Agua",
+        "unit_label": "caja",
+        "units_per_package": 12,
+        "gross_mass": {
+          "value": "15",
+          "unit": "kg"
+        }
+      }
+    ],
+    "logistic_units": [
+      {
+        "logistic_unit_id": "PALLET-STD",
+        "label": "Pallet compartido",
+        "type": "PALLET",
+        "tare_mass": {
+          "value": "25",
+          "unit": "kg"
+        },
+        "empty_dimensions": {
+          "length": "120",
+          "width": "100",
+          "height": "15",
+          "unit": "cm"
+        }
+      }
+    ],
+    "presentations": [
+      {
+        "presentation_id": "PAL-JUICE",
+        "label": "Jugo palletizado",
+        "logistic_unit_id": "PALLET-STD",
+        "components": [
+          {
+            "product_id": "JUICE",
+            "quantity": "80"
+          }
+        ],
+        "loaded_dimensions": {
+          "length": "120",
+          "width": "100",
+          "height": "180",
+          "unit": "cm"
+        },
+        "gross_mass": {
+          "value": "985",
+          "unit": "kg"
+        }
+      },
+      {
+        "presentation_id": "PAL-WATER",
+        "label": "Agua palletizado",
+        "logistic_unit_id": "PALLET-STD",
+        "components": [
+          {
+            "product_id": "WATER",
+            "quantity": "80"
+          }
+        ],
+        "loaded_dimensions": {
+          "length": "120",
+          "width": "100",
+          "height": "200",
+          "unit": "cm"
+        },
+        "gross_mass": {
+          "value": "1225",
+          "unit": "kg"
+        }
+      }
+    ]
+  }
+}
